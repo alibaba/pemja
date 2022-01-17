@@ -239,32 +239,105 @@ public class PythonInterpreterTest {
     }
 
     @Test
-    public void testMultiInterpreterDifferentEnvironment() {
+    public void testMultiThreadSameEnvironment() throws InterruptedException {
         File file1 = new File(tmpDirPath + File.separatorChar + "file1");
         File file2 = new File(tmpDirPath + File.separatorChar + "file2");
         file1.mkdirs();
         file2.mkdirs();
-        PythonInterpreterConfig config1 =
-                PythonInterpreterConfig.newBuilder()
-                        .addPythonPaths(file1.getAbsolutePath())
-                        .build();
+        AtomicReference<String> path1 = new AtomicReference<>();
+        AtomicReference<String> path2 = new AtomicReference<>();
 
-        PythonInterpreterConfig config2 =
-                PythonInterpreterConfig.newBuilder()
-                        .addPythonPaths(file2.getAbsolutePath())
-                        .build();
+        Thread threadA =
+                new Thread(
+                        () -> {
+                            PythonInterpreterConfig config1 =
+                                    PythonInterpreterConfig.newBuilder()
+                                            .setExcType(
+                                                    PythonInterpreterConfig.ExecType.MULTI_THREAD)
+                                            .addPythonPaths(
+                                                    file1.getAbsolutePath(),
+                                                    file2.getAbsolutePath())
+                                            .build();
+                            PythonInterpreter interpreter1 = new PythonInterpreter(config1);
+                            interpreter1.exec("import sys");
+                            interpreter1.exec("a = str(sys.path)");
+                            path1.set(interpreter1.get("a", String.class));
+                            interpreter1.close();
+                        });
 
-        PythonInterpreter interpreter1 = new PythonInterpreter(config1);
-        interpreter1.exec("import sys");
-        interpreter1.exec("a = str(sys.path)");
-        PythonInterpreter interpreter2 = new PythonInterpreter(config2);
-        interpreter2.exec("import sys");
-        interpreter2.exec("a = str(sys.path)");
+        Thread threadB =
+                new Thread(
+                        () -> {
+                            PythonInterpreterConfig config2 =
+                                    PythonInterpreterConfig.newBuilder()
+                                            .setExcType(
+                                                    PythonInterpreterConfig.ExecType.MULTI_THREAD)
+                                            .addPythonPaths(
+                                                    file1.getAbsolutePath(),
+                                                    file2.getAbsolutePath())
+                                            .build();
+                            PythonInterpreter interpreter2 = new PythonInterpreter(config2);
+                            interpreter2.exec("import sys");
+                            interpreter2.exec("a = str(sys.path)");
+                            path2.set(interpreter2.get("a", String.class));
+                            interpreter2.close();
+                        });
 
-        // different interpreter has different system path.
-        assertNotEquals(interpreter1.get("a"), interpreter2.get("a"));
-        interpreter1.close();
-        interpreter2.close();
+        threadA.start();
+        threadB.start();
+        threadA.join();
+        threadB.join();
+        assertEquals(path1.get(), path2.get());
+    }
+
+    @Test
+    public void testMultiInterpreterDifferentEnvironment() throws InterruptedException {
+        File file1 = new File(tmpDirPath + File.separatorChar + "file1");
+        File file2 = new File(tmpDirPath + File.separatorChar + "file2");
+        file1.mkdirs();
+        file2.mkdirs();
+        AtomicReference<String> path1 = new AtomicReference<>();
+        AtomicReference<String> path2 = new AtomicReference<>();
+
+        Thread threadA =
+                new Thread(
+                        () -> {
+                            PythonInterpreterConfig config1 =
+                                    PythonInterpreterConfig.newBuilder()
+                                            .setExcType(
+                                                    PythonInterpreterConfig.ExecType
+                                                            .SUB_INTERPRETERS)
+                                            .addPythonPaths(file1.getAbsolutePath())
+                                            .build();
+                            PythonInterpreter interpreter1 = new PythonInterpreter(config1);
+                            interpreter1.exec("import sys");
+                            interpreter1.exec("a = str(sys.path)");
+                            path1.set(interpreter1.get("a", String.class));
+                            interpreter1.close();
+                        });
+
+        Thread threadB =
+                new Thread(
+                        () -> {
+                            PythonInterpreterConfig config2 =
+                                    PythonInterpreterConfig.newBuilder()
+                                            .setExcType(
+                                                    PythonInterpreterConfig.ExecType
+                                                            .SUB_INTERPRETERS)
+                                            .addPythonPaths(file2.getAbsolutePath())
+                                            .build();
+                            PythonInterpreter interpreter2 = new PythonInterpreter(config2);
+                            interpreter2.exec("import sys");
+                            interpreter2.exec("a = str(sys.path)");
+                            path2.set(interpreter2.get("a", String.class));
+                            interpreter2.close();
+                        });
+
+        threadA.start();
+        threadB.start();
+        threadA.join();
+        threadB.join();
+        assertNotEquals(path1.get(), path2.get());
     }
 
     @Test

@@ -20,6 +20,7 @@ package pemja.core;
 import pemja.utils.CommonUtils;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
@@ -27,6 +28,8 @@ import java.util.concurrent.CountDownLatch;
 public final class PythonInterpreter implements Interpreter {
 
     private static final long serialVersionUID = 1L;
+
+    private static boolean isStarted = false;
 
     private final MainInterpreter mainInterpreter = MainInterpreter.instance;
 
@@ -144,13 +147,20 @@ public final class PythonInterpreter implements Interpreter {
         mainInterpreter.initialize(config.getPythonExec());
         this.tState = init(config.getExecType().ordinal());
 
-        configSearchPaths(config.getPaths());
+        synchronized (PythonInterpreter.class) {
+            exec("import sys");
+            if (!isStarted
+                    || config.getExecType()
+                            .equals(PythonInterpreterConfig.ExecType.SUB_INTERPRETERS)) {
+                configSearchPaths(config.getPaths());
+                isStarted = true;
+            }
+        }
     }
 
     /** Config Search Paths in the current {@link PythonInterpreter} instance */
     private void configSearchPaths(String[] paths) {
         if (paths != null) {
-            exec("import sys");
             for (String path : paths) {
                 exec(String.format("sys.path.append('%s')", path));
             }

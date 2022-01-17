@@ -20,6 +20,7 @@ package pemja.core;
 import java.io.File;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
@@ -77,7 +78,7 @@ public final class PythonInterpreterConfig {
     }
 
     public static class PythonInterpreterConfigBuilder {
-        private Set<String> paths = new HashSet<>();
+        private Set<String> paths = new LinkedHashSet<>();
 
         private String pythonExec = null;
 
