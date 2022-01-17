@@ -33,6 +33,37 @@ under the License.
         <junit5.version>5.7.2</junit5.version>
     </properties>
 
+    <name>PemJa</name>
+    <description>Alibaba RSocket Broker Maven parent module</description>
+    <url>https://github.com/alibaba/pemja</url>
+    <inceptionYear>2022</inceptionYear>
+
+    <licenses>
+        <license>
+            <name>Apache License</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>huangxingbo</id>
+            <name>huangxingbo</name>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git@github.com:alibaba/pemja.git</connection>
+        <developerConnection>scm:git:git@github.com:alibaba/pemja.git</developerConnection>
+        <url>https://github.com/alibaba/pemja</url>
+    </scm>
+
+    <issueManagement>
+        <system>Github</system>
+        <url>https://github.com/alibaba/pemja/issues</url>
+    </issueManagement>
+
     <dependencies>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
