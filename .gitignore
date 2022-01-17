@@ -1,0 +1,11 @@
+.classpath
+*.jar
+.idea/*
+*.pyc
+.DS_Store
+dist/
+build/
+*.so
+*.html
+*.egg-info
+target
