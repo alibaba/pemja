@@ -8,4 +8,5 @@ build/
 *.so
 *.html
 *.egg-info
+*.iml
 target
