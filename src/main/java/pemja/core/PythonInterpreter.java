@@ -148,19 +148,14 @@ public final class PythonInterpreter implements Interpreter {
         this.tState = init(config.getExecType().ordinal());
 
         synchronized (PythonInterpreter.class) {
-            exec("import sys");
-            if (!isStarted
-                    || config.getExecType()
-                            .equals(PythonInterpreterConfig.ExecType.SUB_INTERPRETERS)) {
-                configSearchPaths(config.getPaths());
-                isStarted = true;
-            }
+            configSearchPaths(config.getPaths());
         }
     }
 
     /** Config Search Paths in the current {@link PythonInterpreter} instance */
     private void configSearchPaths(String[] paths) {
         if (paths != null) {
+            exec("import sys");
             for (String path : paths) {
                 exec(String.format("sys.path.append('%s')", path));
             }

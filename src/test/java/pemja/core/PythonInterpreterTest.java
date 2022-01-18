@@ -287,7 +287,13 @@ public class PythonInterpreterTest {
         threadB.start();
         threadA.join();
         threadB.join();
-        assertEquals(path1.get(), path2.get());
+        String path1String = path1.get();
+        String path2String = path1.get();
+        if (path1String.length() > path2String.length()) {
+            assertEquals(path1String.substring(0, path2String.length()), path2String);
+        } else {
+            assertEquals(path1String, path2String.substring(0, path1String.length()));
+        }
     }
 
     @Test
