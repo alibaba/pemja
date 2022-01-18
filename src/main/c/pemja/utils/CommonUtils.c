@@ -29,7 +29,7 @@ JNI_OnLoad(JavaVM *vm, void *reserved)
  * Method:    loadLibrary0
  * Signature: (Ljava/lang/String;)V
  */
-JNIEXPORT void JNICALL Java_jcp_utils_CommonUtils_loadLibrary0
+JNIEXPORT void JNICALL Java_pemja_utils_CommonUtils_loadLibrary0
   (JNIEnv *env, jobject obj, jstring library)
 {
     void* dlresult = dlopen((*env)->GetStringUTFChars(env, library, 0), RTLD_NOW | RTLD_GLOBAL);
