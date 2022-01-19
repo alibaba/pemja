@@ -29,8 +29,6 @@ public final class PythonInterpreter implements Interpreter {
 
     private static final long serialVersionUID = 1L;
 
-    private static boolean isStarted = false;
-
     private final MainInterpreter mainInterpreter = MainInterpreter.instance;
 
     /**

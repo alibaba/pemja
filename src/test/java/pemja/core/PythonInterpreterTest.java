@@ -31,6 +31,7 @@ import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -114,21 +115,40 @@ public class PythonInterpreterTest {
             interpreter.set("q", q);
             interpreter.set("r", r);
 
-            assertArrayEquals(k, interpreter.get("k", boolean[].class));
-            assertArrayEquals(m, interpreter.get("m", short[].class));
-            assertArrayEquals(n, interpreter.get("n", int[].class));
-            assertArrayEquals(o, interpreter.get("o", long[].class));
-
-            float[] actualP = interpreter.get("p", float[].class);
-            assertEquals(p.length, actualP.length);
-            for (int i = 0; i < actualP.length; i++) {
-                assertEquals(Float.compare(p[i], actualP[i]), 0);
+            Object[] actualK = interpreter.get("k", Object[].class);
+            assertEquals(k.length, actualK.length);
+            for (int i = 0; i < k.length; i++) {
+                assertEquals(k[i], actualK[i]);
             }
 
-            double[] actualQ = interpreter.get("q", double[].class);
+            Object[] actualM = interpreter.get("m", Object[].class);
+            assertEquals(m.length, actualM.length);
+            for (int i = 0; i < m.length; i++) {
+                assertEquals(m[i], ((Long) actualM[i]).longValue());
+            }
+
+            Object[] actualN = interpreter.get("n", Object[].class);
+            assertEquals(n.length, actualN.length);
+            for (int i = 0; i < n.length; i++) {
+                assertEquals(n[i], ((Long) actualN[i]).longValue());
+            }
+
+            Object[] actualO = interpreter.get("o", Object[].class);
+            assertEquals(o.length, actualO.length);
+            for (int i = 0; i < o.length; i++) {
+                assertEquals(o[i], ((Long) actualO[i]).longValue());
+            }
+
+            Object[] actualP = interpreter.get("p", Object[].class);
+            assertEquals(p.length, actualP.length);
+            for (int i = 0; i < actualP.length; i++) {
+                assertEquals(Float.compare(p[i], ((Double) actualP[i]).floatValue()), 0);
+            }
+
+            Object[] actualQ = interpreter.get("q", Object[].class);
             assertEquals(q.length, actualQ.length);
             for (int i = 0; i < actualQ.length; i++) {
-                assertEquals(Double.compare(q[i], actualQ[i]), 0);
+                assertEquals(Double.compare(q[i], (Double) actualQ[i]), 0);
             }
 
             Object[] actualR = interpreter.get("r", Object[].class);

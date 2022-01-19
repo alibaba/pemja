@@ -19,37 +19,10 @@
 #include <pyexceptions.h>
 #include <datetime.h>
 
-#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
-#include <numpy/arrayobject.h>
-
 #include <java_class/JavaClass.h>
 
 #define DEFINE_CLASS_VAR(var, name) jclass var = NULL;
 CLASS_TABLE(DEFINE_CLASS_VAR)
-
-static int numpy_initialized = 0;
-
-static inline PyObject*
-_init_numpy(void)
-{
-    import_array();
-    return NULL;
-}
-
-static int
-init_numpy(void)
-{
-    if (!numpy_initialized) {
-        _init_numpy();
-        if (!PyErr_Occurred()) {
-            numpy_initialized = 1;
-        } else {
-            PyErr_Format(PyExc_RuntimeError, "Failed to import numpy Python module(s).");
-        }
-    }
-
-    return numpy_initialized;
-}
 
 void
 Jcp_CacheClasses(JNIEnv *env)
@@ -123,17 +96,17 @@ JcpPyObject_FromJObject(JNIEnv* env, jobject value)
     } else if ((*env)->IsSameObject(env, clazz, JBYTE_ARRAY_TYPE)) {
         result = JcpPyBytes_FromJByteArray(env, value);
     } else if ((*env)->IsSameObject(env, clazz, JBOOLEAN_ARRAY_TYPE)) {
-        result = JcpPyNumpyArray_FromJBooleanArray(env, value);
+        result = JcpPyList_FromJBooleanArray(env, value);
     } else if ((*env)->IsSameObject(env, clazz, JSHORT_ARRAY_TYPE)) {
-        result = JcpPyNumpyArray_FromJShortArray(env, value);
+        result = JcpPyList_FromJShortArray(env, value);
     } else if ((*env)->IsSameObject(env, clazz, JINT_ARRAY_TYPE)) {
-        result = JcpPyNumpyArray_FromJIntArray(env, value);
+        result = JcpPyList_FromJIntArray(env, value);
     } else if ((*env)->IsSameObject(env, clazz, JLONG_ARRAY_TYPE)) {
-        result = JcpPyNumpyArray_FromJLongArray(env, value);
+        result = JcpPyList_FromJLongArray(env, value);
     } else if ((*env)->IsSameObject(env, clazz, JFLOAT_ARRAY_TYPE)) {
-        result = JcpPyNumpyArray_FromJFloatArray(env, value);
+        result = JcpPyList_FromJFloatArray(env, value);
     } else if ((*env)->IsSameObject(env, clazz, JDOUBLE_ARRAY_TYPE)) {
-        result = JcpPyNumpyArray_FromJDoubleArray(env, value);
+        result = JcpPyList_FromJDoubleArray(env, value);
     } else if ((*env)->IsInstanceOf(env, value, JOBJECT_ARRAY_TYPE)) {
         result = JcpPyList_FromJObjectArray(env, value);
     } else if ((*env)->IsSameObject(env, clazz, JSQLDATE_TYPE)) {
@@ -410,6 +383,144 @@ JcpPyBytes_FromJByteArray(JNIEnv* env, jbyteArray value)
     return result;
 }
 
+/* Function to return a Python List from a Java boolean array */
+
+
+JcpAPI_FUNC(PyObject*) JcpPyList_FromJBooleanArray(JNIEnv* env, jbooleanArray value)
+{
+    int length;
+
+    jboolean* booleans;
+
+    PyObject* result;
+
+    length = (*env)->GetArrayLength(env, value);
+    booleans = (*env)->GetBooleanArrayElements(env, value, 0);
+
+    result = PyList_New(length);
+
+    for (int i = 0; i < length; i++) {
+        PyList_SetItem(result, i, JcpPyBool_FromLong(booleans[i]));
+    }
+
+    return result;
+}
+
+
+/* Function to return a Python List from a Java short array */
+
+JcpAPI_FUNC(PyObject*) JcpPyList_FromJShortArray(JNIEnv* env, jshortArray value)
+{
+    int length;
+
+    jshort* shorts;
+
+    PyObject* result;
+
+    length = (*env)->GetArrayLength(env, value);
+    shorts = (*env)->GetShortArrayElements(env, value, 0);
+
+    result = PyList_New(length);
+
+    for (int i = 0; i < length; i++) {
+        PyList_SetItem(result, i, JcpPyInt_FromInt(shorts[i]));
+    }
+
+    return result;
+}
+
+
+/* Function to return a Python List from a Java int array */
+
+JcpAPI_FUNC(PyObject*) JcpPyList_FromJIntArray(JNIEnv* env, jintArray value)
+{
+    int length;
+
+    jint* ints;
+
+    PyObject* result;
+
+    length = (*env)->GetArrayLength(env, value);
+    ints = (*env)->GetIntArrayElements(env, value, 0);
+
+    result = PyList_New(length);
+
+    for (int i = 0; i < length; i++) {
+        PyList_SetItem(result, i, JcpPyInt_FromInt(ints[i]));
+    }
+
+    return result;
+}
+
+
+/* Function to return a Python List from a Java long array */
+
+JcpAPI_FUNC(PyObject*) JcpPyList_FromJLongArray(JNIEnv* env, jlongArray value)
+{
+    int length;
+
+    jlong* longs;
+
+    PyObject* result;
+
+    length = (*env)->GetArrayLength(env, value);
+    longs = (*env)->GetLongArrayElements(env, value, 0);
+
+    result = PyList_New(length);
+
+    for (int i = 0; i < length; i++) {
+        PyList_SetItem(result, i, JcpPyInt_FromLong(longs[i]));
+    }
+
+    return result;
+}
+
+
+/* Function to return a Python List from a Java float array */
+
+JcpAPI_FUNC(PyObject*) JcpPyList_FromJFloatArray(JNIEnv* env, jfloatArray value)
+{
+    int length;
+
+    jfloat* floats;
+
+    PyObject* result;
+
+    length = (*env)->GetArrayLength(env, value);
+    floats = (*env)->GetFloatArrayElements(env, value, 0);
+
+    result = PyList_New(length);
+
+    for (int i = 0; i < length; i++) {
+        PyList_SetItem(result, i, JcpPyFloat_FromDouble(floats[i]));
+    }
+
+    return result;
+}
+
+
+/* Function to return a Python List from a Java double array */
+
+JcpAPI_FUNC(PyObject*) JcpPyList_FromJDoubleArray(JNIEnv* env, jdoubleArray value)
+{
+    int length;
+
+    jdouble* doubles;
+
+    PyObject* result;
+
+    length = (*env)->GetArrayLength(env, value);
+    doubles = (*env)->GetDoubleArrayElements(env, value, 0);
+
+    result = PyList_New(length);
+
+    for (int i = 0; i < length; i++) {
+        PyList_SetItem(result, i, JcpPyFloat_FromDouble(doubles[i]));
+    }
+
+    return result;
+}
+
 
 /* Function to return a Python List from a Java object array */
 
@@ -682,71 +793,6 @@ JcpPyDecimal_FromJBigDecimal(JNIEnv* env, jobject value)
     return result;
 }
 
-
-/* --------- Functions to return a numpy array from a Java primitive array ----------*/
-
-
-/* Function to return a Python numpy array from a Java boolean array */
-
-PyObject*
-JcpPyNumpyArray_FromJBooleanArray(JNIEnv* env, jbooleanArray value)
-{
-
-    Jcp_NUMPY_ARRAY_CONVERT(NPY_BOOL, (*env)->GetBooleanArrayRegion);
-}
-
-
-/* Function to return a Python numpy array from a Java short array */
-
-PyObject*
-JcpPyNumpyArray_FromJShortArray(JNIEnv* env, jshortArray value)
-{
-
-    Jcp_NUMPY_ARRAY_CONVERT(NPY_INT16, (*env)->GetShortArrayRegion);
-}
-
-
-/* Function to return a Python numpy array from a Java int array */
-
-PyObject*
-JcpPyNumpyArray_FromJIntArray(JNIEnv* env, jintArray value)
-{
-
-    Jcp_NUMPY_ARRAY_CONVERT(NPY_INT32, (*env)->GetIntArrayRegion);
-}
-
-
-/* Function to return a Python numpy array from a Java long array */
-
-PyObject*
-JcpPyNumpyArray_FromJLongArray(JNIEnv* env, jlongArray value)
-{
-
-    Jcp_NUMPY_ARRAY_CONVERT(NPY_INT64, (*env)->GetLongArrayRegion);
-}
-
-
-/* Function to return a Python numpy array from a Java float array */
-
-PyObject*
-JcpPyNumpyArray_FromJFloatArray(JNIEnv* env, jfloatArray value)
-{
-
-    Jcp_NUMPY_ARRAY_CONVERT(NPY_FLOAT32, (*env)->GetFloatArrayRegion);
-}
-
-
-/* Function to return a Python numpy array from a Java double array */
-
-PyObject*
-JcpPyNumpyArray_FromJDoubleArray(JNIEnv* env, jdoubleArray value)
-{
-
-    Jcp_NUMPY_ARRAY_CONVERT(NPY_FLOAT64, (*env)->GetDoubleArrayRegion);
-}
-
-// ------------------------------------------------------------------------------------
-
 // -------------------------------------------------------------------------------------------------
 
 
@@ -771,8 +817,6 @@ JcpPyObject_AsJObject(JNIEnv* env, PyObject* pyobject, jclass clazz)
         return JcpPyFloat_AsJObject(env, pyobject, clazz);
     } else if (PyBytes_CheckExact(pyobject)) {
         return JcpPyBytes_AsJObject(env, pyobject, clazz);
-    } else if (PyNumpyArray_Check(pyobject)) {
-        return JcpPyNumpyArray_AsJObject(env, pyobject, clazz);
     } else if (PyList_CheckExact(pyobject)) {
         return JcpPyList_AsJObject(env, pyobject, clazz);
     } else if (PyDict_CheckExact(pyobject)) {
@@ -1344,78 +1388,6 @@ JcpPyDecimal_AsJObject(JNIEnv* env, PyObject* pyobject)
     if (str) {
         result = JavaBigDecimal_New(env, JcpPyString_AsJString(env, str));
         Py_DECREF(str);
-    }
-
-    return result;
-}
-
-
-/* Function to check whether the Python object is numpy array object */
-
-int
-PyNumpyArray_Check(PyObject* pyobject)
-{
-    if (!init_numpy()) {
-        return 0;
-    }
-
-    return PyArray_CheckExact(pyobject);
-}
-
-
-/* Function to return a Java array from a Python numpy array object */
-
-jarray
-JcpPyNumpyArray_AsJObject(JNIEnv* env, PyObject* pyobject, jclass clazz)
-{
-
-    int paType;
-
-    PyArrayObject *pyArrayObject;
-    PyArrayObject *copy   = NULL;
-
-    jsize size;
-    jarray result;
-
-    if (!init_numpy()) {
-        return NULL;
-    }
-
-    pyArrayObject = (PyArrayObject *) pyobject;
-    size = (jsize) PyArray_Size(pyobject);
-    paType = PyArray_TYPE(pyArrayObject);
-
-    // Decides if the data area of the ndarray pyobject is not in machine byte-order
-    if (PyArray_ISBYTESWAPPED(pyArrayObject)) {
-        copy = (PyArrayObject *) PyArray_Byteswap(pyArrayObject, 0);
-    } else {
-        copy = PyArray_GETCONTIGUOUS(pyArrayObject);
-    }
-
-    if (paType == NPY_BOOL) {
-        result = (*env)->NewBooleanArray(env, size);
-        (*env)->SetBooleanArrayRegion(env, result, 0, size, (const jboolean *) PyArray_DATA(copy));
-    } else if (paType == NPY_BYTE || paType == NPY_UBYTE) {
-        result = (*env)->NewByteArray(env, size);
-        (*env)->SetByteArrayRegion(env, result, 0, size, (const jbyte *) PyArray_DATA(copy));
-    } else if (paType == NPY_INT16 || paType == NPY_UINT16) {
-        result = (*env)->NewShortArray(env, size);
-        (*env)->SetShortArrayRegion(env, result, 0, size, (const jshort *) PyArray_DATA(copy));
-    } else if (paType == NPY_INT32 || paType == NPY_UINT32) {
-        result = (*env)->NewIntArray(env, size);
-        (*env)->SetIntArrayRegion(env, result, 0, size, (const jint*) PyArray_DATA(copy));
-    } else if (paType == NPY_INT64 || paType == NPY_UINT64) {
-        result = (*env)->NewLongArray(env, size);
-        (*env)->SetLongArrayRegion(env, result, 0, size, (const jlong*) PyArray_DATA(copy));
-    } else if (paType == NPY_FLOAT32) {
-        result = (*env)->NewFloatArray(env, size);
-        (*env)->SetFloatArrayRegion(env, result, 0, size, (const jfloat*) PyArray_DATA(copy));
-    } else if (paType == NPY_FLOAT64) {
-        result = (*env)->NewDoubleArray(env, size);
-        (*env)->SetDoubleArrayRegion(env, result, 0, size, (const jdouble*) PyArray_DATA(copy));
-    } else {
-        (*env)->ThrowNew(env, JPYTHONEXCE_TYPE, "Unsupported paType");
-        return NULL;
     }
 
     return result;

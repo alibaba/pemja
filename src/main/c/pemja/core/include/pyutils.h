@@ -138,6 +138,24 @@ JcpAPI_FUNC(PyObject*) JcpPyFloat_FromJDouble(JNIEnv*, jobject);
 /* Function to return a Python bytes from a Java byte array */
 JcpAPI_FUNC(PyObject*) JcpPyBytes_FromJByteArray(JNIEnv*, jbyteArray);
 
+/* Function to return a Python List from a Java boolean array */
+JcpAPI_FUNC(PyObject*) JcpPyList_FromJBooleanArray(JNIEnv*, jbooleanArray);
+
+/* Function to return a Python List from a Java short array */
+JcpAPI_FUNC(PyObject*) JcpPyList_FromJShortArray(JNIEnv*, jshortArray);
+
+/* Function to return a Python List from a Java int array */
+JcpAPI_FUNC(PyObject*) JcpPyList_FromJIntArray(JNIEnv*, jintArray);
+
+/* Function to return a Python List from a Java long array */
+JcpAPI_FUNC(PyObject*) JcpPyList_FromJLongArray(JNIEnv*, jlongArray);
+
+/* Function to return a Python List from a Java float array */
+JcpAPI_FUNC(PyObject*) JcpPyList_FromJFloatArray(JNIEnv*, jfloatArray);
+
+/* Function to return a Python List from a Java double array */
+JcpAPI_FUNC(PyObject*) JcpPyList_FromJDoubleArray(JNIEnv*, jdoubleArray);
+
 /* Function to return a Python List from a Java object array */
 JcpAPI_FUNC(PyObject*) JcpPyList_FromJObjectArray(JNIEnv*, jobjectArray);
 
@@ -158,44 +176,6 @@ JcpAPI_FUNC(PyObject*) JcpPyDateTime_FromJSqlTimestamp(JNIEnv*, jobject);
 
 /* Function to return a Python Decimal from a Java BigDecimal object */
 JcpAPI_FUNC(PyObject*) JcpPyDecimal_FromJBigDecimal(JNIEnv*, jobject);
-
-/* Functions to return a numpy array from a Java primitive array */
-#define Jcp_NUMPY_ARRAY_CONVERT(NPY_TYPE, Region_copyFunc) { \
-            int length; \
-            npy_intp* dims; \
-            PyObject* result; \
-            if (value == NULL) { \
-                Py_RETURN_NONE; \
-            } \
-            if (!init_numpy()) { \
-                return NULL; \
-            } \
-            length = (*env)->GetArrayLength(env, value); \
-            dims = malloc(1 * sizeof(npy_intp)); \
-            dims[0] = length; \
-            result = PyArray_SimpleNew(1, dims, NPY_TYPE); \
-            Region_copyFunc(env, value, 0, length, PyArray_DATA((PyArrayObject *) result)); \
-            free(dims); \
-            return result; \
-        }
-
-/* Function to return a Python numpy array from a Java boolean array */
-JcpAPI_FUNC(PyObject*) JcpPyNumpyArray_FromJBooleanArray(JNIEnv*, jbooleanArray);
-
-/* Function to return a Python numpy array from a Java short array */
-JcpAPI_FUNC(PyObject*) JcpPyNumpyArray_FromJShortArray(JNIEnv*, jshortArray);
-
-/* Function to return a Python numpy array from a Java int array */
-JcpAPI_FUNC(PyObject*) JcpPyNumpyArray_FromJIntArray(JNIEnv*, jintArray);
-
-/* Function to return a Python numpy array from a Java long array */
-JcpAPI_FUNC(PyObject*) JcpPyNumpyArray_FromJLongArray(JNIEnv*, jlongArray);
-
-/* Function to return a Python numpy array from a Java float array */
-JcpAPI_FUNC(PyObject*) JcpPyNumpyArray_FromJFloatArray(JNIEnv*, jfloatArray);
-
-/* Function to return a Python numpy array from a Java double array */
-JcpAPI_FUNC(PyObject*) JcpPyNumpyArray_FromJDoubleArray(JNIEnv*, jdoubleArray);
 
 // ------------------------------------------------------------------------------------
 
@@ -256,11 +236,5 @@ JcpAPI_FUNC(int) JcpPyDecimal_Check(PyObject*);
 
 /* Function to return a Java BigDecimal object from a Python Decimal object */
 JcpAPI_FUNC(jobject) JcpPyDecimal_AsJObject(JNIEnv*, PyObject*);
-
-/* Function to check whether the Python object is numpy array object */
-PyAPI_FUNC(int) PyNumpyArray_Check(PyObject*);
-
-/* Function to return a Java array from a Python numpy array object */
-JcpAPI_FUNC(jarray) JcpPyNumpyArray_AsJObject(JNIEnv*, PyObject*, jclass);
 
 #endif // ifndef _Included_pyutils
