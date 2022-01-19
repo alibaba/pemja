@@ -31,7 +31,6 @@ import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -332,7 +331,7 @@ public class PythonInterpreterTest {
                                     PythonInterpreterConfig.newBuilder()
                                             .setExcType(
                                                     PythonInterpreterConfig.ExecType
-                                                            .SUB_INTERPRETERS)
+                                                            .SUB_INTERPRETER)
                                             .addPythonPaths(file1.getAbsolutePath())
                                             .build();
                             PythonInterpreter interpreter1 = new PythonInterpreter(config1);
@@ -349,7 +348,7 @@ public class PythonInterpreterTest {
                                     PythonInterpreterConfig.newBuilder()
                                             .setExcType(
                                                     PythonInterpreterConfig.ExecType
-                                                            .SUB_INTERPRETERS)
+                                                            .SUB_INTERPRETER)
                                             .addPythonPaths(file2.getAbsolutePath())
                                             .build();
                             PythonInterpreter interpreter2 = new PythonInterpreter(config2);
@@ -445,7 +444,7 @@ public class PythonInterpreterTest {
                                             PythonInterpreterConfig.newBuilder()
                                                     .setExcType(
                                                             PythonInterpreterConfig.ExecType
-                                                                    .SUB_INTERPRETERS)
+                                                                    .SUB_INTERPRETER)
                                                     .build())) {
                                 try {
                                     interpreter.exec("import json");
@@ -474,7 +473,7 @@ public class PythonInterpreterTest {
                                             PythonInterpreterConfig.newBuilder()
                                                     .setExcType(
                                                             PythonInterpreterConfig.ExecType
-                                                                    .SUB_INTERPRETERS)
+                                                                    .SUB_INTERPRETER)
                                                     .build())) {
                                 try {
                                     interpreter.exec("import json");

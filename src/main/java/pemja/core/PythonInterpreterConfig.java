@@ -147,16 +147,17 @@ public final class PythonInterpreterConfig {
         }
     }
 
-    /** The Execution type specifies how to execute the Python function. */
+    /** The Execution type specifies how to execute the Python function in concurrency. */
     public enum ExecType {
 
-        /** Python Interpreter supports execute the python function in multi thread. */
+        /** Python supports execute the python function in multi thread. */
         MULTI_THREAD,
 
         /**
-         * Python Sub Interpreters has better performance, but in some Python libraries including
-         * CPython extensions may raise exceptions.
+         * Python Sub Interpreter has better performance than multi thread because it can better
+         * overcome the performance impact of GIL, but some Python libraries including CPython
+         * extensions may not support sub interpreter.
          */
-        SUB_INTERPRETERS
+        SUB_INTERPRETER
     }
 }
