@@ -154,8 +154,8 @@ public final class PythonInterpreter implements Interpreter {
     private void configSearchPaths(String[] paths) {
         if (paths != null) {
             exec("import sys");
-            for (String path : paths) {
-                exec(String.format("sys.path.append('%s')", path));
+            for (int i = paths.length - 1; i >= 0; i--) {
+                exec(String.format("sys.path.insert(0, '%s')", paths[i]));
             }
         }
     }
