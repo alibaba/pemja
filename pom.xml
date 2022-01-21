@@ -34,7 +34,7 @@ under the License.
     </properties>
 
     <name>PemJa</name>
-    <description>Alibaba RSocket Broker Maven parent module</description>
+    <description>PemJa is an open source cross language call framework based on FFI</description>
     <url>https://github.com/alibaba/pemja</url>
     <inceptionYear>2022</inceptionYear>
 
