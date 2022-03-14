@@ -14,4 +14,4 @@
 # limitations under the License.
 setuptools>=18.0
 wheel
-numpy==1.19.5
+numpy==1.21.4
