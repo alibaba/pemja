@@ -100,6 +100,26 @@ interpreter.exec("a = invoke.A()");
 interpreter.invokeMethod("a", "add", 3);
 interpreter.invokeMethod("a", "minus", 2);
 interpreter.invokeMethod("a", "add_all", 1, 2, 3);
+
+
+// python callback java methods
+/*
+// invoke_callback.py
+from pemja import findClass
+
+StringBuilder = findClass('java.lang.StringBuilder')
+Integer = findClass('java.lang.Integer')
+
+def callback_java():
+    sb = StringBuilder()
+    sb.append('pemja')
+    sb.append('java')
+    sb.append('python')
+    sb.append(Integer.toHexString(Integer.MAX_VALUE))
+    return sb.toString()
+*/
+interpreter.exec("import call_back")
+print(interpreter.invoke("call_back.callback_java"))
 ```
 
 ## Documentation
