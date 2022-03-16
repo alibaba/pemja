@@ -43,7 +43,7 @@ import static org.junit.Assert.assertNotEquals;
 public class PythonInterpreterTest {
 
     private String tmpDirPath;
-    private String testDir;
+    private String[] testDir;
 
     @Before
     public void prepareTestEnvironment() {
@@ -63,14 +63,23 @@ public class PythonInterpreterTest {
         }
         this.tmpDirPath = tmpDirFile.getAbsolutePath();
         this.testDir =
-                String.join(
-                        File.separator,
-                        System.getProperty("user.dir"),
-                        "src",
-                        "main",
-                        "python",
-                        "pemja",
-                        "tests");
+                new String[] {
+                    String.join(
+                            File.separator,
+                            File.separator,
+                            System.getProperty("user.dir"),
+                            "src",
+                            "main",
+                            "python"),
+                    String.join(
+                            File.separator,
+                            System.getProperty("user.dir"),
+                            "src",
+                            "main",
+                            "python",
+                            "pemja",
+                            "tests")
+                };
     }
 
     @After
