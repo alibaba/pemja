@@ -15,11 +15,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
-#include <pyexceptions.h>
-#include <pyutils.h>
-#include <java_class/Exception.h>
-#include <java_class/Throwable.h>
-#include <java_class/StackTraceElement.h>
+#include "Pemja.h"
+
+#include "java_class/JavaClass.h"
 
 int
 JcpPyErr_Throw(JNIEnv* env)

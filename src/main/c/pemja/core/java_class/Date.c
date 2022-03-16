@@ -15,8 +15,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
-#include <java_class/Date.h>
-#include <pyutils.h>
+#include "Pemja.h"
+
+#include "java_class/Date.h"
 
 static jmethodID init_Date = 0;
 static jmethodID getYear = 0;

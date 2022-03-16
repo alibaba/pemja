@@ -15,8 +15,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
-#include <java_class/Double.h>
-#include <pyutils.h>
+#include "Pemja.h"
+
+#include "java_class/Double.h"
 
 static jmethodID init_D = 0;
 

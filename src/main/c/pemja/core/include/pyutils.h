@@ -14,12 +14,6 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-#include <jni.h>
-#include <Python.h>
-
-#include <jcpport.h>
-
 #ifndef _Included_pyutils
 #define _Included_pyutils
 
@@ -62,7 +56,22 @@
     F(JPYTHONEXCE_TYPE, "pemja/core/PythonException") \
     F(JTHROWABLE_TYPE, "java/lang/Throwable") \
     F(JSTACK_TRACE_ELEMENT_TYPE, "java/lang/StackTraceElement") \
+    F(JCONSTRUCTOR_TYPE, "java/lang/reflect/Constructor") \
+    F(JFIELD_TYPE, "java/lang/reflect/Field") \
+    F(JMETHOD_TYPE, "java/lang/reflect/Method") \
+    F(JMEMBER_TYPE, "java/lang/reflect/Member") \
+    F(JMODIFIER_TYPE, "java/lang/reflect/Modifier") \
+    F(JCLASS_TYPE, "java/lang/Class") \
     F(JOBJECT_TYPE, "java/lang/Object")
+
+// Define primitive class type.
+extern jclass JBOOLEAN_TYPE;
+extern jclass JBYTE_TYPE;
+extern jclass JSHORT_TYPE;
+extern jclass JINT_TYPE;
+extern jclass JLONG_TYPE;
+extern jclass JFLOAT_TYPE;
+extern jclass JDOUBLE_TYPE;
 
 // Define an extern variable for everything in the class table.
 #define DEFINE_CLASS_GLOBAL(var, name) extern jclass var;
@@ -80,6 +89,13 @@ CLASS_TABLE(DEFINE_CLASS_GLOBAL)
         (*env)->DeleteGlobalRef(env, var);\
         var = NULL; \
     }\
+
+#define CACHE_PRIMITIVE_CLASS(primitive, primitive_array) \
+    if (primitive == NULL) { \
+        clazz = JavaClass_getComponentType(env, primitive_array); \
+        primitive = (*env)->NewGlobalRef(env, clazz); \
+        (*env)->DeleteLocalRef(env, clazz); \
+    } \
 
 // ----------------- Upper and lower bounds of Number type. --------------------------
 #define JBYTE_MIN  -128
@@ -100,6 +116,19 @@ CLASS_TABLE(DEFINE_CLASS_GLOBAL)
 
 //  -------------------------------------------------------------------------------------
 
+//  ------------------------------- Java Type ID ----------------------------------------
+#define JBOOLEAN_ID 0
+#define JBYTE_ID    1
+#define JSHORT_ID   2
+#define JINT_ID     3
+#define JLONG_ID    4
+#define JFLOAT_ID   5
+#define JDOUBLE_ID  6
+#define JSTRING_ID  7
+#define JOBJECT_ID  8
+
+//  -------------------------------------------------------------------------------------
+
 /* Function to cache java classes in CLASS_TABLE */
 JcpAPI_FUNC(void) Jcp_CacheClasses(JNIEnv *env);
 
@@ -109,10 +138,16 @@ JcpAPI_FUNC(void) Jcp_UnRefCacheClasses(JNIEnv *env);
 /* Function to return a const char* from a Java String Object */
 JcpAPI_FUNC(const char*) JcpString_FromJString(JNIEnv*, jstring);
 
-/* Function to release the memory of const char* converted by Java String Object*/
+/* Function to release the memory of const char* converted by Java String Object */
 JcpAPI_FUNC(void) JcpString_Clear(JNIEnv*, jstring, const char*);
 
+/* Function to get the Object Id from the Java Class */
+JcpAPI_FUNC(int) JcpJObject_GetObjectId(JNIEnv*, jclass);
+
 // ----------------------- Java object to Python object ---------------------------------
+
+/* Function to check whether PyObject can match the jclass */
+JcpAPI_FUNC(int) JcpPyObject_Check(JNIEnv*, PyObject*, jclass);
 
 /* Function to return a Python Object from a Java Object */
 JcpAPI_FUNC(PyObject*) JcpPyObject_FromJObject(JNIEnv*, jobject);
@@ -183,6 +218,9 @@ JcpAPI_FUNC(PyObject*) JcpPyDecimal_FromJBigDecimal(JNIEnv*, jobject);
 
 /* Function to return a Java Object from a Python Object */
 JcpAPI_FUNC(jobject) JcpPyObject_AsJObject(JNIEnv*, PyObject*, jclass);
+
+/* Function to return a jvalue from a Python Object */
+JcpAPI_FUNC(jvalue) JcpPyObject_AsJValue(JNIEnv*, PyObject*, jclass);
 
 /* Functions to return a Java primitive value from a Python primitive object */
 JcpAPI_FUNC(jboolean) JcpPyBool_AsJBoolean(PyObject*);

@@ -15,8 +15,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
-#include <java_class/Long.h>
-#include <pyutils.h>
+#include "Pemja.h"
+
+#include "java_class/Long.h"
 
 static jmethodID init_J = 0;
 

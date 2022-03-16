@@ -15,8 +15,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
-#include <java_class/LocalTime.h>
-#include <pyutils.h>
+#include "Pemja.h"
+
+#include "java_class/LocalTime.h"
 
 static jmethodID ofNanoOfDay = 0;
 static jmethodID toNanoOfDay = 0;

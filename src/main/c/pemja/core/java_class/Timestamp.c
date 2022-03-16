@@ -15,8 +15,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
-#include <java_class/Timestamp.h>
-#include <pyutils.h>
+#include "Pemja.h"
+
+#include "java_class/Timestamp.h"
 
 static jmethodID init_Timestamp = 0;
 static jmethodID valueOf = 0;

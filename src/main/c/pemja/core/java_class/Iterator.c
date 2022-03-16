@@ -15,8 +15,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
-#include <java_class/Iterator.h>
-#include <pyutils.h>
+#include "Pemja.h"
+
+#include "java_class/Iterator.h"
 
 static jmethodID hasNext = 0;
 static jmethodID next = 0;

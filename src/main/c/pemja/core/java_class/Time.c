@@ -15,8 +15,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
-#include <java_class/Time.h>
-#include <pyutils.h>
+#include "Pemja.h"
+
+#include "java_class/Time.h"
 
 static jmethodID init_time = 0;
 static jmethodID getTime = 0;
