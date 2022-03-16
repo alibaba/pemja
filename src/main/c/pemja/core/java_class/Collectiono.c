@@ -15,8 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-#include <java_class/Collection.h>
-#include <pyutils.h>
+#include "Pemja.h"
 
 static jmethodID size = 0;
 

@@ -26,7 +26,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Files;
-import java.nio.file.StandardOpenOption;
 import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -44,6 +43,7 @@ import static org.junit.Assert.assertNotEquals;
 public class PythonInterpreterTest {
 
     private String tmpDirPath;
+    private String testDir;
 
     @Before
     public void prepareTestEnvironment() {
@@ -62,6 +62,15 @@ public class PythonInterpreterTest {
                     e);
         }
         this.tmpDirPath = tmpDirFile.getAbsolutePath();
+        this.testDir =
+                String.join(
+                        File.separator,
+                        System.getProperty("user.dir"),
+                        "src",
+                        "main",
+                        "python",
+                        "pemja",
+                        "tests");
     }
 
     @After
@@ -184,76 +193,27 @@ public class PythonInterpreterTest {
     }
 
     @Test
-    public void testInvoke() {
-        String pyPath = String.join(File.separator, tmpDirPath, "invoke.py");
+    public void testCallPython() {
         try {
-            File pyFile = new File(pyPath);
-            pyFile.createNewFile();
-            pyFile.setExecutable(true);
-            String pyProgram =
-                    "#!/usr/bin/python\n"
-                            + "# -*- coding: UTF-8 -*-\n"
-                            + "import os\n"
-                            + "import sys\n"
-                            + "\n"
-                            + "class A(object):\n"
-                            + "\tdef __init__(self):\n"
-                            + "\t\tself._a = 0\n"
-                            + "\n"
-                            + "\tdef get_value(self):\n"
-                            + "\t\treturn self._a\n"
-                            + "\n"
-                            + "\tdef add(self, n):\n"
-                            + "\t\tself._a += n\n"
-                            + "\t\treturn self._a\n"
-                            + "\n"
-                            + "\tdef add_all(self, *args):\n"
-                            + "\t\tfor item in args:\n"
-                            + "\t\t\tself._a += item\n"
-                            + "\t\treturn self._a\n"
-                            + "\n"
-                            + "\tdef minus(self, n):\n"
-                            + "\t\tself._a -= n\n"
-                            + "\t\treturn self._a\n"
-                            + "\n"
-                            + "def no_arg():\n"
-                            + "\treturn 'no arg'\n"
-                            + "\n"
-                            + "def one_arg(arg):\n"
-                            + "\treturn arg\n"
-                            + "\n"
-                            + "def parse(*args, **kwargs):\n"
-                            + "\tif args:\n"
-                            + "\t\tif kwargs:\n"
-                            + "\t\t\treturn args[0] + kwargs['a']\n"
-                            + "\t\telse:\n"
-                            + "\t\t\treturn args[0]\n"
-                            + "\telse:\n"
-                            + "\t\tif kwargs:\n"
-                            + "\t\t\treturn kwargs['a']\n"
-                            + "\t\telse:\n"
-                            + "\t\t\treturn 'empty'\n";
-            Files.write(pyFile.toPath(), pyProgram.getBytes(), StandardOpenOption.WRITE);
-
             PythonInterpreterConfig config =
-                    PythonInterpreterConfig.newBuilder().addPythonPaths(tmpDirPath).build();
+                    PythonInterpreterConfig.newBuilder().addPythonPaths(testDir).build();
             Object[] args = new Object[] {1};
             Map<String, Object> kwargs = new HashMap<>();
             kwargs.put("a", 2);
             try (PythonInterpreter interpreter = new PythonInterpreter(config)) {
-                interpreter.exec("import invoke");
-                assertEquals("no arg", interpreter.invoke("invoke.no_arg"));
-                assertEquals(1L, interpreter.invoke("invoke.one_arg", args));
-                assertEquals(1L, interpreter.invoke("invoke.parse", args));
-                assertEquals(2L, interpreter.invoke("invoke.parse", kwargs));
-                assertEquals(3L, interpreter.invoke("invoke.parse", args, kwargs));
-                interpreter.exec("a = invoke.A()");
+                interpreter.exec("import test_call");
+                assertEquals("no arg", interpreter.invoke("test_call.test_call_no_args"));
+                assertEquals(1L, interpreter.invoke("test_call.test_call_one_arg", args));
+                assertEquals(1L, interpreter.invoke("test_call.test_call_variable_args", args));
+                assertEquals(2L, interpreter.invoke("test_call.test_call_keywords_args", kwargs));
+                assertEquals(3L, interpreter.invoke("test_call.test_call_all_args", args, kwargs));
+                interpreter.exec("a = test_call.A()");
                 assertEquals(3L, interpreter.invokeMethod("a", "add", 3));
                 assertEquals(1L, interpreter.invokeMethod("a", "minus", 2));
                 assertEquals(7L, interpreter.invokeMethod("a", "add_all", 1, 2, 3));
             }
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to invoke.py", e);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to invoke test_call.py", e);
         }
     }
 
@@ -509,6 +469,22 @@ public class PythonInterpreterTest {
             interpreter.exec("b = a.upper()");
             String result = interpreter.get("b", String.class);
             assertEquals(result, input.toUpperCase());
+        }
+    }
+
+    @Test
+    public void testCallbackJava() {
+        try {
+            PythonInterpreterConfig config =
+                    PythonInterpreterConfig.newBuilder().addPythonPaths(testDir).build();
+            try (PythonInterpreter interpreter = new PythonInterpreter(config)) {
+                interpreter.exec("import test_call");
+                assertEquals(
+                        "pemjajavapython7fffffff",
+                        interpreter.invoke("test_call.test_callback_java"));
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to call test_call_java in test_call.py", e);
         }
     }
 

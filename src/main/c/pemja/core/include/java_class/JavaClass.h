@@ -14,6 +14,8 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
+#ifndef JAVA_CLASS_H
+#define JAVA_CLASS_H
 
 #include <java_class/Boolean.h>
 #include <java_class/Byte.h>
@@ -39,4 +41,12 @@
 #include <java_class/Time.h>
 #include <java_class/Timestamp.h>
 #include <java_class/BigDecimal.h>
+#include <java_class/Constructor.h>
+#include <java_class/Method.h>
+#include <java_class/Field.h>
+#include <java_class/Member.h>
+#include <java_class/Modifier.h>
+#include <java_class/Class.h>
 #include <java_class/Object.h>
+
+#endif

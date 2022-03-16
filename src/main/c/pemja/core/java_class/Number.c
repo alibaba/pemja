@@ -15,8 +15,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
-#include <java_class/Number.h>
-#include <pyutils.h>
+#include "Pemja.h"
+
+#include "java_class/Number.h"
 
 static jmethodID byteValue = 0;
 static jmethodID shortValue = 0;

@@ -15,8 +15,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
-#include <java_class/Map.h>
-#include <pyutils.h>
+#include "Pemja.h"
+
+#include "java_class/Map.h"
 
 static jmethodID init_HashMap = 0;
 static jmethodID entrySet = 0;

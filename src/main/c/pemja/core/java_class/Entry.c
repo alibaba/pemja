@@ -15,8 +15,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
-#include <java_class/Entry.h>
-#include <pyutils.h>
+#include "Pemja.h"
+
+#include "java_class/Entry.h"
 
 static jmethodID getKey = 0;
 static jmethodID getValue = 0;

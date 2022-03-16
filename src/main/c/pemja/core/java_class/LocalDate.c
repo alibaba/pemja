@@ -15,8 +15,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
-#include <java_class/LocalDate.h>
-#include <pyutils.h>
+#include "Pemja.h"
+
+#include "java_class/LocalDate.h"
 
 static jmethodID ofEpochDay = 0;
 static jmethodID toEpochDay = 0;

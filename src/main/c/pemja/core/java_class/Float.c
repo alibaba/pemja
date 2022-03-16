@@ -15,8 +15,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
-#include <java_class/Float.h>
-#include <pyutils.h>
+#include "Pemja.h"
+
+#include "java_class/Float.h"
 
 static jmethodID init_F = 0;
 

@@ -15,10 +15,10 @@
 // specific language governing permissions and limitations
 // under the License.
 
-#include <MainInterpreter.h>
-#include <PythonInterpreter.h>
-#include <pylib.h>
-#include <pyutils.h>
+#include "Pemja.h"
+
+#include "MainInterpreter.h"
+#include "PythonInterpreter.h"
 
 // ---------------------------------- jni functions ------------------------
 

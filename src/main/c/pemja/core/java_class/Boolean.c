@@ -14,9 +14,9 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
+#include "Pemja.h"
 
-#include <java_class/Boolean.h>
-#include <pyutils.h>
+#include "java_class/Boolean.h"
 
 static jmethodID init_Z = 0;
 static jmethodID booleanValue = 0;

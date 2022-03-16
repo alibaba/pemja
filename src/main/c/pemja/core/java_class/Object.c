@@ -15,8 +15,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
-#include <java_class/Object.h>
-#include <pyutils.h>
+#include "Pemja.h"
+
+#include "java_class/Object.h"
 
 static jmethodID equals = 0;
 static jmethodID toString = 0;

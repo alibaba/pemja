@@ -14,15 +14,6 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-#include <jni.h>
-#include <Python.h>
-
-#include <pyutils.h>
-#include <pyexceptions.h>
-#include <java_class/JavaClass.h>
-#include <jcpport.h>
-
 #ifndef _Included_pylib
 #define _Included_pylib
 
@@ -39,6 +30,9 @@ struct __JcpThread {
     /* The attached JNIEnv of the Thread */
     JNIEnv        *env;
 
+    /* The pemja module */
+    PyObject      *pemja_module;
+
     /* The cached callable function name */
     char          *cache_function_name;
 
@@ -50,6 +44,9 @@ struct __JcpThread {
 
     /* The cached callable object */
     PyObject      *cache_callable;
+
+    /* A cached Dict which mappes class name to methods and fields.*/
+    PyObject      *name_to_attrs;
 };
 
 typedef struct __JcpThread JcpThread;
@@ -62,6 +59,9 @@ typedef struct __JcpThread JcpThread;
 
 #define Jcp_END_ALLOW_THREADS    PyEval_ReleaseThread(jcp_thread->tstate); \
                  }
+
+
+JcpAPI_FUNC(JcpThread*) JcpThread_Get();
 
 
 /* Initialization and finalization */

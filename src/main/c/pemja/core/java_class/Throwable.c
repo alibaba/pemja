@@ -15,8 +15,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
-#include <java_class/Throwable.h>
-#include <pyutils.h>
+#include "Pemja.h"
+
+#include "java_class/Throwable.h"
 
 static jmethodID getStackTrace = 0;
 static jmethodID setStackTrace = 0;

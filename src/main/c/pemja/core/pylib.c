@@ -15,9 +15,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
-#include <pylib.h>
+#include "Pemja.h"
+
+#include "python_class/PythonClass.h"
 
 static PyThreadState *JcpMainThreadState = NULL;
+
+/*
+* Create redirection module.
+*/
 
 static PyObject*
 stdout_redirection(PyObject *self, PyObject *args)
@@ -69,9 +75,153 @@ static struct PyModuleDef redirection_module_def = {
 
 
 /*
+* Create pemja module.
+*/
+
+static PyObject*
+pemja_find_class(PyObject *self, PyObject *args)
+{
+    JcpThread *jcp_thread;
+    PyObject* result;
+
+    char *name, *p;
+
+    JNIEnv* env;
+    jclass clazz;
+
+    if (!PyArg_ParseTuple(args, "s", &name)) {
+        return NULL;
+    }
+
+    // get JcpThread
+    jcp_thread = JcpThread_Get();
+    if (!jcp_thread) {
+        if (!PyErr_Occurred()) {
+            PyErr_Format(PyExc_RuntimeError, "Invalid JcpThread pointer.");
+        }
+        return NULL;
+    }
+
+    // get JNIEnv*
+    env = jcp_thread->env;
+
+    // convert python class name to java class name. e.g. java.lang.Object -> java/lang/Object
+    for (p = name; *p != '\0'; p++) {
+        if (*p == '.') {
+            *p = '/';
+        }
+    }
+
+    clazz = (*env)->FindClass(env, name);
+    // failed to find the class
+    if ((*env)->ExceptionOccurred(env)) {
+        return NULL;
+    }
+
+    result = JcpPyJClass_New(env, clazz);
+
+    (*env)->DeleteLocalRef(env, clazz);
+    return result;
+}
+
+
+static PyMethodDef pemja_methods[] = {
+    {"findClass",                   (PyCFunction) pemja_find_class, METH_VARARGS, ""},
+    {NULL,                          NULL, 0, NULL} /*sentinel */
+};
+
+static struct PyModuleDef pemja_module_def = {
+    PyModuleDef_HEAD_INIT,
+    "_pemja",             /* m_name */
+    NULL,                /* m_doc */
+    -1,                  /* m_size */
+    pemja_methods,       /* m_methods */
+    NULL,                /* m_reload */
+    NULL,                /* m_traverse */
+    NULL,                /* m_clear */
+    NULL,                /* m_free */
+};
+
+
+/*
+* Initialize pemja module
+*/
+static PyObject*
+pemja_module_init(JNIEnv* env)
+{
+    PyObject    *sys_modules   = NULL;
+    PyObject    *pemja_module  = NULL;
+
+    // create _pemja module
+    pemja_module = PyModule_Create(&pemja_module_def);
+    if (pemja_module == NULL) {
+        (*env)->ThrowNew(env, JILLEGAL_STATE_EXEC_TYPE, "Failed to create `_pemja` module.");
+        return NULL;
+    }
+
+    sys_modules = PyImport_GetModuleDict();
+    if (PyDict_SetItemString(sys_modules, "_pemja", pemja_module) == -1) {
+        (*env)->ThrowNew(env, JILLEGAL_STATE_EXEC_TYPE,
+                        "Failed to add `_pemja` module to sys.modules");
+        return NULL;
+    }
+
+    // import _pemja module
+    pemja_module = PyImport_ImportModule("_pemja");
+    if (!pemja_module) {
+        (*env)->ThrowNew(env, JILLEGAL_STATE_EXEC_TYPE, "Failed to import `_pemja` module");
+        return NULL;
+    }
+
+    return pemja_module;
+}
+
+/**
+* Get the JcpThread.
+*/
+JcpThread*
+JcpThread_Get()
+{
+    PyObject  *tdict, *t, *key;
+    JcpThread *ret = NULL;
+
+    key = PyUnicode_FromString(DICT_KEY);
+    if ((tdict = PyThreadState_GetDict()) != NULL && key != NULL) {
+        t = PyDict_GetItem(tdict, key); /* borrowed */
+        if (t != NULL && !PyErr_Occurred()) {
+            ret = (JcpThread*) PyCapsule_GetPointer(t, NULL);
+        }
+    }
+    Py_XDECREF(key);
+    if (!ret && !PyErr_Occurred()) {
+        PyErr_Format(PyExc_RuntimeError, "No JcpThread instance available on current thread.");
+    }
+    return ret;
+}
+
+
+/*
  * Initialize Python main Interpreter and this method will be called at startup and be called only
  * once.
  */
+
+
+static int
+pyjtypes_init()
+{
+    if (PyType_Ready(&PyJObject_Type) < 0) {
+        return -1;
+    }
+
+    if (!PyJClass_Type.tp_base) {
+        PyJClass_Type.tp_base = &PyJObject_Type;
+    }
+    if (PyType_Ready(&PyJClass_Type) < 0) {
+        return -1;
+    }
+
+    return 0;
+}
 
 void
 JcpPy_Initialize(JNIEnv *env)
@@ -95,6 +245,11 @@ JcpPy_Initialize(JNIEnv *env)
     // Initialize Python thread support
     PyEval_InitThreads();
 #endif
+
+    if (pyjtypes_init() < 0) {
+        (*env)->ThrowNew(env, JILLEGAL_STATE_EXEC_TYPE, "Failed to initialize pyjtypes.");
+        return;
+    }
 
     // save a pointer to the main PyThreadState object
     JcpMainThreadState = PyThreadState_Get();
@@ -220,6 +375,8 @@ JcpPy_InitThread(JNIEnv *env, int type)
     jcp_thread->cache_object_name = NULL;
     jcp_thread->cache_method_name = NULL;
     jcp_thread->cache_callable = NULL;
+    jcp_thread->name_to_attrs = NULL;
+    jcp_thread->pemja_module = pemja_module_init(env);
 
     PyEval_ReleaseThread(jcp_thread->tstate);
 
@@ -255,6 +412,8 @@ JcpPy_FinalizeThread(intptr_t ptr)
     Py_DECREF(key);
 
     Py_CLEAR(jcp_thread->globals);
+    Py_CLEAR(jcp_thread->name_to_attrs);
+    Py_CLEAR(jcp_thread->pemja_module);
 
     if (jcp_thread->cache_function_name) {
         free(jcp_thread->cache_function_name);
