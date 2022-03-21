@@ -15,4 +15,7 @@
 #  See the License for the specific language governing permissions and
 # limitations under the License.
 ################################################################################
-from _pemja import *
+try:
+    from _pemja import *
+except ImportError:
+    pass
