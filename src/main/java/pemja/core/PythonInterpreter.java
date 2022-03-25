@@ -20,8 +20,9 @@ package pemja.core;
 import pemja.utils.CommonUtils;
 
 import java.io.Serializable;
-import java.util.Arrays;
+import java.lang.reflect.Field;
 import java.util.Map;
+import java.util.Vector;
 import java.util.concurrent.CountDownLatch;
 
 /** The Interpreter implementation for Python Interpreter. */
@@ -349,6 +350,7 @@ public final class PythonInterpreter implements Interpreter {
         private MainInterpreter() {}
 
         /** Initializes CPython. */
+        @SuppressWarnings("unchecked")
         synchronized void initialize(String pythonExec) {
             if (!isStarted) {
                 String pemjaLibPath =
@@ -357,12 +359,37 @@ public final class PythonInterpreter implements Interpreter {
                 String pythonLibPath = CommonUtils.INSTANCE.getPythonLibrary(pythonExec);
                 String pemjaModulePath = CommonUtils.INSTANCE.getPemJaModulePath(pythonExec);
 
-                System.load(pythonLibPath);
-                if (CommonUtils.INSTANCE.isLinuxOs()) {
-                    // We need to load libpython in unix globally.
-                    CommonUtils.INSTANCE.loadLibrary(pythonExec, pythonLibPath);
+                try {
+                    System.load(pythonLibPath);
+                    if (CommonUtils.INSTANCE.isLinuxOs()) {
+                        // We need to load libpython in unix globally.
+                        CommonUtils.INSTANCE.loadLibrary(pythonExec, pythonLibPath);
+                    }
+                } catch (UnsatisfiedLinkError error) {
+                    // ignore
                 }
-                System.load(pemjaLibPath);
+
+                try {
+                    System.load(pemjaLibPath);
+                } catch (UnsatisfiedLinkError error) {
+                    try {
+                        Field field = ClassLoader.class.getDeclaredField("loadedLibraryNames");
+                        field.setAccessible(true);
+                        Vector<String> libs = (Vector<String>) field.get(null);
+                        synchronized (libs) {
+                            int size = libs.size();
+                            for (int i = 0; i < size; i++) {
+                                String element = libs.elementAt(i);
+                                if (element.contains("pemja_core")) {
+                                    libs.removeElementAt(i);
+                                }
+                            }
+                        }
+                        System.load(pemjaLibPath);
+                    } catch (Throwable throwable) {
+                        // ignore
+                    }
+                }
 
                 // We load on a separate thread to try and avoid GIL issues that come about from a
                 // being on the same thread as the main interpreter.
