@@ -23,7 +23,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Field;
 import java.util.Objects;
+import java.util.Vector;
 import java.util.regex.Pattern;
 
 /** A common util Class. */
@@ -46,11 +48,32 @@ public class CommonUtils {
     /**
      * Because JVM can't load library globally, so we support this method to load library globally.
      */
+    @SuppressWarnings("unchecked")
     public void loadLibrary(String pythonExec, String library) {
         if (!initialized) {
             String utilsLibPath =
                     getLibraryPathWithPattern(pythonExec, "^pemja_utils\\.cpython-.*\\.so$");
-            System.load(utilsLibPath);
+            try {
+                System.load(utilsLibPath);
+            } catch (UnsatisfiedLinkError error) {
+                try {
+                    Field field = ClassLoader.class.getDeclaredField("loadedLibraryNames");
+                    field.setAccessible(true);
+                    Vector<String> libs = (Vector<String>) field.get(null);
+                    synchronized (libs) {
+                        int size = libs.size();
+                        for (int i = 0; i < size; i++) {
+                            String element = libs.elementAt(i);
+                            if (element.contains("pemja_utils")) {
+                                libs.removeElementAt(i);
+                            }
+                        }
+                    }
+                    System.load(utilsLibPath);
+                } catch (Throwable throwable) {
+                    // ignore
+                }
+            }
             initialized = true;
         }
         loadLibrary0(library);
