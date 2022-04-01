@@ -912,6 +912,8 @@ JcpPyObject_AsJObject(JNIEnv* env, PyObject* pyobject, jclass clazz)
         return JcpPyDict_AsJObject(env, pyobject);
     } else if (JcpPyDecimal_Check(pyobject)) {
         return JcpPyDecimal_AsJObject(env, pyobject);
+    } else if (PyGen_CheckExact(pyobject)) {
+        return JcpPyGenerator_AsJObject(env, pyobject);
     } else {
         // the macro PyDateTime_IMPORT must be invoked.
         if (!PyDateTimeAPI) {
@@ -1527,3 +1529,19 @@ JcpPyDecimal_AsJObject(JNIEnv* env, PyObject* pyobject)
 
     return result;
 }
+
+
+/* Function to return a Java Generator Object from a Python Generator object */
+
+jobject JcpPyGenerator_AsJObject(JNIEnv* env, PyObject* pyobject)
+{
+    PyObject* iter;
+
+    jobject jiter;
+
+    iter = PyObject_GetIter(pyobject);
+
+    jiter = JavaPyIterator_New(env, (intptr_t) JcpThread_Get(), (intptr_t) pyobject);
+    return jiter;
+}
+

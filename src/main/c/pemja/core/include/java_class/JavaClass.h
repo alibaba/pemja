@@ -48,5 +48,7 @@
 #include <java_class/Modifier.h>
 #include <java_class/Class.h>
 #include <java_class/Object.h>
+#include <java_class/PyIterator.h>
+#include <java_class/PyObject.h>
 
 #endif
