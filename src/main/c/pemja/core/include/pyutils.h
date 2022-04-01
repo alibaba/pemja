@@ -53,7 +53,9 @@
     F(JHASHMAP_TYPE, "java/util/HashMap") \
     F(JMAP_ENTRY_TYPE, "java/util/Map$Entry") \
     F(JILLEGAL_STATE_EXEC_TYPE, "java/lang/IllegalStateException") \
+    F(JNOSUCHELEMENT_EXEC_TYPE, "java/util/NoSuchElementException") \
     F(JPYTHONEXCE_TYPE, "pemja/core/PythonException") \
+    F(JPY_ITERPRETER_TYPE, "pemja/core/object/PyIterator") \
     F(JTHROWABLE_TYPE, "java/lang/Throwable") \
     F(JSTACK_TRACE_ELEMENT_TYPE, "java/lang/StackTraceElement") \
     F(JCONSTRUCTOR_TYPE, "java/lang/reflect/Constructor") \
@@ -274,5 +276,8 @@ JcpAPI_FUNC(int) JcpPyDecimal_Check(PyObject*);
 
 /* Function to return a Java BigDecimal object from a Python Decimal object */
 JcpAPI_FUNC(jobject) JcpPyDecimal_AsJObject(JNIEnv*, PyObject*);
+
+/* Function to return a Java Generator Object from a Python Generator object */
+JcpAPI_FUNC(jobject) JcpPyGenerator_AsJObject(JNIEnv*, PyObject*);
 
 #endif // ifndef _Included_pyutils

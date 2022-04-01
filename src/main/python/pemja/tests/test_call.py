@@ -69,3 +69,10 @@ def test_callback_java():
     sb.append('python')
     sb.append(Integer.toHexString(Integer.MAX_VALUE))
     return sb.toString()
+
+
+def test_return_generator(num: int):
+    for i in range(num):
+        yield i
+    yield "haha"
+    yield None

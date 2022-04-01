@@ -20,6 +20,7 @@ package pemja.core;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import pemja.core.object.PyIterator;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -494,6 +495,28 @@ public class PythonInterpreterTest {
             }
         } catch (Exception e) {
             throw new RuntimeException("Failed to call test_call_java in test_call.py", e);
+        }
+    }
+
+    @Test
+    public void testReturnGenerator() {
+        try {
+            PythonInterpreterConfig config =
+                    PythonInterpreterConfig.newBuilder().addPythonPaths(testDir).build();
+            try (PythonInterpreter interpreter = new PythonInterpreter(config)) {
+                interpreter.exec("import test_call");
+                PyIterator iterators =
+                        (PyIterator) interpreter.invoke("test_call.test_return_generator", 3);
+                Object[] expected = new Object[] {0L, 1L, 2L, "haha", null};
+                int index = 0;
+                while (iterators.hasNext()) {
+                    assertEquals(expected[index], iterators.next());
+                    index++;
+                }
+                iterators.close();
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to call test_return_generator in test_call.py", e);
         }
     }
 
