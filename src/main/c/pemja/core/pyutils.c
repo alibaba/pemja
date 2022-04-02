@@ -363,7 +363,6 @@ JcpPyBytes_FromJByteArray(JNIEnv* env, jbyteArray value)
 {
 
     int length;
-    char* chars;
 
     jbyte* bytes;
 
@@ -375,9 +374,7 @@ JcpPyBytes_FromJByteArray(JNIEnv* env, jbyteArray value)
 
     length = (*env)->GetArrayLength(env, value);
     bytes = (*env)->GetByteArrayElements(env, value, 0);
-    chars = (char*) bytes;
-    chars[length] = '\0';
-    result = PyBytes_FromStringAndSize(chars, length);
+    result = PyBytes_FromStringAndSize((char*) bytes, length);
     (*env)->ReleaseByteArrayElements(env, value, bytes, JNI_ABORT);
 
     return result;
