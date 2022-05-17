@@ -156,7 +156,7 @@ pyjobject_dealloc(PyJObject* self)
 {
     JNIEnv *env;
 
-    env = JcpThread_Get()->env;
+    env = JcpThreadEnv_Get();
 
     if (self->clazz) {
         (*env)->DeleteGlobalRef(env, self->clazz);

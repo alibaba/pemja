@@ -46,7 +46,7 @@ pyjfield_init(JNIEnv* env, PyJFieldObject* self)
 static void
 pyjfield_dealloc(PyJFieldObject* self)
 {
-    JNIEnv *env  = JcpThread_Get()->env;
+    JNIEnv *env  = JcpThreadEnv_Get();
 
     if (self->fd) {
         (*env)->DeleteGlobalRef(env, self->fd);

@@ -499,6 +499,60 @@ public class PythonInterpreterTest {
     }
 
     @Test
+    public void testCallbackJavaInMultiThread() throws InterruptedException {
+        AtomicReference<Throwable> exceptionReference = new AtomicReference<>();
+        Thread threadA =
+                new Thread(
+                        () -> {
+                            try (PythonInterpreter interpreter =
+                                    new PythonInterpreter(
+                                            PythonInterpreterConfig.newBuilder()
+                                                    .addPythonPaths(testDir)
+                                                    .build())) {
+                                try {
+                                    interpreter.exec("import test_call");
+                                    assertEquals(
+                                            "pemjajavapython7fffffff",
+                                            interpreter.invoke("test_call.test_callback_java"));
+                                } catch (Throwable throwable) {
+                                    if (exceptionReference.get() == null) {
+                                        exceptionReference.set(throwable);
+                                    }
+                                }
+                            }
+                        });
+
+        Thread threadB =
+                new Thread(
+                        () -> {
+                            try (PythonInterpreter interpreter =
+                                    new PythonInterpreter(
+                                            PythonInterpreterConfig.newBuilder()
+                                                    .addPythonPaths(testDir)
+                                                    .build())) {
+                                try {
+                                    interpreter.exec("import test_call");
+                                    assertEquals(
+                                            "pemjajavapython7fffffff",
+                                            interpreter.invoke("test_call.test_callback_java"));
+                                } catch (Throwable throwable) {
+                                    if (exceptionReference.get() == null) {
+                                        exceptionReference.set(throwable);
+                                    }
+                                }
+                            }
+                        });
+        threadA.start();
+        threadB.start();
+        threadA.join();
+        threadB.join();
+        if (exceptionReference.get() != null) {
+            throw new RuntimeException(
+                    "Error occurs in Python Interpreter threads", exceptionReference.get());
+        }
+    }
+
+    @Test
     public void testReturnGenerator() {
         try {
             PythonInterpreterConfig config =

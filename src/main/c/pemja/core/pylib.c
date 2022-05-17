@@ -200,6 +200,21 @@ JcpThread_Get()
 }
 
 
+JNIEnv*
+JcpThreadEnv_Get(void)
+{
+    JavaVM *jvm;
+    JNIEnv *env;
+    jsize nVMs;
+
+
+    JNI_GetCreatedJavaVMs(&jvm, 1, &nVMs);
+
+    (*jvm)->AttachCurrentThreadAsDaemon(jvm, (void**) &env, NULL);
+
+    return env;
+}
+
 /*
  * Initialize Python main Interpreter and this method will be called at startup and be called only
  * once.

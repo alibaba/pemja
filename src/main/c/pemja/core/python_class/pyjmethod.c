@@ -201,6 +201,18 @@ pyjmethod_call(PyJMethodObject *self, PyObject *args, PyObject *kwargs)
             pyobject = JcpPyString_FromJString(env, (jstring) object);
             break;
         }
+        case JVOID_ID: {
+
+            if (self->md_is_static) {
+                (*env)->CallStaticVoidMethodA(env, instance->clazz, self->md_id, jargs);
+            } else {
+                (*env)->CallVoidMethodA(env, instance->object, self->md_id, jargs);
+            }
+
+            pyobject = Py_None;
+            Py_INCREF(pyobject);
+            break;
+        }
         case JOBJECT_ID: {
             jobject object;
 
@@ -233,7 +245,7 @@ EXIT_ERROR:
 static void
 pyjmethod_dealloc(PyJMethodObject* self)
 {
-    JNIEnv *env  = JcpThread_Get()->env;
+    JNIEnv *env  = JcpThreadEnv_Get();
 
     if (env) {
         if (self->md_params) {

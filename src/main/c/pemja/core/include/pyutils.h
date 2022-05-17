@@ -75,6 +75,9 @@ extern jclass JLONG_TYPE;
 extern jclass JFLOAT_TYPE;
 extern jclass JDOUBLE_TYPE;
 
+// define void class type
+extern jclass JVOID_TYPE;
+
 // Define an extern variable for everything in the class table.
 #define DEFINE_CLASS_GLOBAL(var, name) extern jclass var;
 CLASS_TABLE(DEFINE_CLASS_GLOBAL)
@@ -127,7 +130,8 @@ CLASS_TABLE(DEFINE_CLASS_GLOBAL)
 #define JFLOAT_ID   5
 #define JDOUBLE_ID  6
 #define JSTRING_ID  7
-#define JOBJECT_ID  8
+#define JVOID_ID    8
+#define JOBJECT_ID  9
 
 //  -------------------------------------------------------------------------------------
 

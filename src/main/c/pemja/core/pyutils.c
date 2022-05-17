@@ -34,10 +34,14 @@ jclass JLONG_TYPE = NULL;
 jclass JFLOAT_TYPE = NULL;
 jclass JDOUBLE_TYPE = NULL;
 
+// void class
+jclass JVOID_TYPE = NULL;
+
 void
 Jcp_CacheClasses(JNIEnv *env)
 {
-    jclass clazz;
+    jclass clazz, voidClazz;
+    jfieldID fieldId;
 
     CLASS_TABLE(CACHE_CLASS)
 
@@ -49,6 +53,18 @@ Jcp_CacheClasses(JNIEnv *env)
     CACHE_PRIMITIVE_CLASS(JLONG_TYPE, JLONG_ARRAY_TYPE)
     CACHE_PRIMITIVE_CLASS(JFLOAT_TYPE, JFLOAT_ARRAY_TYPE)
     CACHE_PRIMITIVE_CLASS(JDOUBLE_TYPE, JDOUBLE_ARRAY_TYPE)
+
+    if (JVOID_TYPE == NULL) {
+        clazz = (*env)->FindClass(env, "java/lang/Void");
+
+        fieldId = (*env)->GetStaticFieldID(env, clazz, "TYPE", "Ljava/lang/Class;");
+
+        voidClazz = (jclass) (*env)->GetStaticObjectField(env, clazz, fieldId);
+
+        JVOID_TYPE = (*env)->NewGlobalRef(env, voidClazz);
+        (*env)->DeleteLocalRef(env, voidClazz);
+        (*env)->DeleteLocalRef(env, clazz);
+    }
 }
 
 void
@@ -63,6 +79,7 @@ Jcp_UnRefCacheClasses(JNIEnv *env)
     UNREF_CACHE_CLASS(JLONG_TYPE, NULL)
     UNREF_CACHE_CLASS(JFLOAT_TYPE, NULL)
     UNREF_CACHE_CLASS(JDOUBLE_TYPE, NULL)
+    UNREF_CACHE_CLASS(JVOID_TYPE, NULL)
 }
 
 
@@ -129,6 +146,11 @@ JcpJObject_GetObjectId(JNIEnv* env, jclass clazz)
         return JFLOAT_ID;
     } else if ((*env)->IsSameObject(env, clazz, JDOUBLE_OBJ_TYPE)) {
         return JDOUBLE_ID;
+    }
+
+    // void type
+    if ((*env)->IsSameObject(env, clazz, JVOID_TYPE)) {
+        return JVOID_ID;
     }
 
     return JOBJECT_ID;

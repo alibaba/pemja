@@ -63,6 +63,8 @@ typedef struct __JcpThread JcpThread;
 
 JcpAPI_FUNC(JcpThread*) JcpThread_Get();
 
+JcpAPI_FUNC(JNIEnv*) JcpThreadEnv_Get();
+
 
 /* Initialization and finalization */
 JcpAPI_FUNC(void) JcpPy_Initialize(JNIEnv *);

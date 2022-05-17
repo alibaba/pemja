@@ -116,7 +116,7 @@ static void
 pyjclass_dealloc(PyJClassObject* self)
 {
     Py_CLEAR(self->constructor);
-    PyObject_Del(self);
+    PyJClass_Type.tp_base->tp_dealloc((PyObject*) self);
 }
 
 
