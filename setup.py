@@ -208,7 +208,7 @@ setup(
     package_data=PACKAGE_DATA,
     author='Apache Software Foundation',
     license='https://www.apache.org/licenses/LICENSE-2.0',
-    author_email='hxbks2ks@gmai.com',
+    author_email='hxbks2ks@gmail.com',
     python_requires='>=3.7',
     install_requires=['numpy==1.21.4'],
     cmdclass={'build_ext': build_ext},
