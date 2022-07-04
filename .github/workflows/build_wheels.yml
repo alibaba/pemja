@@ -48,11 +48,14 @@ jobs:
           path: ./dist/
 
   build_wheels:
-    name: Build python wheels on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
+    name: Build python wheel for ${{ matrix.python }}-${{ matrix.buildplat[1] }}
+    runs-on: ${{ matrix.buildplat[0] }}
     strategy:
       matrix:
-        os: ["ubuntu-20.04", "macOS-10.15"]
+        buildplat:
+          - [ubuntu-20.04, manylinux_x86_64]
+          - [macos-latest, macosx_*]
+        python: ["cp37", "cp38", "cp39"]
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -61,10 +64,18 @@ jobs:
         with:
           java-version: '8'
           distribution: 'adopt'
-      - name: Build wheel
-        run: bash dev/build-wheels.sh
-      - name: Upload wheels as artifacts
-        uses: actions/upload-artifact@v2
+
+      # Used to push the built wheels
+      - uses: actions/setup-python@v3
         with:
-          name: wheel_${{ matrix.os }}
-          path: ./dist/
+          python-version: '3.x'
+
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v2.4.0
+        env:
+          CIBW_BUILD: ${{ matrix.python }}-${{ matrix.buildplat[1] }}
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.python }}-${{ startsWith(matrix.buildplat[1], 'macosx') && 'macosx' || matrix.buildplat[1] }}
+          path: ./wheelhouse/*.whl
