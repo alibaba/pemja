@@ -35,8 +35,11 @@ JcpAPI_DATA(PyTypeObject) PyJObject_Type;
 /* Creates a new PyJMethodObject with a Java Object and Java class Object. */
 JcpAPI_FUNC(PyObject*) JcpPyJObject_New(JNIEnv*, PyTypeObject*, jobject, jclass);
 
+/* Check the PyJObject is InstanceOf the corresponding jclass. */
+JcpAPI_FUNC(jint) JcpPyJObject_IsInstanceOf(JNIEnv*, PyJObject*, jclass);
+
 #define PyJObject_Check(op) \
         PyObject_TypeCheck(op, &PyJObject_Type)
-#define PyJObject_CheckExact(op) Py_IS_TYPE(op, &PyJObject_Type)
+#define PyJObject_CheckExact(op) op->ob_type == &PyJObject_Type
 
 #endif

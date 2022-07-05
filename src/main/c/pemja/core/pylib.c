@@ -177,7 +177,7 @@ pemja_module_init(JNIEnv* env)
 * Get the JcpThread.
 */
 JcpThread*
-JcpThread_Get()
+JcpThread_Get(void)
 {
     PyObject  *tdict, *t, *key;
     JcpThread *ret = NULL;

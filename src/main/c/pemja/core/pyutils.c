@@ -153,6 +153,26 @@ JcpJObject_GetObjectId(JNIEnv* env, jclass clazz)
     return JOBJECT_ID;
 }
 
+
+/* Function to get the Object Id from the PyObject type */
+
+int
+JcpPyObject_ToObjectId(JNIEnv* env, PyObject* pyobject)
+{
+    if (PyUnicode_Check(pyobject)) {
+        return JSTRING_ID;
+    } else if (PyBool_Check(pyobject)) {
+        return JBOOLEAN_ID;
+    } else if (PyLong_CheckExact(pyobject)) {
+        return JLONG_ID;
+    } else if (PyFloat_CheckExact(pyobject)) {
+        return JDOUBLE_ID;
+    }
+
+    return JOBJECT_ID;
+}
+
+
 // ---------------------------------  Java object to Python object ---------------------------------
 
 /* Function to check whether PyObject can match the jclass */
@@ -160,17 +180,36 @@ JcpJObject_GetObjectId(JNIEnv* env, jclass clazz)
 int
 JcpPyObject_Check(JNIEnv* env, PyObject* pyobject, jclass clazz)
 {
-    int type_id;
+    int pid, jid;
 
-    type_id = JcpJObject_GetObjectId(env, clazz);
-    if (type_id == JSTRING_ID && PyUnicode_Check(pyobject)) {
+    if ((*env)->IsSameObject(env, clazz, JOBJECT_TYPE)) {
         return 1;
-    } else if (type_id == JBOOLEAN_ID && PyBool_Check(pyobject)) {
+    }
+
+    jid = JcpJObject_GetObjectId(env, clazz);
+
+    pid = JcpPyObject_ToObjectId(env, pyobject);
+
+    if (pid == jid) {
         return 1;
-    } else if (type_id <= JLONG_ID && PyLong_CheckExact(pyobject)) {
+    } else if (pid == JLONG_ID && jid < JLONG_ID) {
         return 1;
-    } else if (type_id <= JDOUBLE_ID && PyFloat_CheckExact(pyobject)) {
+    } else if (pid == JDOUBLE_ID && jid < JDOUBLE_ID) {
         return 1;
+    } else {
+        if (PyJObject_CheckExact(pyobject)) {
+            if (JcpPyJObject_IsInstanceOf(env, (PyJObject*) pyobject, clazz)) {
+                return 1;
+            } else {
+                return 0;
+            }
+        } else {
+            if (pid == JLONG_ID || pid == JDOUBLE_ID) {
+                return (*env)->IsSameObject(env, clazz, JNUMBER_TYPE);
+            } else if (pid == JSTRING_ID) {
+                return (*env)->IsSameObject(env, clazz, JCHARSEQUENCE_TYPE);
+            }
+        }
     }
 
     return 0;
@@ -208,19 +247,19 @@ JcpPyObject_FromJObject(JNIEnv* env, jobject value)
     } else if ((*env)->IsSameObject(env, clazz, JBYTE_ARRAY_TYPE)) {
         result = JcpPyBytes_FromJByteArray(env, value);
     } else if ((*env)->IsSameObject(env, clazz, JBOOLEAN_ARRAY_TYPE)) {
-        result = JcpPyList_FromJBooleanArray(env, value);
+        result = JcpPyTuple_FromJBooleanArray(env, value);
     } else if ((*env)->IsSameObject(env, clazz, JSHORT_ARRAY_TYPE)) {
-        result = JcpPyList_FromJShortArray(env, value);
+        result = JcpPyTuple_FromJShortArray(env, value);
     } else if ((*env)->IsSameObject(env, clazz, JINT_ARRAY_TYPE)) {
-        result = JcpPyList_FromJIntArray(env, value);
+        result = JcpPyTuple_FromJIntArray(env, value);
     } else if ((*env)->IsSameObject(env, clazz, JLONG_ARRAY_TYPE)) {
-        result = JcpPyList_FromJLongArray(env, value);
+        result = JcpPyTuple_FromJLongArray(env, value);
     } else if ((*env)->IsSameObject(env, clazz, JFLOAT_ARRAY_TYPE)) {
-        result = JcpPyList_FromJFloatArray(env, value);
+        result = JcpPyTuple_FromJFloatArray(env, value);
     } else if ((*env)->IsSameObject(env, clazz, JDOUBLE_ARRAY_TYPE)) {
-        result = JcpPyList_FromJDoubleArray(env, value);
+        result = JcpPyTuple_FromJDoubleArray(env, value);
     } else if ((*env)->IsInstanceOf(env, value, JOBJECT_ARRAY_TYPE)) {
-        result = JcpPyList_FromJObjectArray(env, value);
+        result = JcpPyTuple_FromJObjectArray(env, value);
     } else if ((*env)->IsSameObject(env, clazz, JSQLDATE_TYPE)) {
         result = JcpPyDate_FromJSqlDate(env, value);
     } else if ((*env)->IsSameObject(env, clazz, JSQLTIME_TYPE)) {
@@ -488,10 +527,10 @@ JcpPyBytes_FromJByteArray(JNIEnv* env, jbyteArray value)
     return result;
 }
 
-/* Function to return a Python List from a Java boolean array */
+/* Function to return a Python Tuple from a Java boolean array */
 
 
-JcpAPI_FUNC(PyObject*) JcpPyList_FromJBooleanArray(JNIEnv* env, jbooleanArray value)
+JcpAPI_FUNC(PyObject*) JcpPyTuple_FromJBooleanArray(JNIEnv* env, jbooleanArray value)
 {
     int length;
 
@@ -502,19 +541,19 @@ JcpAPI_FUNC(PyObject*) JcpPyList_FromJBooleanArray(JNIEnv* env, jbooleanArray va
     length = (*env)->GetArrayLength(env, value);
     booleans = (*env)->GetBooleanArrayElements(env, value, 0);
 
-    result = PyList_New(length);
+    result = PyTuple_New(length);
 
     for (int i = 0; i < length; i++) {
-        PyList_SetItem(result, i, JcpPyBool_FromLong(booleans[i]));
+        PyTuple_SetItem(result, i, JcpPyBool_FromLong(booleans[i]));
     }
 
     return result;
 }
 
 
-/* Function to return a Python List from a Java short array */
+/* Function to return a Python Tuple from a Java short array */
 
-JcpAPI_FUNC(PyObject*) JcpPyList_FromJShortArray(JNIEnv* env, jshortArray value)
+JcpAPI_FUNC(PyObject*) JcpPyTuple_FromJShortArray(JNIEnv* env, jshortArray value)
 {
     int length;
 
@@ -525,19 +564,19 @@ JcpAPI_FUNC(PyObject*) JcpPyList_FromJShortArray(JNIEnv* env, jshortArray value)
     length = (*env)->GetArrayLength(env, value);
     shorts = (*env)->GetShortArrayElements(env, value, 0);
 
-    result = PyList_New(length);
+    result = PyTuple_New(length);
 
     for (int i = 0; i < length; i++) {
-        PyList_SetItem(result, i, JcpPyInt_FromInt(shorts[i]));
+        PyTuple_SetItem(result, i, JcpPyInt_FromInt(shorts[i]));
     }
 
     return result;
 }
 
 
-/* Function to return a Python List from a Java int array */
+/* Function to return a Python Tuple from a Java int array */
 
-JcpAPI_FUNC(PyObject*) JcpPyList_FromJIntArray(JNIEnv* env, jintArray value)
+JcpAPI_FUNC(PyObject*) JcpPyTuple_FromJIntArray(JNIEnv* env, jintArray value)
 {
     int length;
 
@@ -548,19 +587,19 @@ JcpAPI_FUNC(PyObject*) JcpPyList_FromJIntArray(JNIEnv* env, jintArray value)
     length = (*env)->GetArrayLength(env, value);
     ints = (*env)->GetIntArrayElements(env, value, 0);
 
-    result = PyList_New(length);
+    result = PyTuple_New(length);
 
     for (int i = 0; i < length; i++) {
-        PyList_SetItem(result, i, JcpPyInt_FromInt(ints[i]));
+        PyTuple_SetItem(result, i, JcpPyInt_FromInt(ints[i]));
     }
 
     return result;
 }
 
 
-/* Function to return a Python List from a Java long array */
+/* Function to return a Python Tuple from a Java long array */
 
-JcpAPI_FUNC(PyObject*) JcpPyList_FromJLongArray(JNIEnv* env, jlongArray value)
+JcpAPI_FUNC(PyObject*) JcpPyTuple_FromJLongArray(JNIEnv* env, jlongArray value)
 {
     int length;
 
@@ -571,19 +610,19 @@ JcpAPI_FUNC(PyObject*) JcpPyList_FromJLongArray(JNIEnv* env, jlongArray value)
     length = (*env)->GetArrayLength(env, value);
     longs = (*env)->GetLongArrayElements(env, value, 0);
 
-    result = PyList_New(length);
+    result = PyTuple_New(length);
 
     for (int i = 0; i < length; i++) {
-        PyList_SetItem(result, i, JcpPyInt_FromLong(longs[i]));
+        PyTuple_SetItem(result, i, JcpPyInt_FromLong(longs[i]));
     }
 
     return result;
 }
 
 
-/* Function to return a Python List from a Java float array */
+/* Function to return a Python Tuple from a Java float array */
 
-JcpAPI_FUNC(PyObject*) JcpPyList_FromJFloatArray(JNIEnv* env, jfloatArray value)
+JcpAPI_FUNC(PyObject*) JcpPyTuple_FromJFloatArray(JNIEnv* env, jfloatArray value)
 {
     int length;
 
@@ -594,19 +633,19 @@ JcpAPI_FUNC(PyObject*) JcpPyList_FromJFloatArray(JNIEnv* env, jfloatArray value)
     length = (*env)->GetArrayLength(env, value);
     floats = (*env)->GetFloatArrayElements(env, value, 0);
 
-    result = PyList_New(length);
+    result = PyTuple_New(length);
 
     for (int i = 0; i < length; i++) {
-        PyList_SetItem(result, i, JcpPyFloat_FromDouble(floats[i]));
+        PyTuple_SetItem(result, i, JcpPyFloat_FromDouble(floats[i]));
     }
 
     return result;
 }
 
 
-/* Function to return a Python List from a Java double array */
+/* Function to return a Python Tuple from a Java double array */
 
-JcpAPI_FUNC(PyObject*) JcpPyList_FromJDoubleArray(JNIEnv* env, jdoubleArray value)
+JcpAPI_FUNC(PyObject*) JcpPyTuple_FromJDoubleArray(JNIEnv* env, jdoubleArray value)
 {
     int length;
 
@@ -617,20 +656,20 @@ JcpAPI_FUNC(PyObject*) JcpPyList_FromJDoubleArray(JNIEnv* env, jdoubleArray valu
     length = (*env)->GetArrayLength(env, value);
     doubles = (*env)->GetDoubleArrayElements(env, value, 0);
 
-    result = PyList_New(length);
+    result = PyTuple_New(length);
 
     for (int i = 0; i < length; i++) {
-        PyList_SetItem(result, i, JcpPyFloat_FromDouble(doubles[i]));
+        PyTuple_SetItem(result, i, JcpPyFloat_FromDouble(doubles[i]));
     }
 
     return result;
 }
 
 
-/* Function to return a Python List from a Java object array */
+/* Function to return a Python Tuple from a Java object array */
 
 PyObject*
-JcpPyList_FromJObjectArray(JNIEnv* env, jobjectArray value)
+JcpPyTuple_FromJObjectArray(JNIEnv* env, jobjectArray value)
 {
 
     int length;
@@ -644,11 +683,11 @@ JcpPyList_FromJObjectArray(JNIEnv* env, jobjectArray value)
     }
 
     length = (*env)->GetArrayLength(env, value);
-    result = PyList_New(length);
+    result = PyTuple_New(length);
 
     for (int i = 0; i < length; i++) {
         element = (*env)->GetObjectArrayElement(env, value, i);
-        PyList_SetItem(result, i, JcpPyObject_FromJObject(env, element));
+        PyTuple_SetItem(result, i, JcpPyObject_FromJObject(env, element));
         (*env)->DeleteLocalRef(env, element);
     }
 
@@ -914,6 +953,10 @@ JcpPyObject_AsJObject(JNIEnv* env, PyObject* pyobject, jclass clazz)
         return NULL;
     } else if (PyUnicode_Check(pyobject)) {
         return JcpPyString_AsJString(env, pyobject);
+    } else if (PyJObject_CheckExact(pyobject)) {
+        return (*env)->NewLocalRef(env, ((PyJObject*) pyobject)->object);
+    } else if (PyGen_CheckExact(pyobject)) {
+        return JcpPyGenerator_AsJObject(env, pyobject);
     } else if (PyBool_Check(pyobject)) {
         return JcpPyBool_AsJObject(env, pyobject, clazz);
     } else if (PyLong_CheckExact(pyobject)) {
@@ -924,12 +967,12 @@ JcpPyObject_AsJObject(JNIEnv* env, PyObject* pyobject, jclass clazz)
         return JcpPyBytes_AsJObject(env, pyobject, clazz);
     } else if (PyList_CheckExact(pyobject)) {
         return JcpPyList_AsJObject(env, pyobject, clazz);
+    } else if (PyTuple_CheckExact(pyobject)) {
+        return JcpPyTuple_AsJObject(env, pyobject, clazz);
     } else if (PyDict_CheckExact(pyobject)) {
         return JcpPyDict_AsJObject(env, pyobject);
     } else if (JcpPyDecimal_Check(pyobject)) {
         return JcpPyDecimal_AsJObject(env, pyobject);
-    } else if (PyGen_CheckExact(pyobject)) {
-        return JcpPyGenerator_AsJObject(env, pyobject);
     } else {
         // the macro PyDateTime_IMPORT must be invoked.
         if (!PyDateTimeAPI) {
@@ -964,7 +1007,11 @@ JcpAPI_FUNC(jvalue) JcpPyObject_AsJValue(JNIEnv* env, PyObject* pyobject, jclass
             result.l = JcpPyString_AsJString(env, pyobject);
             break;
         case JOBJECT_ID:
-            result.l = JcpPyObject_AsJObject(env, pyobject, clazz);
+            if (PyJObject_CheckExact(pyobject)) {
+                result.l = (*env)->NewLocalRef(env, ((PyJObject*) pyobject)->object);
+            } else {
+                result.l = JcpPyObject_AsJObject(env, pyobject, JOBJECT_TYPE);
+            }
             break;
         case JINT_ID:
             result.i = JcpPyInt_AsJInt(pyobject);
@@ -1401,6 +1448,28 @@ JcpPyList_AsJObject(JNIEnv* env, PyObject* pyobject, jclass clazz)
 
     for (int i = 0; i < length; i++) {
         element = JcpPyObject_AsJObject(env, PyList_GetItem(pyobject, i), JOBJECT_TYPE);
+        (*env)->SetObjectArrayElement(env, array, i, element);
+    }
+
+    return array;
+}
+
+
+/* Function to return a Java Object from a Python Tuple object */
+
+jobject
+JcpPyTuple_AsJObject(JNIEnv* env, PyObject* pyobject, jclass clazz)
+{
+    int length;
+    jobjectArray array;
+    jobject element;
+
+    length = PyTuple_Size(pyobject);
+
+    array = (*env)->NewObjectArray(env, length, JOBJECT_TYPE, NULL);
+
+    for (int i = 0; i < length; i++) {
+        element = JcpPyObject_AsJObject(env, PyTuple_GetItem(pyobject, i), JOBJECT_TYPE);
         (*env)->SetObjectArrayElement(env, array, i, element);
     }
 

@@ -61,18 +61,29 @@ pyjmethod_call(PyJMethodObject *self, PyObject *args, PyObject *kwargs)
 
     JNIEnv *env;
     jvalue *jargs;
+    int nargs;
 
     if (kwargs != NULL) {
         PyErr_SetString(PyExc_RuntimeError, "Keywords are not supported in calling Java method.");
     }
 
+    env = JcpThread_Get()->env;
+
     // PyJObject as the first argument.
     if (self->md_params_num != PyTuple_Size(args) - 1) {
-        PyErr_Format(PyExc_RuntimeError,
-                     "Invalid number of arguments: %i, expected %i for method",
-                     (int) PyTuple_GET_SIZE(args) -1 ,
-                     self->md_params_num);
-        return NULL;
+        jboolean varargs = JavaMethod_isVarArgs(env, self->md);
+
+        if (!varargs || self->md_params_num > PyTuple_Size(args)) {
+            PyErr_Format(PyExc_RuntimeError,
+                         "Invalid number of arguments: %i, expected %i for method",
+                         (int) PyTuple_GET_SIZE(args) -1 ,
+                         self->md_params_num);
+            return NULL;
+        }
+
+        nargs = self->md_params_num - 1;
+    } else {
+        nargs = self->md_params_num;
     }
 
     arg = PyTuple_GetItem(args, 0);
@@ -82,19 +93,26 @@ pyjmethod_call(PyJMethodObject *self, PyObject *args, PyObject *kwargs)
 
     instance = (PyJObject*) arg;
 
-    env = JcpThread_Get()->env;
-
     if ((*env)->PushLocalFrame(env, 16 + self->md_params_num) != 0) {
         return NULL;
     }
 
     jargs = (jvalue *) PyMem_Malloc(sizeof(jvalue) * self->md_params_num);
 
-    // TODO: support variable args.
-    for (int i = 0; i < self->md_params_num; i++) {
+    for (int i = 0; i < nargs; i++) {
         arg = PyTuple_GetItem(args, i + 1);
         jclass paramType = (*env)->GetObjectArrayElement(env, self->md_params, i);
         jargs[i] = JcpPyObject_AsJValue(env, arg, paramType);
+        (*env)->DeleteLocalRef(env, paramType);
+        if (PyErr_Occurred()) {
+            goto EXIT_ERROR;
+        }
+    }
+
+    if (nargs < self->md_params_num) {
+        jclass paramType = (*env)->GetObjectArrayElement(env, self->md_params, nargs);
+        PyObject *param = PyTuple_GetSlice(args, nargs, PyTuple_Size(args));
+        jargs[nargs] = JcpPyObject_AsJValue(env, param, paramType);
         (*env)->DeleteLocalRef(env, paramType);
         if (PyErr_Occurred()) {
             goto EXIT_ERROR;
@@ -297,13 +315,23 @@ int
 JcpPyJMethodMatch(PyJMethodObject *self, PyObject* args)
 {
     PyObject    *arg;
-    PyJObject   *instance;
 
     JNIEnv      *env;
     jclass      paramType;
+    int         nargs;
+
+    env  = JcpThread_Get()->env;
 
     if (PyTuple_Size(args) - 1 != self->md_params_num) {
-        return 0;
+        jboolean varargs = JavaMethod_isVarArgs(env, self->md);
+
+        if (!varargs) {
+            return 0;
+        }
+
+        nargs = self->md_params_num - 1;
+    } else {
+        nargs = self->md_params_num;
     }
 
     arg = PyTuple_GetItem(args, 0);
@@ -312,10 +340,8 @@ JcpPyJMethodMatch(PyJMethodObject *self, PyObject* args)
         PyErr_Format(PyExc_RuntimeError, "The first argument type must be a Java Object Type");
     }
 
-    instance = (PyJObject*) arg;
-    env  = JcpThread_Get()->env;
 
-    for (int i = 0; i < self->md_params_num; i++) {
+    for (int i = 0; i < nargs; i++) {
         arg = PyTuple_GetItem(args, i + 1);
         paramType = (jclass) (*env)->GetObjectArrayElement(env, self->md_params, i);
         if (!JcpPyObject_Check(env, arg, paramType)) {

@@ -17,5 +17,6 @@
 jobjectArray JavaMethod_getParameterTypes(JNIEnv*, jobject);
 jint JavaMethod_getModifiers(JNIEnv*, jobject);
 jclass JavaMethod_getReturnType(JNIEnv*, jobject);
+jboolean JavaMethod_isVarArgs(JNIEnv*, jobject);
 
 #endif

@@ -19,6 +19,7 @@
 static jmethodID getParameterTypes = 0;
 static jmethodID getModifiers = 0;
 static jmethodID getReturnType = 0;
+static jmethodID isVarArgs = 0;
 
 jobjectArray
 JavaMethod_getParameterTypes(JNIEnv* env, jobject this)
@@ -48,4 +49,15 @@ JavaMethod_getReturnType(JNIEnv* env, jobject this)
                                             "()Ljava/lang/Class;");
     }
     return (*env)->CallObjectMethod(env, this, getReturnType);
+}
+
+jboolean
+JavaMethod_isVarArgs(JNIEnv* env, jobject this)
+{
+
+    if (!isVarArgs) {
+        isVarArgs = (*env)->GetMethodID(env, JMETHOD_TYPE, "isVarArgs", "()Z");
+    }
+
+    return (*env)->CallBooleanMethod(env, this, isVarArgs);
 }
