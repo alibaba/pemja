@@ -61,12 +61,14 @@ def test_callback_java():
 
     StringBuilder = findClass('java.lang.StringBuilder')
     Integer = findClass('java.lang.Integer')
+    String = findClass('java.lang.String')
 
     sb = StringBuilder()
     sb.append('pemja')
     sb.append('java')
     sb.append('python')
     sb.append(Integer.toHexString(Integer.MAX_VALUE))
+    sb.append(String.join("-", "Pemja", "is", "cool"))
     return sb.toString()
 
 

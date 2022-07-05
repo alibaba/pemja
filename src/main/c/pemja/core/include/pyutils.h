@@ -17,6 +17,7 @@
 #define CLASS_TABLE(F) \
     F(JBOOLEAN_OBJ_TYPE, "java/lang/Boolean") \
     F(JNUMBER_TYPE, "java/lang/Number") \
+    F(JCHARSEQUENCE_TYPE, "java/lang/CharSequence") \
     F(JBYTE_OBJ_TYPE, "java/lang/Byte") \
     F(JSHORT_OBJ_TYPE, "java/lang/Short") \
     F(JINT_OBJ_TYPE, "java/lang/Integer") \
@@ -147,6 +148,9 @@ JcpAPI_FUNC(void) JcpString_Clear(JNIEnv*, jstring, const char*);
 /* Function to get the Object Id from the Java Class */
 JcpAPI_FUNC(int) JcpJObject_GetObjectId(JNIEnv*, jclass);
 
+/* Function to get the Object Id from the PyObject type */
+JcpAPI_FUNC(int) JcpPyObject_ToObjectId(JNIEnv*, PyObject*);
+
 // ----------------------- Java object to Python object ---------------------------------
 
 /* Function to check whether PyObject can match the jclass */
@@ -176,26 +180,26 @@ JcpAPI_FUNC(PyObject*) JcpPyFloat_FromJDouble(JNIEnv*, jobject);
 /* Function to return a Python bytes from a Java byte array */
 JcpAPI_FUNC(PyObject*) JcpPyBytes_FromJByteArray(JNIEnv*, jbyteArray);
 
-/* Function to return a Python List from a Java boolean array */
-JcpAPI_FUNC(PyObject*) JcpPyList_FromJBooleanArray(JNIEnv*, jbooleanArray);
+/* Function to return a Python Tuple from a Java boolean array */
+JcpAPI_FUNC(PyObject*) JcpPyTuple_FromJBooleanArray(JNIEnv*, jbooleanArray);
 
-/* Function to return a Python List from a Java short array */
-JcpAPI_FUNC(PyObject*) JcpPyList_FromJShortArray(JNIEnv*, jshortArray);
+/* Function to return a Python Tuple from a Java short array */
+JcpAPI_FUNC(PyObject*) JcpPyTuple_FromJShortArray(JNIEnv*, jshortArray);
 
-/* Function to return a Python List from a Java int array */
-JcpAPI_FUNC(PyObject*) JcpPyList_FromJIntArray(JNIEnv*, jintArray);
+/* Function to return a Python Tuple from a Java int array */
+JcpAPI_FUNC(PyObject*) JcpPyTuple_FromJIntArray(JNIEnv*, jintArray);
 
-/* Function to return a Python List from a Java long array */
-JcpAPI_FUNC(PyObject*) JcpPyList_FromJLongArray(JNIEnv*, jlongArray);
+/* Function to return a Python Tuple from a Java long array */
+JcpAPI_FUNC(PyObject*) JcpPyTuple_FromJLongArray(JNIEnv*, jlongArray);
 
-/* Function to return a Python List from a Java float array */
-JcpAPI_FUNC(PyObject*) JcpPyList_FromJFloatArray(JNIEnv*, jfloatArray);
+/* Function to return a Python Tuple from a Java float array */
+JcpAPI_FUNC(PyObject*) JcpPyTuple_FromJFloatArray(JNIEnv*, jfloatArray);
 
-/* Function to return a Python List from a Java double array */
-JcpAPI_FUNC(PyObject*) JcpPyList_FromJDoubleArray(JNIEnv*, jdoubleArray);
+/* Function to return a Python Tuple from a Java double array */
+JcpAPI_FUNC(PyObject*) JcpPyTuple_FromJDoubleArray(JNIEnv*, jdoubleArray);
 
-/* Function to return a Python List from a Java object array */
-JcpAPI_FUNC(PyObject*) JcpPyList_FromJObjectArray(JNIEnv*, jobjectArray);
+/* Function to return a Python Tuple from a Java object array */
+JcpAPI_FUNC(PyObject*) JcpPyTuple_FromJObjectArray(JNIEnv*, jobjectArray);
 
 /* Function to return a Python List from a Java Collection object */
 JcpAPI_FUNC(PyObject*) JcpPyList_FromJCollectionObject(JNIEnv*, jobject);
@@ -259,6 +263,9 @@ JcpAPI_FUNC(jstring) JcpPyString_AsJString(JNIEnv*, PyObject*);
 
 /* Function to return a Java Object from a Python List object */
 JcpAPI_FUNC(jobject) JcpPyList_AsJObject(JNIEnv*, PyObject*, jclass);
+
+/* Function to return a Java Object from a Python Tuple object */
+JcpAPI_FUNC(jobject) JcpPyTuple_AsJObject(JNIEnv*, PyObject*, jclass);
 
 /* Function to return a Java Map from a Python Dict object */
 JcpAPI_FUNC(jobject) JcpPyDict_AsJObject(JNIEnv*, PyObject*);

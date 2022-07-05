@@ -58,9 +58,9 @@ typedef struct __JcpThread JcpThread;
                  }
 
 
-JcpAPI_FUNC(JcpThread*) JcpThread_Get();
+JcpAPI_FUNC(JcpThread*) JcpThread_Get(void);
 
-JcpAPI_FUNC(JNIEnv*) JcpThreadEnv_Get();
+JcpAPI_FUNC(JNIEnv*) JcpThreadEnv_Get(void);
 
 
 /* Initialization and finalization */

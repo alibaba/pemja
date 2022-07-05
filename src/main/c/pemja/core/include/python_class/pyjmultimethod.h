@@ -26,7 +26,7 @@ JcpAPI_DATA(PyTypeObject) PyJMultiMethod_Type;
 /* Public interface */
 
 /* Creates a new empty PyJMultiMethodObject. */
-JcpAPI_FUNC(PyJMultiMethodObject*) JcpPyJMultiMethod_New();
+JcpAPI_FUNC(PyJMultiMethodObject*) JcpPyJMultiMethod_New(void);
 
 /* Appends a PyJMethodObject to the PyJMultiMethodObject. */
 JcpAPI_FUNC(int) JcpPyJMultiMethod_Append(PyJMultiMethodObject*, PyJMethodObject*);

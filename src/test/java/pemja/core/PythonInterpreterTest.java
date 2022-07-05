@@ -220,6 +220,10 @@ public class PythonInterpreterTest {
                 assertEquals(3L, interpreter.invokeMethod("a", "add", 3));
                 assertEquals(1L, interpreter.invokeMethod("a", "minus", 2));
                 assertEquals(7L, interpreter.invokeMethod("a", "add_all", 1, 2, 3));
+
+                Object javaObject = new TestObject();
+                assertEquals(
+                        javaObject, interpreter.invoke("test_call.test_call_one_arg", javaObject));
             }
         } catch (Exception e) {
             throw new RuntimeException("Failed to invoke test_call.py", e);
@@ -489,7 +493,7 @@ public class PythonInterpreterTest {
             try (PythonInterpreter interpreter = new PythonInterpreter(config)) {
                 interpreter.exec("import test_call");
                 assertEquals(
-                        "pemjajavapython7fffffff",
+                        "pemjajavapython7fffffff--Pemja-is-cool",
                         interpreter.invoke("test_call.test_callback_java"));
             }
         } catch (Exception e) {
@@ -511,7 +515,7 @@ public class PythonInterpreterTest {
                                 try {
                                     interpreter.exec("import test_call");
                                     assertEquals(
-                                            "pemjajavapython7fffffff",
+                                            "pemjajavapython7fffffff--Pemja-is-cool",
                                             interpreter.invoke("test_call.test_callback_java"));
                                 } catch (Throwable throwable) {
                                     if (exceptionReference.get() == null) {
@@ -532,7 +536,7 @@ public class PythonInterpreterTest {
                                 try {
                                     interpreter.exec("import test_call");
                                     assertEquals(
-                                            "pemjajavapython7fffffff",
+                                            "pemjajavapython7fffffff--Pemja-is-cool",
                                             interpreter.invoke("test_call.test_callback_java"));
                                 } catch (Throwable throwable) {
                                     if (exceptionReference.get() == null) {
@@ -570,6 +574,12 @@ public class PythonInterpreterTest {
             }
         } catch (Exception e) {
             throw new RuntimeException("Failed to call test_return_generator in test_call.py", e);
+        }
+    }
+
+    private static final class TestObject {
+        public String testMethod() {
+            return "testMethod";
         }
     }
 
