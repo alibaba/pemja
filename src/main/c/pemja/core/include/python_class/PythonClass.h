@@ -20,5 +20,8 @@
 #include <python_class/pyjclass.h>
 #include <python_class/pyjconstructor.h>
 #include <python_class/pyjfield.h>
+#include <python_class/pyjiterable.h>
+#include <python_class/pyjiterator.h>
+#include <python_class/pyjcollection.h>
 
 #endif

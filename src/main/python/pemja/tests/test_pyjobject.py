@@ -15,49 +15,29 @@
 # limitations under the License.
 ################################################################################
 
-class A(object):
-    def __init__(self):
-        self._a = 0
+def test_call_collection(collection):
+    assert len(collection) == 3
+    assert 1 in collection
+    assert 2 in collection
+    assert 3 in collection
 
-    def get_value(self):
-        return self._a
+    iterator = iter(collection)
+    values = [value for value in iterator]
+    sorted(values)
 
-    def add(self, n):
-        self._a += n
-        return self._a
+    assert values == [3, 2, 1]
 
-    def add_all(self, *args):
-        for item in args:
-            self._a += item
-        return self._a
-
-    def minus(self, n):
-        self._a -= n
-        return self._a
+    return collection
 
 
-def test_call_no_args():
-    return 'no arg'
+def test_call_iterator(iterator):
+    values = [value for value in iterator]
+    sorted(values)
+
+    assert values == [3, 2, 1]
+
+    return iterator
 
 
-def test_call_one_arg(arg):
-    return arg
-
-
-def test_call_variable_args(*args):
-    return args[0]
-
-
-def test_call_keywords_args(**kwargs):
-    return kwargs['a']
-
-
-def test_call_all_args(*args, **kwargs):
-    return args[0] + kwargs['a']
-
-
-def test_return_generator(num: int):
-    for i in range(num):
-        yield i
-    yield "haha"
-    yield None
+def test_call_java_object(o):
+    return o

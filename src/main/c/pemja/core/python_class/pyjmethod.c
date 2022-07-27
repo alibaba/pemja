@@ -56,27 +56,29 @@ EXIT_ERROR:
 static PyObject *
 pyjmethod_call(PyJMethodObject *self, PyObject *args, PyObject *kwargs)
 {
-    PyObject *arg, *pyobject;
+    PyObject *arg, *pyobject = NULL;
     PyJObject  *instance;
 
     JNIEnv *env;
     jvalue *jargs;
-    int nargs;
+    int nargs, input_nargs;
 
     if (kwargs != NULL) {
         PyErr_SetString(PyExc_RuntimeError, "Keywords are not supported in calling Java method.");
+        return NULL;
     }
 
     env = JcpThread_Get()->env;
 
+    input_nargs = PyTuple_Size(args);
     // PyJObject as the first argument.
-    if (self->md_params_num != PyTuple_Size(args) - 1) {
+    if (self->md_params_num != input_nargs - 1) {
         jboolean varargs = JavaMethod_isVarArgs(env, self->md);
 
-        if (!varargs || self->md_params_num > PyTuple_Size(args)) {
+        if (!varargs || self->md_params_num > input_nargs) {
             PyErr_Format(PyExc_RuntimeError,
                          "Invalid number of arguments: %i, expected %i for method",
-                         (int) PyTuple_GET_SIZE(args) -1 ,
+                         input_nargs -1 ,
                          self->md_params_num);
             return NULL;
         }
@@ -97,7 +99,11 @@ pyjmethod_call(PyJMethodObject *self, PyObject *args, PyObject *kwargs)
         return NULL;
     }
 
-    jargs = (jvalue *) PyMem_Malloc(sizeof(jvalue) * self->md_params_num);
+    if (nargs == input_nargs - 1) {
+        jargs = (jvalue *) PyMem_Malloc(sizeof(jvalue) * nargs);
+    } else {
+        jargs = (jvalue *) PyMem_Malloc(sizeof(jvalue) * self->md_params_num);
+    }
 
     for (int i = 0; i < nargs; i++) {
         arg = PyTuple_GetItem(args, i + 1);
@@ -109,9 +115,9 @@ pyjmethod_call(PyJMethodObject *self, PyObject *args, PyObject *kwargs)
         }
     }
 
-    if (nargs < self->md_params_num) {
+    if (nargs < self->md_params_num && nargs < input_nargs - 1) {
         jclass paramType = (*env)->GetObjectArrayElement(env, self->md_params, nargs);
-        PyObject *param = PyTuple_GetSlice(args, nargs, PyTuple_Size(args));
+        PyObject *param = PyTuple_GetSlice(args, nargs, input_nargs);
         jargs[nargs] = JcpPyObject_AsJValue(env, param, paramType);
         (*env)->DeleteLocalRef(env, paramType);
         if (PyErr_Occurred()) {
@@ -228,6 +234,10 @@ pyjmethod_call(PyJMethodObject *self, PyObject *args, PyObject *kwargs)
             Py_INCREF(pyobject);
             break;
         }
+        case JBYTES_ID:
+        case JLIST_ID:
+        case JMAP_ID:
+        case JARRAY_ID:
         case JOBJECT_ID: {
             jobject object;
 
@@ -241,19 +251,18 @@ pyjmethod_call(PyJMethodObject *self, PyObject *args, PyObject *kwargs)
             break;
         }
         default: {
-            PyErr_SetString(PyExc_TypeError, "Unrecognized type.");
+            PyErr_Format(PyExc_TypeError,
+                        "Unrecognized object id %d.",
+                        self->md_return_id);
+
             pyobject = NULL;
         }
     }
 
-    PyMem_Free(jargs);
-    (*env)->PopLocalFrame(env, NULL);
-    return pyobject;
-
 EXIT_ERROR:
     PyMem_Free(jargs);
     (*env)->PopLocalFrame(env, NULL);
-    return NULL;
+    return pyobject;
 }
 
 
@@ -338,20 +347,31 @@ JcpPyJMethodMatch(PyJMethodObject *self, PyObject* args)
 
     if (!PyJObject_Check(arg)) {
         PyErr_Format(PyExc_RuntimeError, "The first argument type must be a Java Object Type");
+        return 0;
     }
 
+    if (nargs == 0) {
+        return 1;
+    }
+
+    int total_match_degree = 0;
 
     for (int i = 0; i < nargs; i++) {
         arg = PyTuple_GetItem(args, i + 1);
         paramType = (jclass) (*env)->GetObjectArrayElement(env, self->md_params, i);
-        if (!JcpPyObject_Check(env, arg, paramType)) {
-            (*env)->DeleteLocalRef(env, paramType);
+
+        int match_degree = JcpPyObject_match(env, arg, paramType);
+
+        (*env)->DeleteLocalRef(env, paramType);
+
+        if (!match_degree) {
             return 0;
         }
-        (*env)->DeleteLocalRef(env, paramType);
+
+        total_match_degree = total_match_degree * 10 + match_degree;
     }
 
-    return 1;
+    return total_match_degree;
 }
 
 PyTypeObject PyJMethod_Type = {

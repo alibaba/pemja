@@ -30,6 +30,7 @@ jclass JINT_TYPE = NULL;
 jclass JLONG_TYPE = NULL;
 jclass JFLOAT_TYPE = NULL;
 jclass JDOUBLE_TYPE = NULL;
+jclass JCHAR_TYPE = NULL;
 
 // void class
 jclass JVOID_TYPE = NULL;
@@ -50,6 +51,7 @@ Jcp_CacheClasses(JNIEnv *env)
     CACHE_PRIMITIVE_CLASS(JLONG_TYPE, JLONG_ARRAY_TYPE)
     CACHE_PRIMITIVE_CLASS(JFLOAT_TYPE, JFLOAT_ARRAY_TYPE)
     CACHE_PRIMITIVE_CLASS(JDOUBLE_TYPE, JDOUBLE_ARRAY_TYPE)
+    CACHE_PRIMITIVE_CLASS(JCHAR_TYPE, JCHAR_ARRAY_TYPE)
 
     if (JVOID_TYPE == NULL) {
         clazz = (*env)->FindClass(env, "java/lang/Void");
@@ -110,39 +112,55 @@ JcpString_FromJString(JNIEnv* env, jstring s)
 int
 JcpJObject_GetObjectId(JNIEnv* env, jclass clazz)
 {
-    if ((*env)->IsSameObject(env, clazz, JSTRING_TYPE)) {
-        return JSTRING_ID;
-    } else if ((*env)->IsSameObject(env, clazz, JBOOLEAN_TYPE)) {
+    char* msg;
+
+    // check whether it is a Java Object.
+    if ((*env)->IsAssignableFrom(env, clazz, JOBJECT_TYPE)) {
+
+        if ((*env)->IsSameObject(env, clazz, JSTRING_TYPE)) {
+            return JSTRING_ID;
+        }
+
+        // byte array type
+        if ((*env)->IsSameObject(env, clazz, JBYTE_ARRAY_TYPE)) {
+            return JBYTES_ID;
+        }
+
+        // list type
+        if ((*env)->IsAssignableFrom(env, clazz, JLIST_TYPE)) {
+            return JLIST_ID;
+        }
+
+        // map type
+        if ((*env)->IsAssignableFrom(env, clazz, JMAP_TYPE)) {
+            return JMAP_ID;
+        }
+
+        // array type
+        if (JavaClass_isArray(env, clazz)) {
+            return JARRAY_ID;
+        }
+
+        return JOBJECT_ID;
+    }
+
+    // check primitive type.
+    if ((*env)->IsSameObject(env, clazz, JBOOLEAN_TYPE)) {
         return JBOOLEAN_ID;
-    } else if ((*env)->IsSameObject(env, clazz, JBYTE_TYPE)) {
-        return JBYTE_ID;
-    } else if ((*env)->IsSameObject(env, clazz, JSHORT_TYPE)) {
-        return JSHORT_ID;
     } else if ((*env)->IsSameObject(env, clazz, JINT_TYPE)) {
-        return JINT_ID;
+         return JINT_ID;
+    } else if ((*env)->IsSameObject(env, clazz, JDOUBLE_TYPE)) {
+         return JDOUBLE_ID;
     } else if ((*env)->IsSameObject(env, clazz, JLONG_TYPE)) {
         return JLONG_ID;
     } else if ((*env)->IsSameObject(env, clazz, JFLOAT_TYPE)) {
         return JFLOAT_ID;
-    } else if ((*env)->IsSameObject(env, clazz, JDOUBLE_TYPE)) {
-        return JDOUBLE_ID;
-    }
-
-    // box primitive type
-    if ((*env)->IsSameObject(env, clazz, JBOOLEAN_OBJ_TYPE)) {
-       return JBOOLEAN_ID;
-    } else if ((*env)->IsSameObject(env, clazz, JBYTE_OBJ_TYPE)) {
+    } else if ((*env)->IsSameObject(env, clazz, JBYTE_TYPE)) {
         return JBYTE_ID;
-    } else if ((*env)->IsSameObject(env, clazz, JSHORT_OBJ_TYPE)) {
+    } else if ((*env)->IsSameObject(env, clazz, JSHORT_TYPE)) {
         return JSHORT_ID;
-    } else if ((*env)->IsSameObject(env, clazz, JINT_OBJ_TYPE)) {
-        return JINT_ID;
-    } else if ((*env)->IsSameObject(env, clazz, JLONG_OBJ_TYPE)) {
-        return JLONG_ID;
-    } else if ((*env)->IsSameObject(env, clazz, JFLOAT_OBJ_TYPE)) {
-        return JFLOAT_ID;
-    } else if ((*env)->IsSameObject(env, clazz, JDOUBLE_OBJ_TYPE)) {
-        return JDOUBLE_ID;
+    } else if ((*env)->IsSameObject(env, clazz, JCHAR_TYPE)) {
+        return JCHAR_ID;
     }
 
     // void type
@@ -150,65 +168,122 @@ JcpJObject_GetObjectId(JNIEnv* env, jclass clazz)
         return JVOID_ID;
     }
 
-    return JOBJECT_ID;
+    msg = malloc(sizeof(char) * 200);
+    memset(msg, '\0', 200);
+
+    sprintf(msg, "Failed to get the object id to the class %s.",
+            JcpString_FromJString(env, JavaClass_getName(env, clazz)));
+
+    JcpPyErr_ThrowMsg(env, msg);
+    free(msg);
+
+    return -1;
 }
-
-
-/* Function to get the Object Id from the PyObject type */
-
-int
-JcpPyObject_ToObjectId(JNIEnv* env, PyObject* pyobject)
-{
-    if (PyUnicode_Check(pyobject)) {
-        return JSTRING_ID;
-    } else if (PyBool_Check(pyobject)) {
-        return JBOOLEAN_ID;
-    } else if (PyLong_CheckExact(pyobject)) {
-        return JLONG_ID;
-    } else if (PyFloat_CheckExact(pyobject)) {
-        return JDOUBLE_ID;
-    }
-
-    return JOBJECT_ID;
-}
-
 
 // ---------------------------------  Java object to Python object ---------------------------------
 
-/* Function to check whether PyObject can match the jclass */
+/* Function to returns the match degree of the PyObject and the jclass */
 
 int
-JcpPyObject_Check(JNIEnv* env, PyObject* pyobject, jclass clazz)
+JcpPyObject_match(JNIEnv* env, PyObject* pyobject, jclass clazz)
 {
-    int pid, jid;
 
-    if ((*env)->IsSameObject(env, clazz, JOBJECT_TYPE)) {
-        return 1;
+    int object_id;
+
+    object_id = JcpJObject_GetObjectId(env, clazz);
+
+    if (PyBool_Check(pyobject)) {
+        switch (object_id) {
+            case JBOOLEAN_ID:
+                return 4;
+            case JOBJECT_ID:
+                if ((*env)->IsSameObject(env, JBOOLEAN_OBJ_TYPE, clazz)) {
+                    return 3;
+                } else if ((*env)->IsSameObject(env, JOBJECT_TYPE, clazz)) {
+                    return 1;
+                }else if ((*env)->IsAssignableFrom(env, JBOOLEAN_OBJ_TYPE, clazz)) {
+                    return 2;
+                }
+        }
+    } else if (PyLong_CheckExact(pyobject)) {
+        switch (object_id) {
+            case JLONG_ID:
+                return 10;
+            case JINT_ID:
+                return 9;
+            case JDOUBLE_ID:
+                return 8;
+            case JFLOAT_ID:
+                return 7;
+            case JSHORT_ID:
+                return 6;
+            case JBYTE_ID:
+                return 5;
+            case JOBJECT_ID:
+                if ((*env)->IsSameObject(env, JLONG_OBJ_TYPE, clazz)) {
+                    return 4;
+                } else if ((*env)->IsSameObject(env, JINT_OBJ_TYPE, clazz)) {
+                    return 3;
+                } else if ((*env)->IsSameObject(env, JOBJECT_TYPE, clazz)) {
+                    return 1;
+                } else if ((*env)->IsAssignableFrom(env, JLONG_OBJ_TYPE, clazz)) {
+                    return 2;
+                }
+        }
+    } else if (PyFloat_CheckExact(pyobject)) {
+        switch (object_id) {
+            case JDOUBLE_ID:
+                return 6;
+            case JFLOAT_ID:
+                return 5;
+            case JOBJECT_ID:
+                if ((*env)->IsSameObject(env, JDOUBLE_OBJ_TYPE, clazz)) {
+                    return 4;
+                } else if ((*env)->IsSameObject(env, JFLOAT_OBJ_TYPE, clazz)) {
+                    return 3;
+                } else if ((*env)->IsSameObject(env, JOBJECT_TYPE, clazz)) {
+                    return 1;
+                } else if ((*env)->IsAssignableFrom(env, JDOUBLE_OBJ_TYPE, clazz)) {
+                    return 2;
+                }
+        }
+    } else if (PyUnicode_Check(pyobject)) {
+        switch (object_id) {
+            case JSTRING_ID:
+                return 2;
+            case JOBJECT_ID:
+                if ((*env)->IsAssignableFrom(env, JSTRING_TYPE, clazz)) {
+                    return 1;
+                }
+        }
+    } else if (PyBytes_CheckExact(pyobject)) {
+        if (object_id == JBYTES_ID) {
+            return 2;
+        } else if ((*env)->IsAssignableFrom(env, JBYTE_ARRAY_TYPE, clazz)) {
+            return 1;
+        }
+    } else if (PyList_CheckExact(pyobject)) {
+        if (object_id == JLIST_ID) {
+            return 2;
+        } else if ((*env)->IsAssignableFrom(env, JLIST_TYPE, clazz)) {
+            return 1;
+        }
+    } else if (PyDict_CheckExact(pyobject)) {
+        if (object_id == JMAP_ID) {
+            return 2;
+        } else if ((*env)->IsAssignableFrom(env, JMAP_TYPE, clazz)) {
+            return 1;
+        }
+    } else if (PyTuple_CheckExact(pyobject)) {
+        if (object_id == JARRAY_ID) {
+            return 2;
+        } else if ((*env)->IsSameObject(env, clazz, JOBJECT_TYPE)) {
+            return 1;
+        }
     }
-
-    jid = JcpJObject_GetObjectId(env, clazz);
-
-    pid = JcpPyObject_ToObjectId(env, pyobject);
-
-    if (pid == jid) {
-        return 1;
-    } else if (pid == JLONG_ID && jid < JLONG_ID) {
-        return 1;
-    } else if (pid == JDOUBLE_ID && jid < JDOUBLE_ID) {
-        return 1;
-    } else {
-        if (PyJObject_CheckExact(pyobject)) {
-            if (JcpPyJObject_IsInstanceOf(env, (PyJObject*) pyobject, clazz)) {
-                return 1;
-            } else {
-                return 0;
-            }
-        } else {
-            if (pid == JLONG_ID || pid == JDOUBLE_ID) {
-                return (*env)->IsSameObject(env, clazz, JNUMBER_TYPE);
-            } else if (pid == JSTRING_ID) {
-                return (*env)->IsSameObject(env, clazz, JCHARSEQUENCE_TYPE);
-            }
+    else if (PyJObject_Check(pyobject)) {
+        if ((*env)->IsInstanceOf(env, ((PyJObject*) pyobject)->object, clazz)) {
+            return 1;
         }
     }
 
@@ -222,6 +297,7 @@ PyObject *
 JcpPyObject_FromJObject(JNIEnv* env, jobject value)
 {
 
+    char* msg;
     jclass clazz = NULL;
 
     PyObject* result = NULL;
@@ -234,45 +310,88 @@ JcpPyObject_FromJObject(JNIEnv* env, jobject value)
 
     if ((*env)->IsSameObject(env, clazz, JSTRING_TYPE)) {
         result = JcpPyString_FromJString(env, value);
-    } else if ((*env)->IsSameObject(env, clazz, JLONG_OBJ_TYPE)) {
-        result = JcpPyInt_FromJLong(env, value);
-    } else if ((*env)->IsSameObject(env, clazz, JINT_OBJ_TYPE)) {
-        result = JcpPyInt_FromJInteger(env, value);
-    } else if ((*env)->IsSameObject(env, clazz, JBOOLEAN_OBJ_TYPE)) {
+    } else if ((*env)->IsSameObject(env, clazz, JBOOLEAN_TYPE)) {
         result = JcpPyBool_FromJBoolean(env, value);
-    } else if ((*env)->IsSameObject(env, clazz, JDOUBLE_OBJ_TYPE)) {
-        result = JcpPyFloat_FromJDouble(env, value);
-    } else if ((*env)->IsSameObject(env, clazz, JFLOAT_OBJ_TYPE)) {
-        result = JcpPyFloat_FromJFloat(env, value);
     } else if ((*env)->IsSameObject(env, clazz, JBYTE_ARRAY_TYPE)) {
         result = JcpPyBytes_FromJByteArray(env, value);
-    } else if ((*env)->IsSameObject(env, clazz, JBOOLEAN_ARRAY_TYPE)) {
-        result = JcpPyTuple_FromJBooleanArray(env, value);
-    } else if ((*env)->IsSameObject(env, clazz, JSHORT_ARRAY_TYPE)) {
-        result = JcpPyTuple_FromJShortArray(env, value);
-    } else if ((*env)->IsSameObject(env, clazz, JINT_ARRAY_TYPE)) {
-        result = JcpPyTuple_FromJIntArray(env, value);
-    } else if ((*env)->IsSameObject(env, clazz, JLONG_ARRAY_TYPE)) {
-        result = JcpPyTuple_FromJLongArray(env, value);
-    } else if ((*env)->IsSameObject(env, clazz, JFLOAT_ARRAY_TYPE)) {
-        result = JcpPyTuple_FromJFloatArray(env, value);
-    } else if ((*env)->IsSameObject(env, clazz, JDOUBLE_ARRAY_TYPE)) {
-        result = JcpPyTuple_FromJDoubleArray(env, value);
-    } else if ((*env)->IsInstanceOf(env, value, JOBJECT_ARRAY_TYPE)) {
-        result = JcpPyTuple_FromJObjectArray(env, value);
-    } else if ((*env)->IsSameObject(env, clazz, JSQLDATE_TYPE)) {
-        result = JcpPyDate_FromJSqlDate(env, value);
-    } else if ((*env)->IsSameObject(env, clazz, JSQLTIME_TYPE)) {
-        result = JcpPyTime_FromJSqlTime(env, value);
-    } else if ((*env)->IsSameObject(env, clazz, JSQLTIMESTAMP_TYPE)) {
-        result = JcpPyDateTime_FromJSqlTimestamp(env, value);
-    } else if ((*env)->IsInstanceOf(env, value, JCOLLECTION_TYPE)) {
-        result = JcpPyList_FromJCollectionObject(env, value);
-    } else if ((*env)->IsInstanceOf(env, value, JMAP_TYPE)) {
+    } else if ((*env)->IsAssignableFrom(env, clazz, JNUMBER_TYPE)) {
+        if ((*env)->IsSameObject(env, clazz, JLONG_OBJ_TYPE)) {
+            result = JcpPyInt_FromJLong(env, value);
+        } else if ((*env)->IsSameObject(env, clazz, JINT_OBJ_TYPE)) {
+            result = JcpPyInt_FromJInteger(env, value);
+        } else if ((*env)->IsSameObject(env, clazz, JDOUBLE_OBJ_TYPE)) {
+            result = JcpPyFloat_FromJDouble(env, value);
+        } else if ((*env)->IsSameObject(env, clazz, JFLOAT_OBJ_TYPE)) {
+            result = JcpPyFloat_FromJFloat(env, value);
+        } else if ((*env)->IsSameObject(env, clazz, JBIGDECIMAL_TYPE)) {
+            result = JcpPyDecimal_FromJBigDecimal(env, value);
+        } else if ((*env)->IsSameObject(env, clazz, JBIGINTEGER_TYPE)) {
+            result = JcpPyDecimal_FromJBigInteger(env, value);
+        } else {
+            msg = malloc(sizeof(char) * 200);
+            memset(msg, '\0', 200);
+
+            sprintf(msg, "Unknown Number class %s.",
+                    JcpString_FromJString(env, JavaClass_getName(env, clazz)));
+
+            JcpPyErr_ThrowMsg(env, msg);
+            free(msg);
+        }
+    } else if (JavaClass_isArray(env, clazz)) {
+        if ((*env)->IsSameObject(env, clazz, JBOOLEAN_ARRAY_TYPE)) {
+            result = JcpPyTuple_FromJBooleanArray(env, value);
+        } else if ((*env)->IsSameObject(env, clazz, JSHORT_ARRAY_TYPE)) {
+            result = JcpPyTuple_FromJShortArray(env, value);
+        } else if ((*env)->IsSameObject(env, clazz, JINT_ARRAY_TYPE)) {
+            result = JcpPyTuple_FromJIntArray(env, value);
+        } else if ((*env)->IsSameObject(env, clazz, JLONG_ARRAY_TYPE)) {
+            result = JcpPyTuple_FromJLongArray(env, value);
+        } else if ((*env)->IsSameObject(env, clazz, JFLOAT_ARRAY_TYPE)) {
+            result = JcpPyTuple_FromJFloatArray(env, value);
+        } else if ((*env)->IsSameObject(env, clazz, JDOUBLE_ARRAY_TYPE)) {
+            result = JcpPyTuple_FromJDoubleArray(env, value);
+        } else if ((*env)->IsInstanceOf(env, value, JOBJECT_ARRAY_TYPE)) {
+            result = JcpPyTuple_FromJObjectArray(env, value);
+        } else {
+            msg = malloc(sizeof(char) * 200);
+            memset(msg, '\0', 200);
+
+            sprintf(msg, "Unknown Array class %s.",
+                    JcpString_FromJString(env, JavaClass_getName(env, clazz)));
+
+            JcpPyErr_ThrowMsg(env, msg);
+            free(msg);
+        }
+    } else if ((*env)->IsAssignableFrom(env, clazz, JLIST_TYPE)) {
+        result = JcpPyList_FromJListObject(env, value);
+    } else if ((*env)->IsAssignableFrom(env, clazz, JMAP_TYPE)) {
         result = JcpPyDict_FromJMap(env, value);
-    }  else if ((*env)->IsSameObject(env, clazz, JBIGDECIMAL_TYPE)) {
-        result = JcpPyDecimal_FromJBigDecimal(env, value);
-    }  else {
+    } else if ((*env)->IsSameObject(env, clazz, JCHAR_TYPE)) {
+        result = JcpPyString_FromJChar(env, value);
+    } else if ((*env)->IsAssignableFrom(env, clazz, JUTILDATE_TYPE)) {
+        if ((*env)->IsSameObject(env, clazz, JSQLDATE_TYPE)) {
+            result = JcpPyDate_FromJSqlDate(env, value);
+        } else if ((*env)->IsSameObject(env, clazz, JSQLTIME_TYPE)) {
+            result = JcpPyTime_FromJSqlTime(env, value);
+        } else if ((*env)->IsSameObject(env, clazz, JSQLTIMESTAMP_TYPE)) {
+            result = JcpPyDateTime_FromJSqlTimestamp(env, value);
+        } else {
+            msg = malloc(sizeof(char) * 200);
+            memset(msg, '\0', 200);
+
+            sprintf(msg, "Unknown java/util/Date class %s.",
+                    JcpString_FromJString(env, JavaClass_getName(env, clazz)));
+
+            JcpPyErr_ThrowMsg(env, msg);
+            free(msg);
+        }
+    } else if ((*env)->IsAssignableFrom(env, clazz, JCOLLECTION_TYPE)) {
+        result = JcpPyJCollection_New(env, value, clazz);
+    } else if ((*env)->IsAssignableFrom(env, clazz, JITERABLE_TYPE)) {
+        result = JcpPyJIterable_New(env, value, clazz);
+    } else if ((*env)->IsAssignableFrom(env, clazz, JITERATOR_TYPE))
+        result = JcpPyJIterator_New(env, value, clazz);
+    else {
         result = JcpPyJObject_New(env, &PyJObject_Type, value, clazz);
     }
 
@@ -323,6 +442,14 @@ JcpPyFloat_FromDouble(double value)
 {
 
     return PyFloat_FromDouble(value);
+}
+
+/* Function to return a Python String from a jchar value */
+PyObject*
+JcpPyString_FromChar(jchar value)
+{
+    Py_UCS2 c = (Py_UCS2) value;
+    return PyUnicode_FromKindAndData(PyUnicode_2BYTE_KIND, &c, 1);
 }
 
 // ------------------------------------------------------------------------------------
@@ -498,6 +625,23 @@ JcpPyFloat_FromJDouble(JNIEnv* env, jobject value)
     }
 
     return JcpPyFloat_FromDouble((double) d);
+}
+
+PyObject *
+JcpPyString_FromJChar(JNIEnv* env, jobject value)
+{
+    jchar c;
+
+    if (value == NULL) {
+        Py_RETURN_NONE;
+    }
+
+    c = JavaCharacter_charValue(env, value);
+    if ((*env)->ExceptionCheck(env)) {
+        return NULL;
+    }
+
+    return JcpPyString_FromChar(c);
 }
 
 // ------------------------------------------------------------------------------------
@@ -694,12 +838,9 @@ JcpPyTuple_FromJObjectArray(JNIEnv* env, jobjectArray value)
     return result;
 }
 
-
-/* Function to return a Python List from a Java Collection object */
-
+/* Function to return a Python List from a Java List object */
 PyObject*
-JcpPyList_FromJCollectionObject(JNIEnv* env, jobject value)
-{
+JcpPyList_FromJListObject(JNIEnv* env, jobject value) {
 
     int i = 0;
     int size;
@@ -717,6 +858,7 @@ JcpPyList_FromJCollectionObject(JNIEnv* env, jobject value)
     size = JavaCollection_size(env, value);
 
     result = PyList_New(size);
+
     if (result == NULL) {
         return NULL;
     }
@@ -910,20 +1052,65 @@ JcpPyDecimal_FromJBigDecimal(JNIEnv* env, jobject value)
     module = PyImport_ImportModule((char *) "decimal");
 
     if (module == NULL) {
-        (*env)->ThrowNew(env, JPYTHONEXCE_TYPE, "Failed to import `decimal` module.");
+        JcpPyErr_ThrowMsg(env, "Failed to import `decimal` module.");
         return NULL;
     }
 
-    Py_DECREF(module);
-
     clazz = PyObject_GetAttrString(module, (char *) "Decimal");
 
+    Py_DECREF(module);
+
     if (clazz == NULL) {
-        (*env)->ThrowNew(env, JPYTHONEXCE_TYPE, "Failed to import `decimal.Decimal` class.");
+        JcpPyErr_ThrowMsg(env, "Failed to import `decimal.Decimal` class.");
         return NULL;
     }
 
     str = JcpPyString_FromJString(env, JavaBigDecimal_toString(env, value));
+
+    if (str) {
+
+        result = PyObject_CallFunctionObjArgs(clazz, str, NULL);
+
+        Py_DECREF(str);
+    }
+
+    Py_DECREF(clazz);
+
+    return result;
+}
+
+/* Function to return a Python Decimal from a Java BigInteger object */
+
+PyObject*
+JcpPyDecimal_FromJBigInteger(JNIEnv* env, jobject value)
+{
+
+    PyObject *module;
+    PyObject *clazz;
+    PyObject* str;
+    PyObject *result = NULL;
+
+    if (value == NULL) {
+        Py_RETURN_NONE;
+    }
+
+    module = PyImport_ImportModule((char *) "decimal");
+
+    if (module == NULL) {
+        JcpPyErr_ThrowMsg(env, "Failed to import `decimal` module.");
+        return NULL;
+    }
+
+    clazz = PyObject_GetAttrString(module, (char *) "Decimal");
+
+    Py_DECREF(module);
+
+    if (clazz == NULL) {
+        JcpPyErr_ThrowMsg(env, "Failed to import `decimal.Decimal` class.");
+        return NULL;
+    }
+
+    str = JcpPyString_FromJString(env, JavaBigInteger_toString(env, value));
 
     if (str) {
 
@@ -948,12 +1135,13 @@ JcpPyDecimal_FromJBigDecimal(JNIEnv* env, jobject value)
 jobject
 JcpPyObject_AsJObject(JNIEnv* env, PyObject* pyobject, jclass clazz)
 {
+    char* msg;
 
     if (pyobject == Py_None) {
         return NULL;
     } else if (PyUnicode_Check(pyobject)) {
         return JcpPyString_AsJString(env, pyobject);
-    } else if (PyJObject_CheckExact(pyobject)) {
+    } else if (PyJObject_Check(pyobject)) {
         return (*env)->NewLocalRef(env, ((PyJObject*) pyobject)->object);
     } else if (PyGen_CheckExact(pyobject)) {
         return JcpPyGenerator_AsJObject(env, pyobject);
@@ -964,15 +1152,15 @@ JcpPyObject_AsJObject(JNIEnv* env, PyObject* pyobject, jclass clazz)
     } else if (PyFloat_CheckExact(pyobject)) {
         return JcpPyFloat_AsJObject(env, pyobject, clazz);
     } else if (PyBytes_CheckExact(pyobject)) {
-        return JcpPyBytes_AsJObject(env, pyobject, clazz);
+        return JcpPyBytes_AsJObject(env, pyobject);
     } else if (PyList_CheckExact(pyobject)) {
-        return JcpPyList_AsJObject(env, pyobject, clazz);
+        return JcpPyList_AsJObject(env, pyobject);
     } else if (PyTuple_CheckExact(pyobject)) {
         return JcpPyTuple_AsJObject(env, pyobject, clazz);
     } else if (PyDict_CheckExact(pyobject)) {
         return JcpPyDict_AsJObject(env, pyobject);
-    } else if (JcpPyDecimal_Check(pyobject)) {
-        return JcpPyDecimal_AsJObject(env, pyobject);
+    } else if (JcpPyDecimal_Check(pyobject) == 1) {
+        return JcpPyDecimal_AsJObject(env, pyobject, clazz);
     } else {
         // the macro PyDateTime_IMPORT must be invoked.
         if (!PyDateTimeAPI) {
@@ -988,7 +1176,15 @@ JcpPyObject_AsJObject(JNIEnv* env, PyObject* pyobject, jclass clazz)
         }
     }
 
-    (*env)->ThrowNew(env, JPYTHONEXCE_TYPE, "Failed to convert python object to java object");
+    msg = malloc(sizeof(char) * 200);
+    memset(msg, '\0', 200);
+
+    sprintf(msg, "Failed to convert python object %s to java class %s.",
+            JcpString_FromJString(env, JcpPyString_AsJString(env, PyObject_Str(pyobject))),
+            JcpString_FromJString(env, JavaClass_getName(env, clazz)));
+
+    JcpPyErr_ThrowMsg(env, msg);
+    free(msg);
     return NULL;
 }
 
@@ -997,21 +1193,30 @@ JcpPyObject_AsJObject(JNIEnv* env, PyObject* pyobject, jclass clazz)
 
 JcpAPI_FUNC(jvalue) JcpPyObject_AsJValue(JNIEnv* env, PyObject* pyobject, jclass clazz)
 {
-    int type_id;
+    int object_id;
     jvalue result;
 
-    type_id = JcpJObject_GetObjectId(env, clazz);
+    object_id = JcpJObject_GetObjectId(env, clazz);
 
-    switch (type_id) {
+    switch (object_id) {
         case JSTRING_ID:
             result.l = JcpPyString_AsJString(env, pyobject);
             break;
         case JOBJECT_ID:
-            if (PyJObject_CheckExact(pyobject)) {
+            if (PyJObject_Check(pyobject)) {
                 result.l = (*env)->NewLocalRef(env, ((PyJObject*) pyobject)->object);
             } else {
-                result.l = JcpPyObject_AsJObject(env, pyobject, JOBJECT_TYPE);
+                result.l = JcpPyObject_AsJObject(env, pyobject, clazz);
             }
+            break;
+        case JBYTES_ID:
+            result.l = JcpPyBytes_AsJObject(env, pyobject);
+            break;
+        case JLIST_ID:
+            result.l = JcpPyList_AsJObject(env, pyobject);
+            break;
+        case JMAP_ID:
+            result.l = JcpPyDict_AsJObject(env, pyobject);
             break;
         case JINT_ID:
             result.i = JcpPyInt_AsJInt(pyobject);
@@ -1034,8 +1239,13 @@ JcpAPI_FUNC(jvalue) JcpPyObject_AsJValue(JNIEnv* env, PyObject* pyobject, jclass
         case JSHORT_ID:
             result.s = JcpPyInt_AsJShort(pyobject);
             break;
+        case JARRAY_ID:
+            result.l = JcpPyTuple_AsJObject(env, pyobject, clazz);
+            break;
         default:
-            PyErr_SetString(PyExc_TypeError, "Unrecognized type.");
+            PyErr_Format(PyExc_TypeError,
+                        "Unrecognized class %s.",
+                        JcpString_FromJString(env, JavaClass_getName(env, clazz)));
             result.l = NULL;
     }
 
@@ -1164,6 +1374,7 @@ jobject
 JcpPyBool_AsJObject(JNIEnv* env, PyObject* pyobject, jclass clazz)
 {
 
+    char* msg;
     jboolean z;
     jobject result = NULL;
 
@@ -1178,7 +1389,14 @@ JcpPyBool_AsJObject(JNIEnv* env, PyObject* pyobject, jclass clazz)
     }
 
     if (!result) {
-        (*env)->ThrowNew(env, JPYTHONEXCE_TYPE, "Failed to convert python bool to java object");
+        msg = malloc(sizeof(char) * 200);
+        memset(msg, '\0', 200);
+
+        sprintf(msg, "Failed to convert python bool to java class %s.",
+                JcpString_FromJString(env, JavaClass_getName(env, clazz)));
+
+        JcpPyErr_ThrowMsg(env, msg);
+        free(msg);
     }
 
     return result;
@@ -1191,6 +1409,7 @@ jobject
 JcpPyInt_AsJObject(JNIEnv* env, PyObject* pyobject, jclass clazz)
 {
 
+    char* msg;
     jbyte b;
     jshort s;
     jint i;
@@ -1232,7 +1451,14 @@ JcpPyInt_AsJObject(JNIEnv* env, PyObject* pyobject, jclass clazz)
     }
 
     if (!result) {
-        (*env)->ThrowNew(env, JPYTHONEXCE_TYPE, "Failed to convert python int to java object");
+        msg = malloc(sizeof(char) * 200);
+        memset(msg, '\0', 200);
+
+        sprintf(msg, "Failed to convert python int to java class %s.",
+                JcpString_FromJString(env, JavaClass_getName(env, clazz)));
+
+        JcpPyErr_ThrowMsg(env, msg);
+        free(msg);
     }
 
     return result;
@@ -1245,6 +1471,7 @@ jobject
 JcpPyFloat_AsJObject(JNIEnv* env, PyObject* pyobject, jclass clazz)
 {
 
+    char* msg;
     jfloat f;
     jdouble d;
     jobject result = NULL;
@@ -1268,7 +1495,14 @@ JcpPyFloat_AsJObject(JNIEnv* env, PyObject* pyobject, jclass clazz)
     }
 
     if (!result) {
-        (*env)->ThrowNew(env, JPYTHONEXCE_TYPE, "Failed to convert python float to java object");
+        msg = malloc(sizeof(char) * 200);
+        memset(msg, '\0', 200);
+
+        sprintf(msg, "Failed to convert python float to java class %s.",
+                JcpString_FromJString(env, JavaClass_getName(env, clazz)));
+
+        JcpPyErr_ThrowMsg(env, msg);
+        free(msg);
     }
 
     return result;
@@ -1326,7 +1560,7 @@ JcpPyInt_AsLongLong(PyObject* pyobject)
 /* Function to return a Java Object from a Python bytes value */
 
 jobject
-JcpPyBytes_AsJObject(JNIEnv* env, PyObject* pyobject, jclass clazz)
+JcpPyBytes_AsJObject(JNIEnv* env, PyObject* pyobject)
 {
 
     jsize length;
@@ -1346,12 +1580,20 @@ jobject
 JcpPyString_AsJObject(JNIEnv* env, PyObject* pyobject, jclass clazz)
 {
 
+    char* msg;
     jobject result = NULL;
 
     result = JcpPyString_AsJString(env, pyobject);
 
     if (!result) {
-        (*env)->ThrowNew(env, JPYTHONEXCE_TYPE, "Failed to convert python string to java object");
+        msg = malloc(sizeof(char) * 200);
+        memset(msg, '\0', 200);
+
+        sprintf(msg, "Failed to convert python string to java class %s.",
+                JcpString_FromJString(env, JavaClass_getName(env, clazz)));
+
+        JcpPyErr_ThrowMsg(env, msg);
+        free(msg);
     }
 
     return result;
@@ -1432,45 +1674,133 @@ JcpPyString_AsJString(JNIEnv* env, PyObject* pyobject)
     return result;
 }
 
-/* Function to return a Java Object from a Python List object */
+/* Function to return a Java ArrayList from a Python List object */
 
 jobject
-JcpPyList_AsJObject(JNIEnv* env, PyObject* pyobject, jclass clazz)
+JcpPyList_AsJObject(JNIEnv* env, PyObject* pyobject)
 {
 
     int length;
-    jobjectArray array;
     jobject element;
+    jobject list;
 
     length= PyList_Size(pyobject);
 
-     array = (*env)->NewObjectArray(env, length, JOBJECT_TYPE, NULL);
+    list = JavaList_NewArrayList(env);
 
     for (int i = 0; i < length; i++) {
         element = JcpPyObject_AsJObject(env, PyList_GetItem(pyobject, i), JOBJECT_TYPE);
-        (*env)->SetObjectArrayElement(env, array, i, element);
+        JavaList_Add(env, list, element);
     }
 
-    return array;
+    return list;
 }
 
 
-/* Function to return a Java Object from a Python Tuple object */
+/* Function to return a Java Array from a Python Tuple object */
 
 jobject
 JcpPyTuple_AsJObject(JNIEnv* env, PyObject* pyobject, jclass clazz)
 {
+    char* msg;
     int length;
-    jobjectArray array;
+    jobjectArray array = NULL;
     jobject element;
 
     length = PyTuple_Size(pyobject);
 
-    array = (*env)->NewObjectArray(env, length, JOBJECT_TYPE, NULL);
+    if ((*env)->IsSameObject(env, clazz, JOBJECT_TYPE)) {
 
-    for (int i = 0; i < length; i++) {
-        element = JcpPyObject_AsJObject(env, PyTuple_GetItem(pyobject, i), JOBJECT_TYPE);
-        (*env)->SetObjectArrayElement(env, array, i, element);
+        array = (*env)->NewObjectArray(env, length, JOBJECT_TYPE, NULL);
+
+        for (int i = 0; i < length; i++) {
+            element = JcpPyObject_AsJObject(env, PyTuple_GetItem(pyobject, i), JOBJECT_TYPE);
+            (*env)->SetObjectArrayElement(env, array, i, element);
+        }
+
+    } else if ((*env)->IsSameObject(env, clazz, JINT_ARRAY_TYPE)) {
+        array = (*env)->NewIntArray(env, length);
+        jint* ints = (*env)->GetIntArrayElements(env, array, 0);
+
+        for (int i = 0; i < length; i++) {
+            ints[i] = JcpPyInt_AsJInt(PyTuple_GetItem(pyobject, i));
+        }
+
+        (*env)->ReleaseIntArrayElements(env, array, ints, 0);
+
+    } else if ((*env)->IsSameObject(env, clazz, JDOUBLE_ARRAY_TYPE)) {
+
+        array = (*env)->NewDoubleArray(env, length);
+        jdouble* doubles = (*env)->GetDoubleArrayElements(env, (jdoubleArray) array, 0);
+
+        for (int i = 0; i < length; i++) {
+            doubles[i] = JcpPyFloat_AsJDouble(PyTuple_GetItem(pyobject, i));
+        }
+
+        (*env)->ReleaseDoubleArrayElements(env, array, doubles, 0);
+
+    } else if ((*env)->IsSameObject(env, clazz, JLONG_ARRAY_TYPE)) {
+
+        array = (*env)->NewLongArray(env, length);
+        jlong* longs = (*env)->GetLongArrayElements(env, (jlongArray) array, 0);
+
+        for (int i = 0; i < length; i++) {
+            longs[i] = JcpPyInt_AsJLong(PyTuple_GetItem(pyobject, i));
+        }
+
+        (*env)->ReleaseLongArrayElements(env, array, longs, 0);
+
+    } else if ((*env)->IsSameObject(env, clazz, JFLOAT_ARRAY_TYPE)) {
+
+        array = (*env)->NewFloatArray(env, length);
+        jfloat* floats = (*env)->GetFloatArrayElements(env, (jfloatArray) array, 0);
+
+        for (int i = 0; i < length; i++) {
+            floats[i] = JcpPyFloat_AsJFloat(PyTuple_GetItem(pyobject, i));
+        }
+
+        (*env)->ReleaseFloatArrayElements(env, array, floats, 0);
+
+    } else if ((*env)->IsSameObject(env, clazz, JBOOLEAN_ARRAY_TYPE)) {
+
+        array = (*env)->NewBooleanArray(env, length);
+        jboolean* booleans = (*env)->GetBooleanArrayElements(env, (jbooleanArray) array, 0);
+
+        for (int i = 0; i < length; i++) {
+            booleans[i] = JcpPyBool_AsJBoolean(PyTuple_GetItem(pyobject, i));
+        }
+
+        (*env)->ReleaseBooleanArrayElements(env, array, booleans, 0);
+
+    } else if ((*env)->IsSameObject(env, clazz, JSHORT_ARRAY_TYPE)) {
+
+        array = (*env)->NewShortArray(env, length);
+        jshort* shorts = (*env)->GetShortArrayElements(env, (jshortArray) array, 0);
+
+        for (int i = 0; i < length; i++) {
+            shorts[i] = JcpPyInt_AsJShort(PyTuple_GetItem(pyobject, i));
+        }
+
+        (*env)->ReleaseShortArrayElements(env, array, shorts, 0);
+
+    } else if (JavaClass_isArray(env, clazz)) {
+        jclass elementType = JavaClass_getComponentType(env, clazz);
+
+        array = (*env)->NewObjectArray(env, length, elementType, NULL);
+
+        for (int i = 0; i < length; i++) {
+            element = JcpPyObject_AsJObject(env, PyTuple_GetItem(pyobject, i), elementType);
+            (*env)->SetObjectArrayElement(env, array, i, element);
+        }
+    } else {
+        msg = malloc(sizeof(char) * 200);
+        memset(msg, '\0', 200);
+
+        sprintf(msg, "Failed to convert python tuple to java class %s.",
+                JcpString_FromJString(env, JavaClass_getName(env, clazz)));
+
+        JcpPyErr_ThrowMsg(env, msg);
+        free(msg);
     }
 
     return array;
@@ -1579,9 +1909,9 @@ JcpPyDecimal_Check(PyObject* pyobject)
         return 0;
     }
 
-    Py_DECREF(module);
-
     clazz = PyObject_GetAttrString(module, (char *) "Decimal");
+
+    Py_DECREF(module);
 
     if (clazz == NULL) {
         PyErr_Format(PyExc_RuntimeError, "Failed to import `decimal.Decimal` class.");
@@ -1595,10 +1925,10 @@ JcpPyDecimal_Check(PyObject* pyobject)
 }
 
 
-/* Function to return a Java BigDecimal object from a Python Decimal object */
+/* Function to return a Java BigDecimal/BigInteger object from a Python Decimal object */
 
 jobject
-JcpPyDecimal_AsJObject(JNIEnv* env, PyObject* pyobject)
+JcpPyDecimal_AsJObject(JNIEnv* env, PyObject* pyobject, jclass clazz)
 {
 
     PyObject* str;
@@ -1608,7 +1938,13 @@ JcpPyDecimal_AsJObject(JNIEnv* env, PyObject* pyobject)
     str = PyObject_Str(pyobject);
 
     if (str) {
-        result = JavaBigDecimal_New(env, JcpPyString_AsJString(env, str));
+
+        if ((*env)->IsSameObject(env, clazz, JBIGINTEGER_TYPE)) {
+            result = JavaBigInteger_New(env, JcpPyString_AsJString(env, str));
+        } else {
+            result = JavaBigDecimal_New(env, JcpPyString_AsJString(env, str));
+        }
+
         Py_DECREF(str);
     }
 

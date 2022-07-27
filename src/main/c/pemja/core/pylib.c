@@ -15,6 +15,7 @@
 #include "Pemja.h"
 
 #include "python_class/PythonClass.h"
+#include "java_class/JavaClass.h"
 
 static PyThreadState *JcpMainThreadState = NULL;
 
@@ -170,6 +171,17 @@ pemja_module_init(JNIEnv* env)
         return NULL;
     }
 
+    // stuff for making new pyjarray objects
+    PyModule_AddIntConstant(pemja_module, "JBOOLEAN_ID", JBOOLEAN_ID);
+    PyModule_AddIntConstant(pemja_module, "JINT_ID", JINT_ID);
+    PyModule_AddIntConstant(pemja_module, "JLONG_ID", JLONG_ID);
+    PyModule_AddIntConstant(pemja_module, "JSTRING_ID", JSTRING_ID);
+    PyModule_AddIntConstant(pemja_module, "JDOUBLE_ID", JDOUBLE_ID);
+    PyModule_AddIntConstant(pemja_module, "JSHORT_ID", JSHORT_ID);
+    PyModule_AddIntConstant(pemja_module, "JFLOAT_ID", JFLOAT_ID);
+    PyModule_AddIntConstant(pemja_module, "JCHAR_ID", JCHAR_ID);
+    PyModule_AddIntConstant(pemja_module, "JBYTE_ID", JBYTE_ID);
+
     return pemja_module;
 }
 
@@ -225,10 +237,39 @@ pyjtypes_init()
         return -1;
     }
 
+    // class
     if (!PyJClass_Type.tp_base) {
         PyJClass_Type.tp_base = &PyJObject_Type;
     }
+
     if (PyType_Ready(&PyJClass_Type) < 0) {
+        return -1;
+    }
+
+    // iterable
+    if (!PyJIterable_Type.tp_base) {
+        PyJIterable_Type.tp_base = &PyJObject_Type;
+    }
+
+    if (PyType_Ready(&PyJIterable_Type) < 0) {
+        return -1;
+    }
+
+    // iterator
+    if (!PyJIterator_Type.tp_base) {
+        PyJIterator_Type.tp_base = &PyJObject_Type;
+    }
+
+    if (PyType_Ready(&PyJIterator_Type) < 0) {
+        return -1;
+    }
+
+    // collection
+    if (!PyJCollection_Type.tp_base) {
+        PyJCollection_Type.tp_base = &PyJIterable_Type;
+    }
+
+    if (PyType_Ready(&PyJCollection_Type) < 0) {
         return -1;
     }
 

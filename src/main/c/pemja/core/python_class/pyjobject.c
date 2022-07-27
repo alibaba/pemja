@@ -263,13 +263,6 @@ JcpPyJObject_New(JNIEnv *env, PyTypeObject *type, jobject object, jclass clazz)
     return (PyObject*) self;
 }
 
-
-jint
-JcpPyJObject_IsInstanceOf(JNIEnv* env, PyJObject* object, jclass clazz)
-{
-    return (*env)->IsInstanceOf(env, object->object, clazz);
-}
-
 PyTypeObject PyJObject_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "pemja.PyJObject",                          /* tp_name */

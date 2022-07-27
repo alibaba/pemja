@@ -25,12 +25,16 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.nio.file.Files;
 import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
@@ -132,40 +136,28 @@ public class PythonInterpreterTest {
             interpreter.set("q", q);
             interpreter.set("r", r);
 
-            Object[] actualK = interpreter.get("k", Object[].class);
-            assertEquals(k.length, actualK.length);
-            for (int i = 0; i < k.length; i++) {
-                assertEquals(k[i], actualK[i]);
-            }
+            boolean[] actualK = interpreter.get("k", boolean[].class);
+            assertArrayEquals(k, actualK);
 
-            Object[] actualM = interpreter.get("m", Object[].class);
-            assertEquals(m.length, actualM.length);
-            for (int i = 0; i < m.length; i++) {
-                assertEquals(m[i], ((Long) actualM[i]).longValue());
-            }
+            short[] actualM = interpreter.get("m", short[].class);
+            assertArrayEquals(m, actualM);
 
-            Object[] actualN = interpreter.get("n", Object[].class);
-            assertEquals(n.length, actualN.length);
-            for (int i = 0; i < n.length; i++) {
-                assertEquals(n[i], ((Long) actualN[i]).longValue());
-            }
+            int[] actualN = interpreter.get("n", int[].class);
+            assertArrayEquals(n, actualN);
 
-            Object[] actualO = interpreter.get("o", Object[].class);
-            assertEquals(o.length, actualO.length);
-            for (int i = 0; i < o.length; i++) {
-                assertEquals(o[i], ((Long) actualO[i]).longValue());
-            }
+            long[] actualO = interpreter.get("o", long[].class);
+            assertArrayEquals(o, actualO);
 
-            Object[] actualP = interpreter.get("p", Object[].class);
+            float[] actualP = interpreter.get("p", float[].class);
             assertEquals(p.length, actualP.length);
             for (int i = 0; i < actualP.length; i++) {
-                assertEquals(Float.compare(p[i], ((Double) actualP[i]).floatValue()), 0);
+                assertEquals(Float.compare(p[i], actualP[i]), 0);
             }
 
-            Object[] actualQ = interpreter.get("q", Object[].class);
+            double[] actualQ = interpreter.get("q", double[].class);
             assertEquals(q.length, actualQ.length);
             for (int i = 0; i < actualQ.length; i++) {
-                assertEquals(Double.compare(q[i], (Double) actualQ[i]), 0);
+                assertEquals(Double.compare(q[i], actualQ[i]), 0);
             }
 
             Object[] actualR = interpreter.get("r", Object[].class);
@@ -187,7 +179,7 @@ public class PythonInterpreterTest {
             v.add(1L);
             v.add("pemja");
             interpreter.set("v", v);
-            assertArrayEquals(v.toArray(), (Object[]) interpreter.get("v"));
+            assertEquals(v, interpreter.get("v"));
 
             Map<Object, Object> w = new HashMap<>();
             w.put(1L, "pemja");
@@ -198,6 +190,23 @@ public class PythonInterpreterTest {
             BigDecimal x = new BigDecimal("1000000000000000000.05999999999999999899999999999");
             interpreter.set("x", x);
             assertEquals(x, interpreter.get("x"));
+
+            BigInteger y = new BigInteger("1000000000000000000");
+            interpreter.set("y", y);
+            assertEquals(y, interpreter.get("y", BigInteger.class));
+
+            Object[][] z = new String[3][3];
+            z[0] = new String[] {"pemja", "is", "cool"};
+            z[1] = new String[] {"p", "e", "m"};
+            z[2] = new String[] {"ja", "v", "a"};
+            interpreter.set("z", z);
+            assertArrayEquals(z, interpreter.get("z", Object[][].class));
+
+            int[][] a1 = new int[2][2];
+            a1[0] = new int[] {1, 2};
+            a1[1] = new int[] {3, 4};
+            interpreter.set("a1", a1);
+            assertArrayEquals(a1, interpreter.get("a1", int[][].class));
         }
     }
 
@@ -227,6 +236,142 @@ public class PythonInterpreterTest {
             }
         } catch (Exception e) {
             throw new RuntimeException("Failed to invoke test_call.py", e);
+        }
+    }
+
+    @Test
+    public void testCallPythonWithAllTypes() throws Exception {
+        PythonInterpreterConfig config =
+                PythonInterpreterConfig.newBuilder().addPythonPaths(testDir).build();
+        try (PythonInterpreter interpreter = new PythonInterpreter(config)) {
+            interpreter.exec("import test_call");
+            assertEquals(true, interpreter.invoke("test_call.test_call_one_arg", true));
+            assertEquals(127L, interpreter.invoke("test_call.test_call_one_arg", 127));
+            assertEquals(32767L, interpreter.invoke("test_call.test_call_one_arg", 32767));
+            assertEquals(
+                    -2147483648L, interpreter.invoke("test_call.test_call_one_arg", -2147483648));
+            assertEquals(
+                    -9223372036854775808L,
+                    interpreter.invoke("test_call.test_call_one_arg", -9223372036854775808L));
+            assertEquals(1.12, interpreter.invoke("test_call.test_call_one_arg", 1.12));
+            assertEquals(Math.PI, interpreter.invoke("test_call.test_call_one_arg", Math.PI));
+            assertEquals("中", interpreter.invoke("test_call.test_call_one_arg", '中'));
+            assertEquals("中国", interpreter.invoke("test_call.test_call_one_arg", "中国"));
+            assertArrayEquals(
+                    "中国".getBytes(),
+                    (byte[])
+                            interpreter.invoke(
+                                    "test_call.test_call_one_arg", (Object) "中国".getBytes()));
+
+            boolean[] arg0 = new boolean[] {true, false};
+            Object[] res0 =
+                    (Object[]) interpreter.invoke("test_call.test_call_one_arg", (Object) arg0);
+            assertEquals(arg0.length, res0.length);
+            for (int i = 0; i < arg0.length; i++) {
+                assertEquals(arg0[i], res0[i]);
+            }
+
+            boolean[] arg1 = new boolean[] {true, false};
+            Object[] res1 =
+                    (Object[]) interpreter.invoke("test_call.test_call_one_arg", (Object) arg1);
+
+            assertEquals(arg1.length, res1.length);
+            for (int i = 0; i < arg1.length; i++) {
+                assertEquals(arg1[i], res1[i]);
+            }
+
+            byte[] arg2 = new byte[] {-128, 127};
+            byte[] res2 = (byte[]) interpreter.invoke("test_call.test_call_one_arg", (Object) arg2);
+            assertArrayEquals(arg2, res2);
+
+            short[] arg3 = new short[] {-32768, 32767};
+            Object[] res3 =
+                    (Object[]) interpreter.invoke("test_call.test_call_one_arg", (Object) arg3);
+            assertEquals(arg3.length, res3.length);
+            for (int i = 0; i < arg3.length; i++) {
+                assertEquals(arg3[i], ((Long) res3[i]).shortValue());
+            }
+
+            int[] arg4 = new int[] {Integer.MIN_VALUE, Integer.MAX_VALUE};
+            Object[] res4 =
+                    (Object[]) interpreter.invoke("test_call.test_call_one_arg", (Object) arg4);
+            assertEquals(arg4.length, res4.length);
+            for (int i = 0; i < arg4.length; i++) {
+                assertEquals(arg4[i], ((Long) res4[i]).intValue());
+            }
+
+            long[] arg5 = new long[] {Long.MIN_VALUE, Long.MAX_VALUE};
+            Object[] res5 =
+                    (Object[]) interpreter.invoke("test_call.test_call_one_arg", (Object) arg5);
+            assertEquals(arg5.length, res5.length);
+            for (int i = 0; i < arg5.length; i++) {
+                assertEquals(arg5[i], ((Long) res5[i]).longValue());
+            }
+
+            Object[] arg6 = new Object[] {"中国", 123L};
+            Object[] res6 =
+                    (Object[]) interpreter.invoke("test_call.test_call_one_arg", (Object) arg6);
+            assertEquals(arg6.length, res6.length);
+            for (int i = 0; i < arg6.length; i++) {
+                assertEquals(arg6[i], res6[i]);
+            }
+
+            Date arg7 = new Date(2021 - 1900, 9 - 1, 22);
+            Object res7 = interpreter.invoke("test_call.test_call_one_arg", (Object) arg7);
+            assertEquals(arg7, res7);
+
+            Time arg8 = new Time(100000);
+            Object res8 = interpreter.invoke("test_call.test_call_one_arg", (Object) arg8);
+            assertEquals(arg8, res8);
+
+            Timestamp arg9 = new Timestamp(500000010);
+            Object res9 = interpreter.invoke("test_call.test_call_one_arg", (Object) arg9);
+            assertEquals(arg9, res9);
+
+            ArrayList<Object> arg10 = new ArrayList<>();
+            arg10.add(1L);
+            arg10.add("pemja");
+            assertEquals(arg10, interpreter.invoke("test_call.test_call_one_arg", arg10));
+
+            Map<Object, Object> arg11 = new HashMap<>();
+            arg11.put(1L, "pemja");
+            arg11.put("pemja", 2L);
+            assertEquals(arg11, interpreter.invoke("test_call.test_call_one_arg", arg11));
+
+            PyIterator iterators =
+                    (PyIterator) interpreter.invoke("test_call.test_return_generator", 3);
+            Object[] expected = new Object[] {0L, 1L, 2L, "haha", null};
+            int index = 0;
+            while (iterators.hasNext()) {
+                assertEquals(expected[index], iterators.next());
+                index++;
+            }
+            iterators.close();
+        }
+    }
+
+    @Test
+    public void testCallPyJObject() {
+        PythonInterpreterConfig config =
+                PythonInterpreterConfig.newBuilder().addPythonPaths(testDir).build();
+        try (PythonInterpreter interpreter = new PythonInterpreter(config)) {
+            interpreter.exec("import test_pyjobject");
+
+            TestObject arg = new TestObject();
+            assertEquals(arg, interpreter.invoke("test_pyjobject.test_call_java_object", arg));
+
+            Map<String, Long> map = new HashMap<>();
+            map.put("pemja", 1L);
+            map.put("java", 2L);
+            map.put("python", 3L);
+            assertEquals(
+                    map.values(),
+                    interpreter.invoke("test_pyjobject.test_call_collection", map.values()));
+
+            Iterator<Long> valuesIter = map.values().iterator();
+            assertEquals(
+                    valuesIter,
+                    interpreter.invoke("test_pyjobject.test_call_iterator", valuesIter));
         }
     }
 
@@ -351,7 +496,7 @@ public class PythonInterpreterTest {
                                     interpreter.exec("import numpy as np");
                                     interpreter.exec("import math");
                                     interpreter.exec(
-                                            "in_array = [0, math.pi / 2, np.pi / 3, np.pi]");
+                                            "in_array = (0, math.pi / 2, np.pi / 3, np.pi)");
                                     Object[] res =
                                             new Object[] {
                                                 0L,
@@ -379,7 +524,7 @@ public class PythonInterpreterTest {
                                     interpreter.exec("import numpy as np");
                                     interpreter.exec("import math");
                                     interpreter.exec(
-                                            "in_array = [0, math.pi / 2, np.pi / 3, np.pi]");
+                                            "in_array = (0, math.pi / 2, np.pi / 3, np.pi)");
                                     Object[] res =
                                             new Object[] {
                                                 0L,
@@ -486,18 +631,22 @@ public class PythonInterpreterTest {
     }
 
     @Test
-    public void testCallbackJava() {
+    public void testCallbackJavaWithAllTypes() {
         try {
             PythonInterpreterConfig config =
                     PythonInterpreterConfig.newBuilder().addPythonPaths(testDir).build();
             try (PythonInterpreter interpreter = new PythonInterpreter(config)) {
-                interpreter.exec("import test_call");
+                interpreter.exec("import test_callback_java");
+
                 assertEquals(
                         "pemjajavapython7fffffff--Pemja-is-cool",
-                        interpreter.invoke("test_call.test_callback_java"));
+                        interpreter.invoke("test_callback_java.test_callback_java_basic"));
+
+                TestObject object = new TestObject();
+                interpreter.invoke("test_callback_java.test_callback_with_all_types", object);
             }
         } catch (Exception e) {
-            throw new RuntimeException("Failed to call test_call_java in test_call.py", e);
+            throw new RuntimeException("Failed to call test_call_java in test_callback_java.py", e);
         }
     }
 
@@ -513,10 +662,11 @@ public class PythonInterpreterTest {
                                                     .addPythonPaths(testDir)
                                                     .build())) {
                                 try {
-                                    interpreter.exec("import test_call");
+                                    interpreter.exec("import test_callback_java");
                                     assertEquals(
                                             "pemjajavapython7fffffff--Pemja-is-cool",
-                                            interpreter.invoke("test_call.test_callback_java"));
+                                            interpreter.invoke(
+                                                    "test_callback_java.test_callback_java_basic"));
                                 } catch (Throwable throwable) {
                                     if (exceptionReference.get() == null) {
                                         exceptionReference.set(throwable);
@@ -534,10 +684,11 @@ public class PythonInterpreterTest {
                                                     .addPythonPaths(testDir)
                                                     .build())) {
                                 try {
-                                    interpreter.exec("import test_call");
+                                    interpreter.exec("import test_callback_java");
                                     assertEquals(
                                             "pemjajavapython7fffffff--Pemja-is-cool",
-                                            interpreter.invoke("test_call.test_callback_java"));
+                                            interpreter.invoke(
+                                                    "test_callback_java.test_callback_java_basic"));
                                 } catch (Throwable throwable) {
                                     if (exceptionReference.get() == null) {
                                         exceptionReference.set(throwable);
@@ -555,32 +706,201 @@ public class PythonInterpreterTest {
         }
     }
 
-    @Test
-    public void testReturnGenerator() {
-        try {
-            PythonInterpreterConfig config =
-                    PythonInterpreterConfig.newBuilder().addPythonPaths(testDir).build();
-            try (PythonInterpreter interpreter = new PythonInterpreter(config)) {
-                interpreter.exec("import test_call");
-                PyIterator iterators =
-                        (PyIterator) interpreter.invoke("test_call.test_return_generator", 3);
-                Object[] expected = new Object[] {0L, 1L, 2L, "haha", null};
-                int index = 0;
-                while (iterators.hasNext()) {
-                    assertEquals(expected[index], iterators.next());
-                    index++;
-                }
-                iterators.close();
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to call test_return_generator in test_call.py", e);
-        }
-    }
+    public static final class TestObject<T> {
 
-    private static final class TestObject {
-        public String testMethod() {
-            return "testMethod";
+        /* ----------------------------------- test boolean ------------------------------------- */
+
+        public String testBoolean(boolean arg) {
+            return "testBoolean_boolean";
         }
+
+        public String testBoolean(Boolean arg) {
+            return "testBoolean_Boolean";
+        }
+
+        public String testBoolean(T arg) {
+            return "testBoolean_T";
+        }
+
+        public String testBooleanObj(Boolean arg) {
+            return "testBooleanObj_arg";
+        }
+
+        public String testBooleanObj(T arg) {
+            return "testBooleanObj_T";
+        }
+
+        public String testBooleanGeneric(T obj) {
+            return "testBooleanGeneric_T";
+        }
+
+        /* -------------------------------------------------------------------------------------- */
+
+        /* ----------------------------------- test long ---------------------------------------- */
+
+        public String testLong(int arg) {
+            return "testLong_int";
+        }
+
+        public String testLong(long arg) {
+            return "testLong_long";
+        }
+
+        public String testLong(Integer arg) {
+            return "testLong_Integer";
+        }
+
+        public String testLong(Long arg) {
+            return "testLong_Long";
+        }
+
+        public String testLong(Number arg) {
+            return "testLong_Number";
+        }
+
+        public String testLong(T arg) {
+            return "testLong_T";
+        }
+
+        /* -------------------------------------------------------------------------------------- */
+
+        /* ----------------------------------- test int ----------------------------------------- */
+
+        public String testInt(int arg) {
+            return "testInt_int";
+        }
+
+        public String testInt(Integer arg) {
+            return "testInt_Integer";
+        }
+
+        public String testInt(Number arg) {
+            return "testInt_Number";
+        }
+
+        public String testInt(T arg) {
+            return "testInt_T";
+        }
+        /* -------------------------------------------------------------------------------------- */
+
+        /* ----------------------------------- test Number -------------------------------------- */
+
+        public String testNumber(Number arg) {
+            return "testNumber_Number";
+        }
+
+        public String testNumber(T arg) {
+            return "testNumber_T";
+        }
+
+        public String testGeneric(T arg) {
+            return "testGeneric_T";
+        }
+
+        /* -------------------------------------------------------------------------------------- */
+
+        /* ----------------------------------- test Collection ---------------------------------- */
+
+        public String testCollection(Collection collection) {
+            return "testCollection";
+        }
+
+        /* -------------------------------------------------------------------------------------- */
+
+        /* ----------------------------------- test Iterable ------------------------------------ */
+
+        public String testIterable(Iterable iterable) {
+            return "testIterable";
+        }
+
+        /* -------------------------------------------------------------------------------------- */
+
+        /* ----------------------------------- test String -------------------------------------- */
+
+        public String testString(String arg) {
+            return "testString_String";
+        }
+
+        public String testString(CharSequence arg) {
+            return "testString_CharSequence";
+        }
+
+        public String testString(T arg) {
+            return "testString_T";
+        }
+
+        public String testStringCharSequence(CharSequence arg) {
+            return "testStringCharSequence_CharSequence";
+        }
+
+        public String testStringGeneric(T arg) {
+            return "testStringGeneric_T";
+        }
+
+        /* -------------------------------------------------------------------------------------- */
+
+        /* ----------------------------------- test vargs --------------------------------------- */
+
+        public String testVargs(String arg, String... otherArgs) {
+            return "testVargs";
+        }
+
+        /* -------------------------------------------------------------------------------------- */
+
+        /* ----------------------------------- test bytes --------------------------------------- */
+
+        public String testBytes(byte[] arg) {
+            return "testBytes_byte[]";
+        }
+
+        public String testBytesGeneric(T arg) {
+            return "testBytesGeneric_T";
+        }
+
+        /* -------------------------------------------------------------------------------------- */
+
+        /* ----------------------------------- test List ---------------------------------------- */
+
+        public String testList(List list) {
+            return "testList";
+        }
+
+        public String testGenericList(T list) {
+            return "testGenericList_T";
+        }
+
+        /* -------------------------------------------------------------------------------------- */
+
+        /* ----------------------------------- test Map ----------------------------------------- */
+
+        public String testMap(Map map) {
+            return "testMap";
+        }
+
+        public String testGenericMap(Map map) {
+            return "testGenericMap";
+        }
+
+        /* -------------------------------------------------------------------------------------- */
+
+        /* ----------------------------------- test Map ----------------------------------------- */
+
+        public String testArray(String[] args) {
+            return "testArray";
+        }
+
+        public String testIntArray(int[] args) {
+            return "testIntArray";
+        }
+
+        /* -------------------------------------------------------------------------------------- */
+
+        /* ----------------------------------- test Field --------------------------------------- */
+
+        public static final String NAME = "TestObject";
+
+        /* -------------------------------------------------------------------------------------- */
+
     }
 
     private static void deleteDirectory(File directory) throws IOException {

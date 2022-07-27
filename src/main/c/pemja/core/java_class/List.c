@@ -11,10 +11,28 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#ifndef _Included_java_util_Collection
-#define _Included_java_util_Collection
 
-jint JavaCollection_size(JNIEnv*, jobject);
-jboolean JavaCollection_contains(JNIEnv*, jobject, jobject);
+#include "Pemja.h"
 
-#endif
+#include "java_class/List.h"
+
+static jmethodID init_ArrayList = 0;
+static jmethodID add = 0;
+
+jobject
+JavaList_NewArrayList(JNIEnv* env)
+{
+    if (!init_ArrayList) {
+        init_ArrayList = (*env)->GetMethodID(env, JARRAYLIST_TYPE, "<init>", "()V");
+    }
+    return (*env)->NewObject(env, JARRAYLIST_TYPE, init_ArrayList);
+}
+
+jboolean
+JavaList_Add(JNIEnv* env, jobject object, jobject value)
+{
+    if (!add) {
+        add = (*env)->GetMethodID(env, JLIST_TYPE, "add", "(Ljava/lang/Object;)Z");
+    }
+    return (*env)->CallBooleanMethod(env, object, add, value);
+}

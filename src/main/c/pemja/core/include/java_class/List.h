@@ -11,16 +11,10 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+#ifndef _Included_java_util_List
+#define _Included_java_util_List
 
-#include "Pemja.h"
+jobject JavaList_NewArrayList(JNIEnv*);
+jboolean JavaList_Add(JNIEnv*, jobject, jobject);
 
-static jmethodID size = 0;
-
-jint
-JavaCollection_size(JNIEnv* env, jobject object)
-{
-    if (!size) {
-        size = (*env)->GetMethodID(env, JCOLLECTION_TYPE, "size", "()I");
-    }
-    return (*env)->CallIntMethod(env, object, size);
-}
+#endif

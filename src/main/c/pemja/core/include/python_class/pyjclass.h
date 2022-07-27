@@ -30,6 +30,6 @@ JcpAPI_FUNC(PyObject*) JcpPyJClass_New(JNIEnv*, jclass);
 
 #define PyJClass_Check(op) \
         PyObject_TypeCheck(op, &PyJClass_Type)
-#define PyJClass_CheckExact(op) Py_IS_TYPE(op, &PyJClass_Type)
+#define PyJClass_CheckExact(op) op->ob_type == &PyJClass_Type
 
 #endif
