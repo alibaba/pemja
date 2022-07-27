@@ -207,3 +207,9 @@ JcpPyErr_Throw(JNIEnv* env)
 
     return 1;
 }
+
+int
+JcpPyErr_ThrowMsg(JNIEnv* env, const char* msg)
+{
+    return (*env)->ThrowNew(env, JPYTHONEXCE_TYPE, msg);
+}

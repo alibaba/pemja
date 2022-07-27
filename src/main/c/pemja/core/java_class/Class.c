@@ -20,6 +20,7 @@ static jmethodID getConstructors = 0;
 static jmethodID getMethods = 0;
 static jmethodID getFields = 0;
 static jmethodID getComponentType = 0;
+static jmethodID isArray = 0;
 
 jstring
 JavaClass_getName(JNIEnv* env, jobject this)
@@ -60,7 +61,7 @@ JavaClass_getFields(JNIEnv* env, jobject this)
     return (*env)->CallObjectMethod(env, this, getFields);
 }
 
-jobject
+jclass
 JavaClass_getComponentType(JNIEnv* env, jobject this)
 {
     if (!getComponentType) {
@@ -68,4 +69,14 @@ JavaClass_getComponentType(JNIEnv* env, jobject this)
                                                "()Ljava/lang/Class;");
     }
     return (*env)->CallObjectMethod(env, this, getComponentType);
+}
+
+jboolean
+JavaClass_isArray(JNIEnv* env, jobject this)
+{
+    if (!isArray) {
+        isArray = (*env)->GetMethodID(env, JCLASS_TYPE, "isArray", "()Z");
+    }
+
+    return (*env)->CallBooleanMethod(env, this, isArray);
 }

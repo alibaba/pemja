@@ -18,6 +18,7 @@ jstring JavaClass_getName(JNIEnv*, jobject);
 jobjectArray JavaClass_getConstructors(JNIEnv*, jobject);
 jobjectArray JavaClass_getMethods(JNIEnv*, jobject);
 jobjectArray JavaClass_getFields(JNIEnv*, jobject);
-jobject JavaClass_getComponentType(JNIEnv*, jobject);
+jclass JavaClass_getComponentType(JNIEnv*, jobject);
+jboolean JavaClass_isArray(JNIEnv*, jobject);
 
 #endif

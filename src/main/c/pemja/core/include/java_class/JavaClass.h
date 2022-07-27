@@ -26,6 +26,7 @@
 #include <java_class/Iterable.h>
 #include <java_class/Iterator.h>
 #include <java_class/Collection.h>
+#include <java_class/List.h>
 #include <java_class/Map.h>
 #include <java_class/Entry.h>
 #include <java_class/Exception.h>
@@ -38,6 +39,7 @@
 #include <java_class/Time.h>
 #include <java_class/Timestamp.h>
 #include <java_class/BigDecimal.h>
+#include <java_class/BigInteger.h>
 #include <java_class/Constructor.h>
 #include <java_class/Method.h>
 #include <java_class/Field.h>

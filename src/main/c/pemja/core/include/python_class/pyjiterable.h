@@ -11,32 +11,16 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#ifndef _Included_pyjobject
-#define _Included_pyjobject
+#ifndef _Included_pyjiterable
+#define _Included_pyjiterable
 
-#include <jni.h>
-
-#define PyJOjbect_HEAD  \
-    PyObject_HEAD       \
-    jclass      clazz;  \
-    jobject     object; \
-    PyObject*   attr;   \
-    PyObject*   class_name;
-
-typedef struct {
-    PyJOjbect_HEAD
-} PyJObject;
-
-
-JcpAPI_DATA(PyTypeObject) PyJObject_Type;
+JcpAPI_DATA(PyTypeObject) PyJIterable_Type;
 
 /* Public interface */
+JcpAPI_FUNC(PyObject*) JcpPyJIterable_New(JNIEnv*, jobject, jclass);
 
-/* Creates a new PyJMethodObject with a Java Object and Java class Object. */
-JcpAPI_FUNC(PyObject*) JcpPyJObject_New(JNIEnv*, PyTypeObject*, jobject, jclass);
-
-#define PyJObject_Check(op) \
-        PyObject_TypeCheck(op, &PyJObject_Type)
-#define PyJObject_CheckExact(op) op->ob_type == &PyJObject_Type
+#define PyJIterable_Check(op) \
+        PyObject_TypeCheck(op, &PyJIterable_Type)
+#define PyJIterable_CheckExact(op) op->ob_type == &PyJIterable_Type
 
 #endif

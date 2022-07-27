@@ -15,5 +15,6 @@
 #define _Included_pyexceptions
 
 JcpAPI_FUNC(int) JcpPyErr_Throw(JNIEnv*);
+JcpAPI_FUNC(int) JcpPyErr_ThrowMsg(JNIEnv*, const char*);
 
 #endif

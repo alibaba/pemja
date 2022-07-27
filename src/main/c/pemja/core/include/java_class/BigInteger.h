@@ -11,10 +11,10 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#ifndef _Included_java_util_Collection
-#define _Included_java_util_Collection
+#ifndef _Included_java_math_Integer
+#define _Included_java_math_Integer
 
-jint JavaCollection_size(JNIEnv*, jobject);
-jboolean JavaCollection_contains(JNIEnv*, jobject, jobject);
+jobject JavaBigInteger_New(JNIEnv*, jstring);
+jstring JavaBigInteger_toString(JNIEnv*, jobject);
 
 #endif

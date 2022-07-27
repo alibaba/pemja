@@ -11,10 +11,27 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#ifndef _Included_java_util_Collection
-#define _Included_java_util_Collection
 
-jint JavaCollection_size(JNIEnv*, jobject);
-jboolean JavaCollection_contains(JNIEnv*, jobject, jobject);
+#include "Pemja.h"
 
-#endif
+static jmethodID size = 0;
+static jmethodID contains = 0;
+
+jint
+JavaCollection_size(JNIEnv* env, jobject object)
+{
+    if (!size) {
+        size = (*env)->GetMethodID(env, JCOLLECTION_TYPE, "size", "()I");
+    }
+    return (*env)->CallIntMethod(env, object, size);
+}
+
+
+jboolean
+JavaCollection_contains(JNIEnv* env, jobject this, jobject object)
+{
+    if (!contains) {
+        contains = (*env)->GetMethodID(env, JCOLLECTION_TYPE, "contains", "(Ljava/lang/Object;)Z");
+    }
+    return (*env)->CallBooleanMethod(env, this, contains, object);
+}

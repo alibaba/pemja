@@ -27,6 +27,7 @@
     F(JCHAR_OBJ_TYPE, "java/lang/Character") \
     F(JSTRING_TYPE, "java/lang/String") \
     F(JBIGDECIMAL_TYPE, "java/math/BigDecimal") \
+    F(JBIGINTEGER_TYPE, "java/math/BigInteger") \
     F(JBOOLEAN_ARRAY_TYPE, "[Z") \
     F(JBYTE_ARRAY_TYPE, "[B") \
     F(JCHAR_ARRAY_TYPE, "[C") \
@@ -37,6 +38,7 @@
     F(JDOUBLE_ARRAY_TYPE, "[D") \
     F(JSTRING_ARRAY_TYPE, "[Ljava/lang/String;") \
     F(JOBJECT_ARRAY_TYPE, "[Ljava/lang/Object;") \
+    F(JUTILDATE_TYPE, "java/util/Date") \
     F(JSQLDATE_TYPE, "java/sql/Date") \
     F(JSQLTIME_TYPE, "java/sql/Time") \
     F(JSQLTIMESTAMP_TYPE, "java/sql/Timestamp") \
@@ -47,6 +49,7 @@
     F(JITERATOR_TYPE, "java/util/Iterator") \
     F(JCOLLECTION_TYPE, "java/util/Collection") \
     F(JLIST_TYPE, "java/util/List") \
+    F(JARRAYLIST_TYPE, "java/util/ArrayList") \
     F(JMAP_TYPE, "java/util/Map") \
     F(JHASHMAP_TYPE, "java/util/HashMap") \
     F(JMAP_ENTRY_TYPE, "java/util/Map$Entry") \
@@ -72,6 +75,7 @@ extern jclass JINT_TYPE;
 extern jclass JLONG_TYPE;
 extern jclass JFLOAT_TYPE;
 extern jclass JDOUBLE_TYPE;
+extern jclass JCHAR_TYPE;
 
 // define void class type
 extern jclass JVOID_TYPE;
@@ -127,9 +131,14 @@ CLASS_TABLE(DEFINE_CLASS_GLOBAL)
 #define JLONG_ID    4
 #define JFLOAT_ID   5
 #define JDOUBLE_ID  6
-#define JSTRING_ID  7
-#define JVOID_ID    8
-#define JOBJECT_ID  9
+#define JCHAR_ID    7
+#define JSTRING_ID  8
+#define JVOID_ID    9
+#define JOBJECT_ID  10
+#define JBYTES_ID   11
+#define JLIST_ID    12
+#define JMAP_ID     13
+#define JARRAY_ID   14
 
 //  -------------------------------------------------------------------------------------
 
@@ -148,13 +157,10 @@ JcpAPI_FUNC(void) JcpString_Clear(JNIEnv*, jstring, const char*);
 /* Function to get the Object Id from the Java Class */
 JcpAPI_FUNC(int) JcpJObject_GetObjectId(JNIEnv*, jclass);
 
-/* Function to get the Object Id from the PyObject type */
-JcpAPI_FUNC(int) JcpPyObject_ToObjectId(JNIEnv*, PyObject*);
-
 // ----------------------- Java object to Python object ---------------------------------
 
-/* Function to check whether PyObject can match the jclass */
-JcpAPI_FUNC(int) JcpPyObject_Check(JNIEnv*, PyObject*, jclass);
+/* Function to returns the match degree of the PyObject and the jclass */
+JcpAPI_FUNC(int) JcpPyObject_match(JNIEnv*, PyObject*, jclass);
 
 /* Function to return a Python Object from a Java Object */
 JcpAPI_FUNC(PyObject*) JcpPyObject_FromJObject(JNIEnv*, jobject);
@@ -164,6 +170,7 @@ JcpAPI_FUNC(PyObject*) JcpPyBool_FromLong(long);
 JcpAPI_FUNC(PyObject*) JcpPyInt_FromInt(int);
 JcpAPI_FUNC(PyObject*) JcpPyInt_FromLong(long);
 JcpAPI_FUNC(PyObject*) JcpPyFloat_FromDouble(double);
+JcpAPI_FUNC(PyObject*) JcpPyString_FromChar(jchar);
 
 /* Function to return a Python String object from a Java String object */
 JcpAPI_FUNC(PyObject*) JcpPyString_FromJString(JNIEnv*, jstring);
@@ -176,6 +183,7 @@ JcpAPI_FUNC(PyObject*) JcpPyInt_FromJInteger(JNIEnv*, jobject);
 JcpAPI_FUNC(PyObject*) JcpPyInt_FromJLong(JNIEnv*, jobject);
 JcpAPI_FUNC(PyObject*) JcpPyFloat_FromJFloat(JNIEnv*, jobject);
 JcpAPI_FUNC(PyObject*) JcpPyFloat_FromJDouble(JNIEnv*, jobject);
+JcpAPI_FUNC(PyObject*) JcpPyString_FromJChar(JNIEnv*, jobject);
 
 /* Function to return a Python bytes from a Java byte array */
 JcpAPI_FUNC(PyObject*) JcpPyBytes_FromJByteArray(JNIEnv*, jbyteArray);
@@ -201,8 +209,8 @@ JcpAPI_FUNC(PyObject*) JcpPyTuple_FromJDoubleArray(JNIEnv*, jdoubleArray);
 /* Function to return a Python Tuple from a Java object array */
 JcpAPI_FUNC(PyObject*) JcpPyTuple_FromJObjectArray(JNIEnv*, jobjectArray);
 
-/* Function to return a Python List from a Java Collection object */
-JcpAPI_FUNC(PyObject*) JcpPyList_FromJCollectionObject(JNIEnv*, jobject);
+/* Function to return a Python List from a Java List object */
+JcpAPI_FUNC(PyObject*) JcpPyList_FromJListObject(JNIEnv*, jobject);
 
 /* Function to return a Python Dict from a Java Map object */
 JcpAPI_FUNC(PyObject*) JcpPyDict_FromJMap(JNIEnv*, jobject);
@@ -218,6 +226,9 @@ JcpAPI_FUNC(PyObject*) JcpPyDateTime_FromJSqlTimestamp(JNIEnv*, jobject);
 
 /* Function to return a Python Decimal from a Java BigDecimal object */
 JcpAPI_FUNC(PyObject*) JcpPyDecimal_FromJBigDecimal(JNIEnv*, jobject);
+
+/* Function to return a Python Decimal from a Java BigInteger object */
+JcpAPI_FUNC(PyObject*) JcpPyDecimal_FromJBigInteger(JNIEnv* env, jobject value);
 
 // ------------------------------------------------------------------------------------
 
@@ -250,7 +261,7 @@ JcpAPI_FUNC(long) JcpPyInt_AsLong(PyObject*);
 JcpAPI_FUNC(long long) JcpPyInt_AsLongLong(PyObject*);
 
 /* Function to return a Java Object from a Python bytes value */
-JcpAPI_FUNC(jobject) JcpPyBytes_AsJObject(JNIEnv*, PyObject*, jclass);
+JcpAPI_FUNC(jobject) JcpPyBytes_AsJObject(JNIEnv*, PyObject*);
 
 /* Function to return a Java Object from a Python String value */
 JcpAPI_FUNC(jobject) JcpPyString_AsJObject(JNIEnv*, PyObject*, jclass);
@@ -261,10 +272,10 @@ JcpAPI_FUNC(jchar) JcpPyString_AsJChar(PyObject*);
 /* Function to return a Java String object from a Python String Object */
 JcpAPI_FUNC(jstring) JcpPyString_AsJString(JNIEnv*, PyObject*);
 
-/* Function to return a Java Object from a Python List object */
-JcpAPI_FUNC(jobject) JcpPyList_AsJObject(JNIEnv*, PyObject*, jclass);
+/* Function to return a Java ArrayList from a Python List object */
+JcpAPI_FUNC(jobject) JcpPyList_AsJObject(JNIEnv*, PyObject*);
 
-/* Function to return a Java Object from a Python Tuple object */
+/* Function to return a Java Array from a Python Tuple object */
 JcpAPI_FUNC(jobject) JcpPyTuple_AsJObject(JNIEnv*, PyObject*, jclass);
 
 /* Function to return a Java Map from a Python Dict object */
@@ -282,8 +293,8 @@ JcpAPI_FUNC(jobject) JcpPyDateTime_AsJObject(JNIEnv*, PyObject*);
 /* Function to check whether the Python object is Python Decimal object */
 JcpAPI_FUNC(int) JcpPyDecimal_Check(PyObject*);
 
-/* Function to return a Java BigDecimal object from a Python Decimal object */
-JcpAPI_FUNC(jobject) JcpPyDecimal_AsJObject(JNIEnv*, PyObject*);
+/* Function to return a Java BigDecimal/BigInteger object from a Python Decimal object */
+JcpAPI_FUNC(jobject) JcpPyDecimal_AsJObject(JNIEnv*, PyObject*, jclass);
 
 /* Function to return a Java Generator Object from a Python Generator object */
 JcpAPI_FUNC(jobject) JcpPyGenerator_AsJObject(JNIEnv*, PyObject*);
