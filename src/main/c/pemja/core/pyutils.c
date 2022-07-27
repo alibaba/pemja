@@ -310,7 +310,7 @@ JcpPyObject_FromJObject(JNIEnv* env, jobject value)
 
     if ((*env)->IsSameObject(env, clazz, JSTRING_TYPE)) {
         result = JcpPyString_FromJString(env, value);
-    } else if ((*env)->IsSameObject(env, clazz, JBOOLEAN_TYPE)) {
+    } else if ((*env)->IsSameObject(env, clazz, JBOOLEAN_OBJ_TYPE)) {
         result = JcpPyBool_FromJBoolean(env, value);
     } else if ((*env)->IsSameObject(env, clazz, JBYTE_ARRAY_TYPE)) {
         result = JcpPyBytes_FromJByteArray(env, value);
@@ -323,6 +323,10 @@ JcpPyObject_FromJObject(JNIEnv* env, jobject value)
             result = JcpPyFloat_FromJDouble(env, value);
         } else if ((*env)->IsSameObject(env, clazz, JFLOAT_OBJ_TYPE)) {
             result = JcpPyFloat_FromJFloat(env, value);
+        } else if ((*env)->IsSameObject(env, clazz, JBYTE_OBJ_TYPE)) {
+            result = JcpPyInt_FromJByte(env, value);
+        } else if ((*env)->IsSameObject(env, clazz, JSHORT_OBJ_TYPE)) {
+            result = JcpPyInt_FromJShort(env, clazz);
         } else if ((*env)->IsSameObject(env, clazz, JBIGDECIMAL_TYPE)) {
             result = JcpPyDecimal_FromJBigDecimal(env, value);
         } else if ((*env)->IsSameObject(env, clazz, JBIGINTEGER_TYPE)) {
@@ -366,7 +370,7 @@ JcpPyObject_FromJObject(JNIEnv* env, jobject value)
         result = JcpPyList_FromJListObject(env, value);
     } else if ((*env)->IsAssignableFrom(env, clazz, JMAP_TYPE)) {
         result = JcpPyDict_FromJMap(env, value);
-    } else if ((*env)->IsSameObject(env, clazz, JCHAR_TYPE)) {
+    } else if ((*env)->IsSameObject(env, clazz, JCHAR_OBJ_TYPE)) {
         result = JcpPyString_FromJChar(env, value);
     } else if ((*env)->IsAssignableFrom(env, clazz, JUTILDATE_TYPE)) {
         if ((*env)->IsSameObject(env, clazz, JSQLDATE_TYPE)) {
