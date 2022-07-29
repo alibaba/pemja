@@ -36,7 +36,7 @@ pyjclass_init_constructors(PyJClassObject *self)
     PyObject *pyjconstructor, *callable;
     PyJMultiMethodObject *methods;
 
-    env = JcpThread_Get()->env;
+    env = JcpThreadEnv_Get();
 
     if ((*env)->PushLocalFrame(env, 16) != 0) {
         return -1;

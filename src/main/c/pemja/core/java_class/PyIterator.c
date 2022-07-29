@@ -22,9 +22,9 @@ jobject
 JavaPyIterator_New(JNIEnv* env, jlong tstate, jlong pyobject)
 {
     if (!init_PyIterator) {
-        init_PyIterator = (*env)->GetMethodID(env, JPY_ITERPRETER_TYPE, "<init>", "(JJ)V");
+        init_PyIterator = (*env)->GetMethodID(env, JPYITERPRETER_TYPE, "<init>", "(JJ)V");
     }
-    return (*env)->NewObject(env, JPY_ITERPRETER_TYPE, init_PyIterator, tstate, pyobject);
+    return (*env)->NewObject(env, JPYITERPRETER_TYPE, init_PyIterator, tstate, pyobject);
 }
 
 JNIEXPORT jobject JNICALL Java_pemja_core_object_PyIterator_next
@@ -40,12 +40,17 @@ JNIEXPORT jobject JNICALL Java_pemja_core_object_PyIterator_next
 
     item = PyIter_Next(pyobject);
 
-    if (item) {
-        result = JcpPyObject_AsJObject(env, item, JOBJECT_TYPE);
-        Py_DECREF(item);
+    if (PyErr_Occurred()) {
+        JcpPyErr_Throw(env);
+        Py_XDECREF(item);
     } else {
-        // last value;
-        (*env)->ThrowNew(env, JNOSUCHELEMENT_EXEC_TYPE, "StopIteration");
+        if (item) {
+            result = JcpPyObject_AsJObject(env, item, JOBJECT_TYPE);
+            Py_DECREF(item);
+        } else {
+            // last value;
+            (*env)->ThrowNew(env, JNOSUCHELEMENT_EXEC_TYPE, "StopIteration");
+        }
     }
 
     Jcp_END_ALLOW_THREADS

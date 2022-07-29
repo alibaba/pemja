@@ -40,7 +40,7 @@ pyjiterable_iterator(PyObject* self)
     JNIEnv* env;
     jobject iterator;
 
-    env = JcpThread_Get()->env;
+    env = JcpThreadEnv_Get();
 
     iterator = JavaIterable_iterator(env, ((PyJObject*) self)->object);
 

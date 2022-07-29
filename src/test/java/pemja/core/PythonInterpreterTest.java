@@ -20,6 +20,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import pemja.core.object.PyIterator;
+import pemja.core.object.PyObject;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -347,6 +348,16 @@ public class PythonInterpreterTest {
                 index++;
             }
             iterators.close();
+
+            PyObject arg12 = (PyObject) interpreter.invoke("test_call.test_return_python_object");
+            assertEquals(2L, arg12.getAttr("_a"));
+            arg12.setAttr("_a", 4);
+            assertEquals(4L, arg12.getAttr("_a"));
+            arg12.invokeMethod("add", 12);
+            assertEquals(16L, arg12.invokeMethod("get_value"));
+            arg12.invokeMethod("add_all", 1, 2, 3);
+            assertEquals(22L, arg12.getAttr("_a"));
+            arg12.close();
         }
     }
 

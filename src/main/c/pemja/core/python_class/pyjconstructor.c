@@ -80,7 +80,7 @@ pyjconstructor_call(PyJMethodObject *self, PyObject *args, PyObject *kwargs)
 
     clazz = (PyJClassObject*) arg;
 
-    env = JcpThread_Get()->env;
+    env = JcpThreadEnv_Get();
     if ((*env)->PushLocalFrame(env, 16 + self->md_params_num) != 0) {
         return NULL;
     }

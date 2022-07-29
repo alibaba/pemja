@@ -15,6 +15,7 @@
 #include "Pemja.h"
 
 #include "java_class/JavaClass.h"
+#include "python_class/PythonClass.h"
 
 int
 JcpPyErr_Throw(JNIEnv* env)
@@ -205,6 +206,47 @@ JcpPyErr_Throw(JNIEnv* env)
         (*env)->Throw(env, jpyexception);
     }
 
+    return 1;
+}
+
+int
+JcpJavaErr_Throw(JNIEnv *env)
+{
+    jthrowable exception = NULL;
+    PyObject *jpyExc;
+    jobjectArray stack;
+
+    if (!(*env)->ExceptionCheck(env)) {
+        return 0;
+    }
+
+    if ((exception = (*env)->ExceptionOccurred(env)) == NULL) {
+        return 0;
+    }
+
+    if (PyErr_Occurred()) {
+        PyErr_Print();
+    }
+
+    (*env)->ExceptionClear(env);
+
+    stack = JavaThrowable_getStackTrace(env, exception);
+    if ((*env)->ExceptionCheck(env)) {
+        PyErr_Format(PyExc_RuntimeError,
+                     "Throwing java exception in pyjobject failed.");
+        return 1;
+
+    }
+    (*env)->DeleteLocalRef(env, stack);
+
+    jpyExc = JcpPyJObject_New(env, &PyJObject_Type, exception, NULL);
+    if (!jpyExc) {
+        return 1;
+    }
+
+    PyErr_SetObject(PyExc_RuntimeError, jpyExc);
+    Py_DECREF(jpyExc);
+    (*env)->DeleteLocalRef(env, exception);
     return 1;
 }
 

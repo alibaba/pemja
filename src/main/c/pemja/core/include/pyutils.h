@@ -56,7 +56,8 @@
     F(JILLEGAL_STATE_EXEC_TYPE, "java/lang/IllegalStateException") \
     F(JNOSUCHELEMENT_EXEC_TYPE, "java/util/NoSuchElementException") \
     F(JPYTHONEXCE_TYPE, "pemja/core/PythonException") \
-    F(JPY_ITERPRETER_TYPE, "pemja/core/object/PyIterator") \
+    F(JPYITERPRETER_TYPE, "pemja/core/object/PyIterator") \
+    F(JPYOBJECT_TYPE, "pemja/core/object/PyObject") \
     F(JTHROWABLE_TYPE, "java/lang/Throwable") \
     F(JSTACK_TRACE_ELEMENT_TYPE, "java/lang/StackTraceElement") \
     F(JCONSTRUCTOR_TYPE, "java/lang/reflect/Constructor") \
@@ -298,5 +299,8 @@ JcpAPI_FUNC(jobject) JcpPyDecimal_AsJObject(JNIEnv*, PyObject*, jclass);
 
 /* Function to return a Java Generator Object from a Python Generator object */
 JcpAPI_FUNC(jobject) JcpPyGenerator_AsJObject(JNIEnv*, PyObject*);
+
+/* Function to return a Java PyObject from a Python object */
+JcpAPI_FUNC(jobject) JcpPyObject_AsJPyObject(JNIEnv*, PyObject*);
 
 #endif // ifndef _Included_pyutils

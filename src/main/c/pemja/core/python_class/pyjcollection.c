@@ -36,7 +36,7 @@ pyjcollection_len(PyObject *self)
 {
     JNIEnv* env;
 
-    env = JcpThread_Get()->env;
+    env = JcpThreadEnv_Get();
 
     return JavaCollection_size(env, ((PyJObject*) self)->object);
 }
@@ -47,7 +47,7 @@ pyjcollection_contains(PyObject* self, PyObject* o)
     JNIEnv* env;
     jobject value;
 
-    env = JcpThread_Get()->env;
+    env = JcpThreadEnv_Get();
 
     value = JcpPyObject_AsJObject(env, o, JOBJECT_TYPE);
 
