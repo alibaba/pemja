@@ -112,6 +112,8 @@ JcpString_FromJString(JNIEnv* env, jstring s)
 int
 JcpJObject_GetObjectId(JNIEnv* env, jclass clazz)
 {
+    jstring classname;
+    const char* cname;
     char* msg;
 
     // check whether it is a Java Object.
@@ -171,8 +173,10 @@ JcpJObject_GetObjectId(JNIEnv* env, jclass clazz)
     msg = malloc(sizeof(char) * 200);
     memset(msg, '\0', 200);
 
-    sprintf(msg, "Failed to get the object id to the class %s.",
-            JcpString_FromJString(env, JavaClass_getName(env, clazz)));
+    classname = JavaClass_getName(env, clazz);
+    cname = JcpString_FromJString(env, classname);
+    sprintf(msg, "Failed to get the object id to the class %s.", cname);
+    JcpString_Clear(env, classname, cname);
 
     JcpPyErr_ThrowMsg(env, msg);
     free(msg);
@@ -297,6 +301,8 @@ PyObject *
 JcpPyObject_FromJObject(JNIEnv* env, jobject value)
 {
 
+    jstring classname;
+    const char* cname;
     char* msg;
     jclass clazz = NULL;
 
@@ -335,8 +341,10 @@ JcpPyObject_FromJObject(JNIEnv* env, jobject value)
             msg = malloc(sizeof(char) * 200);
             memset(msg, '\0', 200);
 
-            sprintf(msg, "Unknown Number class %s.",
-                    JcpString_FromJString(env, JavaClass_getName(env, clazz)));
+            classname = JavaClass_getName(env, clazz);
+            cname = JcpString_FromJString(env, classname);
+            sprintf(msg, "Unknown Number class %s.", cname);
+            JcpString_Clear(env, classname, cname);
 
             JcpPyErr_ThrowMsg(env, msg);
             free(msg);
@@ -360,8 +368,10 @@ JcpPyObject_FromJObject(JNIEnv* env, jobject value)
             msg = malloc(sizeof(char) * 200);
             memset(msg, '\0', 200);
 
-            sprintf(msg, "Unknown Array class %s.",
-                    JcpString_FromJString(env, JavaClass_getName(env, clazz)));
+            classname = JavaClass_getName(env, clazz);
+            cname = JcpString_FromJString(env, classname);
+            sprintf(msg, "Unknown Array class %s.", cname);
+            JcpString_Clear(env, classname, cname);
 
             JcpPyErr_ThrowMsg(env, msg);
             free(msg);
@@ -383,8 +393,10 @@ JcpPyObject_FromJObject(JNIEnv* env, jobject value)
             msg = malloc(sizeof(char) * 200);
             memset(msg, '\0', 200);
 
-            sprintf(msg, "Unknown java/util/Date class %s.",
-                    JcpString_FromJString(env, JavaClass_getName(env, clazz)));
+            classname = JavaClass_getName(env, clazz);
+            cname = JcpString_FromJString(env, classname);
+            sprintf(msg, "Unknown java/util/Date class %s.", cname);
+            JcpString_Clear(env, classname, cname);
 
             JcpPyErr_ThrowMsg(env, msg);
             free(msg);
@@ -393,9 +405,11 @@ JcpPyObject_FromJObject(JNIEnv* env, jobject value)
         result = JcpPyJCollection_New(env, value, clazz);
     } else if ((*env)->IsAssignableFrom(env, clazz, JITERABLE_TYPE)) {
         result = JcpPyJIterable_New(env, value, clazz);
-    } else if ((*env)->IsAssignableFrom(env, clazz, JITERATOR_TYPE))
+    } else if ((*env)->IsAssignableFrom(env, clazz, JITERATOR_TYPE)) {
         result = JcpPyJIterator_New(env, value, clazz);
-    else {
+    } else if ((*env)->IsAssignableFrom(env, clazz, JPYOBJECT_TYPE)) {
+        result = (PyObject*) JavaPyObject_GetPyobject(env, value);
+    } else {
         result = JcpPyJObject_New(env, &PyJObject_Type, value, clazz);
     }
 
@@ -1139,8 +1153,6 @@ JcpPyDecimal_FromJBigInteger(JNIEnv* env, jobject value)
 jobject
 JcpPyObject_AsJObject(JNIEnv* env, PyObject* pyobject, jclass clazz)
 {
-    char* msg;
-
     if (pyobject == Py_None) {
         return NULL;
     } else if (PyUnicode_Check(pyobject)) {
@@ -1177,19 +1189,10 @@ JcpPyObject_AsJObject(JNIEnv* env, PyObject* pyobject, jclass clazz)
             return JcpPyDate_AsJObject(env, pyobject);
         } else if (PyTime_CheckExact(pyobject)) {
             return JcpPyTime_AsJObject(env, pyobject);
+        } else {
+            return JcpPyObject_AsJPyObject(env, pyobject);
         }
     }
-
-    msg = malloc(sizeof(char) * 200);
-    memset(msg, '\0', 200);
-
-    sprintf(msg, "Failed to convert python object %s to java class %s.",
-            JcpString_FromJString(env, JcpPyString_AsJString(env, PyObject_Str(pyobject))),
-            JcpString_FromJString(env, JavaClass_getName(env, clazz)));
-
-    JcpPyErr_ThrowMsg(env, msg);
-    free(msg);
-    return NULL;
 }
 
 
@@ -1378,6 +1381,8 @@ jobject
 JcpPyBool_AsJObject(JNIEnv* env, PyObject* pyobject, jclass clazz)
 {
 
+    jstring classname;
+    const char* cname;
     char* msg;
     jboolean z;
     jobject result = NULL;
@@ -1396,8 +1401,10 @@ JcpPyBool_AsJObject(JNIEnv* env, PyObject* pyobject, jclass clazz)
         msg = malloc(sizeof(char) * 200);
         memset(msg, '\0', 200);
 
-        sprintf(msg, "Failed to convert python bool to java class %s.",
-                JcpString_FromJString(env, JavaClass_getName(env, clazz)));
+        classname = JavaClass_getName(env, clazz);
+        cname = JcpString_FromJString(env, classname);
+        sprintf(msg, "Unknown Number class %s.", cname);
+        JcpString_Clear(env, classname, cname);
 
         JcpPyErr_ThrowMsg(env, msg);
         free(msg);
@@ -1413,6 +1420,8 @@ jobject
 JcpPyInt_AsJObject(JNIEnv* env, PyObject* pyobject, jclass clazz)
 {
 
+    jstring classname;
+    const char* cname;
     char* msg;
     jbyte b;
     jshort s;
@@ -1458,8 +1467,10 @@ JcpPyInt_AsJObject(JNIEnv* env, PyObject* pyobject, jclass clazz)
         msg = malloc(sizeof(char) * 200);
         memset(msg, '\0', 200);
 
-        sprintf(msg, "Failed to convert python int to java class %s.",
-                JcpString_FromJString(env, JavaClass_getName(env, clazz)));
+        classname = JavaClass_getName(env, clazz);
+        cname = JcpString_FromJString(env, classname);
+        sprintf(msg, "Unknown Number class %s.", cname);
+        JcpString_Clear(env, classname, cname);
 
         JcpPyErr_ThrowMsg(env, msg);
         free(msg);
@@ -1475,6 +1486,8 @@ jobject
 JcpPyFloat_AsJObject(JNIEnv* env, PyObject* pyobject, jclass clazz)
 {
 
+    jstring classname;
+    const char* cname;
     char* msg;
     jfloat f;
     jdouble d;
@@ -1502,8 +1515,10 @@ JcpPyFloat_AsJObject(JNIEnv* env, PyObject* pyobject, jclass clazz)
         msg = malloc(sizeof(char) * 200);
         memset(msg, '\0', 200);
 
-        sprintf(msg, "Failed to convert python float to java class %s.",
-                JcpString_FromJString(env, JavaClass_getName(env, clazz)));
+        classname = JavaClass_getName(env, clazz);
+        cname = JcpString_FromJString(env, classname);
+        sprintf(msg, "Unknown Number class %s.", cname);
+        JcpString_Clear(env, classname, cname);
 
         JcpPyErr_ThrowMsg(env, msg);
         free(msg);
@@ -1584,6 +1599,8 @@ jobject
 JcpPyString_AsJObject(JNIEnv* env, PyObject* pyobject, jclass clazz)
 {
 
+    jstring classname;
+    const char* cname;
     char* msg;
     jobject result = NULL;
 
@@ -1593,8 +1610,10 @@ JcpPyString_AsJObject(JNIEnv* env, PyObject* pyobject, jclass clazz)
         msg = malloc(sizeof(char) * 200);
         memset(msg, '\0', 200);
 
-        sprintf(msg, "Failed to convert python string to java class %s.",
-                JcpString_FromJString(env, JavaClass_getName(env, clazz)));
+        classname = JavaClass_getName(env, clazz);
+        cname = JcpString_FromJString(env, classname);
+        sprintf(msg, "Unknown Number class %s.", cname);
+        JcpString_Clear(env, classname, cname);
 
         JcpPyErr_ThrowMsg(env, msg);
         free(msg);
@@ -1706,6 +1725,8 @@ JcpPyList_AsJObject(JNIEnv* env, PyObject* pyobject)
 jobject
 JcpPyTuple_AsJObject(JNIEnv* env, PyObject* pyobject, jclass clazz)
 {
+    jstring classname;
+    const char* cname;
     char* msg;
     int length;
     jobjectArray array = NULL;
@@ -1800,8 +1821,10 @@ JcpPyTuple_AsJObject(JNIEnv* env, PyObject* pyobject, jclass clazz)
         msg = malloc(sizeof(char) * 200);
         memset(msg, '\0', 200);
 
-        sprintf(msg, "Failed to convert python tuple to java class %s.",
-                JcpString_FromJString(env, JavaClass_getName(env, clazz)));
+        classname = JavaClass_getName(env, clazz);
+        cname = JcpString_FromJString(env, classname);
+        sprintf(msg, "Unknown Number class %s.", cname);
+        JcpString_Clear(env, classname, cname);
 
         JcpPyErr_ThrowMsg(env, msg);
         free(msg);
@@ -1966,7 +1989,15 @@ jobject JcpPyGenerator_AsJObject(JNIEnv* env, PyObject* pyobject)
 
     iter = PyObject_GetIter(pyobject);
 
-    jiter = JavaPyIterator_New(env, (intptr_t) JcpThread_Get(), (intptr_t) pyobject);
+    jiter = JavaPyIterator_New(env, (intptr_t) JcpThread_Get(), (intptr_t) iter);
     return jiter;
 }
 
+
+/* Function to return a Java PyObject from a Python object */
+
+jobject JcpPyObject_AsJPyObject(JNIEnv* env, PyObject* pyobject)
+{
+    Py_INCREF(pyobject);
+    return JavaPyObject_New(env, (intptr_t) JcpThread_Get(), (intptr_t) pyobject);
+}

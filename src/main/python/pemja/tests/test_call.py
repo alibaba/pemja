@@ -61,3 +61,9 @@ def test_return_generator(num: int):
         yield i
     yield "haha"
     yield None
+
+
+def test_return_python_object():
+    a = A()
+    a.add(2)
+    return a

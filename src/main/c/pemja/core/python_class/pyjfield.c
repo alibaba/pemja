@@ -23,7 +23,7 @@ pyjfield_init(JNIEnv* env, PyJFieldObject* self)
 {
     jint modifier;
 
-    env  = JcpThread_Get()->env;
+    env  = JcpThreadEnv_Get();
     if ((*env)->PushLocalFrame(env, 16) != 0) {
         return -1;
     }
@@ -94,7 +94,7 @@ JcpPyJField_Get(PyJFieldObject* self, PyJObject* pyjobject)
 
     PyObject *result;
 
-    env = JcpThread_Get()->env;
+    env = JcpThreadEnv_Get();
 
     if (!self->fd_is_initialized) {
         if (pyjfield_init(env, self) < 0) {
@@ -226,7 +226,7 @@ int
 JcpPyJField_Set(PyJFieldObject* self, PyJObject* pyjobject, PyObject* value)
 {
     JNIEnv *env;
-    env = JcpThread_Get()->env;
+    env = JcpThreadEnv_Get();
 
     if (!self->fd_is_initialized) {
         if (pyjfield_init(env, self) < 0) {

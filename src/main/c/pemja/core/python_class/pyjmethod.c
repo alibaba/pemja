@@ -26,13 +26,14 @@ pyjmethod_init(JNIEnv *env, PyJMethodObject* self)
     jclass returnType;
 
     if ((*env)->PushLocalFrame(env, 16) != 0) {
+        JcpJavaErr_Throw(env);
         return -1;
     }
 
     self->md_id = (*env)->FromReflectedMethod(env, self->md);
     parameters = JavaMethod_getParameterTypes(env, self->md);
 
-    if (!parameters) {
+    if (JcpJavaErr_Throw(env) || !parameters) {
         goto EXIT_ERROR;
     }
 
@@ -40,9 +41,23 @@ pyjmethod_init(JNIEnv *env, PyJMethodObject* self)
     self->md_params_num = (*env)->GetArrayLength(env, parameters);
 
     modifier = JavaMethod_getModifiers(env, self->md);
+
+    if (JcpJavaErr_Throw(env)) {
+        goto EXIT_ERROR;
+    }
+
     self->md_is_static = JavaModifier_isStatic(env, modifier);
 
+    if (JcpJavaErr_Throw(env)) {
+        goto EXIT_ERROR;
+    }
+
     returnType = JavaMethod_getReturnType(env, self->md);
+
+    if (JcpJavaErr_Throw(env) || !returnType) {
+        goto EXIT_ERROR;
+    }
+
     self->md_return_id = JcpJObject_GetObjectId(env, returnType);
 
     (*env)->PopLocalFrame(env, NULL);
@@ -68,12 +83,16 @@ pyjmethod_call(PyJMethodObject *self, PyObject *args, PyObject *kwargs)
         return NULL;
     }
 
-    env = JcpThread_Get()->env;
+    env = JcpThreadEnv_Get();
 
     input_nargs = PyTuple_Size(args);
     // PyJObject as the first argument.
     if (self->md_params_num != input_nargs - 1) {
         jboolean varargs = JavaMethod_isVarArgs(env, self->md);
+
+        if (JcpJavaErr_Throw(env)) {
+            return NULL;
+        }
 
         if (!varargs || self->md_params_num > input_nargs) {
             PyErr_Format(PyExc_RuntimeError,
@@ -110,7 +129,7 @@ pyjmethod_call(PyJMethodObject *self, PyObject *args, PyObject *kwargs)
         jclass paramType = (*env)->GetObjectArrayElement(env, self->md_params, i);
         jargs[i] = JcpPyObject_AsJValue(env, arg, paramType);
         (*env)->DeleteLocalRef(env, paramType);
-        if (PyErr_Occurred()) {
+        if (JcpJavaErr_Throw(env) || PyErr_Occurred()) {
             goto EXIT_ERROR;
         }
     }
@@ -120,7 +139,7 @@ pyjmethod_call(PyJMethodObject *self, PyObject *args, PyObject *kwargs)
         PyObject *param = PyTuple_GetSlice(args, nargs, input_nargs);
         jargs[nargs] = JcpPyObject_AsJValue(env, param, paramType);
         (*env)->DeleteLocalRef(env, paramType);
-        if (PyErr_Occurred()) {
+        if (JcpJavaErr_Throw(env) || PyErr_Occurred()) {
             goto EXIT_ERROR;
         }
     }
@@ -135,6 +154,10 @@ pyjmethod_call(PyJMethodObject *self, PyObject *args, PyObject *kwargs)
                 object = (*env)->CallBooleanMethodA(env, instance->object, self->md_id, jargs);
             }
 
+            if (JcpJavaErr_Throw(env)) {
+                goto EXIT_ERROR;
+            }
+
             pyobject = JcpPyBool_FromLong((long) object);
             break;
         }
@@ -145,6 +168,10 @@ pyjmethod_call(PyJMethodObject *self, PyObject *args, PyObject *kwargs)
                 object = (*env)->CallStaticByteMethodA(env, instance->clazz, self->md_id, jargs);
             } else {
                 object = (*env)->CallByteMethodA(env, instance->object, self->md_id, jargs);
+            }
+
+            if (JcpJavaErr_Throw(env)) {
+                goto EXIT_ERROR;
             }
 
             pyobject = JcpPyInt_FromInt((int) object);
@@ -159,6 +186,10 @@ pyjmethod_call(PyJMethodObject *self, PyObject *args, PyObject *kwargs)
                 object = (*env)->CallShortMethodA(env, instance->object, self->md_id, jargs);
             }
 
+            if (JcpJavaErr_Throw(env)) {
+                goto EXIT_ERROR;
+            }
+
             pyobject = JcpPyInt_FromInt((int) object);
             break;
         }
@@ -169,6 +200,10 @@ pyjmethod_call(PyJMethodObject *self, PyObject *args, PyObject *kwargs)
                 object = (*env)->CallStaticIntMethodA(env, instance->clazz, self->md_id, jargs);
             } else {
                 object = (*env)->CallIntMethodA(env, instance->object, self->md_id, jargs);
+            }
+
+            if (JcpJavaErr_Throw(env)) {
+                goto EXIT_ERROR;
             }
 
             pyobject = JcpPyInt_FromInt(object);
@@ -183,6 +218,10 @@ pyjmethod_call(PyJMethodObject *self, PyObject *args, PyObject *kwargs)
                 object = (*env)->CallLongMethodA(env, instance->object, self->md_id, jargs);
             }
 
+            if (JcpJavaErr_Throw(env)) {
+                goto EXIT_ERROR;
+            }
+
             pyobject = JcpPyInt_FromLong((long) object);
             break;
         }
@@ -193,6 +232,10 @@ pyjmethod_call(PyJMethodObject *self, PyObject *args, PyObject *kwargs)
                 object = (*env)->CallStaticFloatMethodA(env, instance->clazz, self->md_id, jargs);
             } else {
                 object = (*env)->CallFloatMethodA(env, instance->object, self->md_id, jargs);
+            }
+
+            if (JcpJavaErr_Throw(env)) {
+                goto EXIT_ERROR;
             }
 
             pyobject = JcpPyFloat_FromDouble((double) object);
@@ -207,6 +250,10 @@ pyjmethod_call(PyJMethodObject *self, PyObject *args, PyObject *kwargs)
                 object = (*env)->CallDoubleMethodA(env, instance->object, self->md_id, jargs);
             }
 
+            if (JcpJavaErr_Throw(env)) {
+                goto EXIT_ERROR;
+            }
+
             pyobject = JcpPyFloat_FromDouble((double) object);
             break;
         }
@@ -219,6 +266,10 @@ pyjmethod_call(PyJMethodObject *self, PyObject *args, PyObject *kwargs)
                 object = (*env)->CallObjectMethodA(env, instance->object, self->md_id, jargs);
             }
 
+            if (JcpJavaErr_Throw(env)) {
+                goto EXIT_ERROR;
+            }
+
             pyobject = JcpPyString_FromJString(env, (jstring) object);
             break;
         }
@@ -228,6 +279,10 @@ pyjmethod_call(PyJMethodObject *self, PyObject *args, PyObject *kwargs)
                 (*env)->CallStaticVoidMethodA(env, instance->clazz, self->md_id, jargs);
             } else {
                 (*env)->CallVoidMethodA(env, instance->object, self->md_id, jargs);
+            }
+
+            if (JcpJavaErr_Throw(env)) {
+                goto EXIT_ERROR;
             }
 
             pyobject = Py_None;
@@ -245,6 +300,10 @@ pyjmethod_call(PyJMethodObject *self, PyObject *args, PyObject *kwargs)
                 object = (*env)->CallStaticObjectMethodA(env, instance->clazz, self->md_id, jargs);
             } else {
                 object = (*env)->CallObjectMethodA(env, instance->object, self->md_id, jargs);
+            }
+
+            if (JcpJavaErr_Throw(env)) {
+                goto EXIT_ERROR;
             }
 
             pyobject = JcpPyObject_FromJObject(env, object);
@@ -329,7 +388,7 @@ JcpPyJMethodMatch(PyJMethodObject *self, PyObject* args)
     jclass      paramType;
     int         nargs;
 
-    env  = JcpThread_Get()->env;
+    env  = JcpThreadEnv_Get();
 
     if (PyTuple_Size(args) - 1 != self->md_params_num) {
         jboolean varargs = JavaMethod_isVarArgs(env, self->md);

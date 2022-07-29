@@ -37,7 +37,7 @@ public class PyIterator extends PyObject implements Iterator {
         if (!stopIteration) {
             try {
                 if (needFetch) {
-                    element = next(tsState, pyobject);
+                    element = next(tState, pyobject);
                     needFetch = false;
                 }
             } catch (NoSuchElementException e) {
@@ -50,7 +50,7 @@ public class PyIterator extends PyObject implements Iterator {
     @Override
     public Object next() {
         if (needFetch) {
-            element = next(tsState, pyobject);
+            element = next(tState, pyobject);
         }
         needFetch = true;
         return element;

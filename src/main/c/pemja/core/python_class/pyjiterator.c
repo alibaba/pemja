@@ -39,7 +39,7 @@ pyjiterator_next(PyObject* self)
 
     PyObject* pyobject = NULL;
 
-    env = JcpThread_Get()->env;
+    env = JcpThreadEnv_Get();
 
     object = ((PyJObject*) self)->object;
 

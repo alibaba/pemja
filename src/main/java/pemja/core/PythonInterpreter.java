@@ -398,15 +398,15 @@ public final class PythonInterpreter implements Interpreter {
                             public void run() {
                                 try {
                                     initialize();
+                                    // add shared modules
+                                    addToPath(pemjaModulePath);
+                                    importModule("redirect_stream");
                                 } catch (Throwable t) {
                                     error = t;
                                 } finally {
                                     damonThreadStart.countDown();
                                 }
 
-                                // add shared modules
-                                addToPath(pemjaModulePath);
-                                importModule("redirect_stream");
                                 try {
                                     damonThreadFinish.await();
                                 } catch (InterruptedException e) {

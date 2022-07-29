@@ -175,7 +175,7 @@ pyjobject_str(PyJObject *self)
     JNIEnv *env;
     jstring str;
 
-    env = JcpThread_Get()->env;
+    env = JcpThreadEnv_Get();
 
     if (self->object) {
         str = JavaObject_toString(env, self->object);
