@@ -89,16 +89,19 @@ pyjconstructor_call(PyJMethodObject *self, PyObject *args, PyObject *kwargs)
 
     for (int i = 0; i < self->md_params_num; i++) {
         arg = PyTuple_GetItem(args, i + 1);
-        jclass paramType = (*env)->GetObjectArrayElement(env, self->md_params, i);
+        jclass paramType = (jclass) (*env)->GetObjectArrayElement(env, self->md_params, i);
+        if (JcpJavaErr_Throw(env)) {
+            goto EXIT_ERROR;
+        }
         jargs[i] = JcpPyObject_AsJValue(env, arg, paramType);
         (*env)->DeleteLocalRef(env, paramType);
-        if (PyErr_Occurred()) {
+        if (JcpJavaErr_Throw(env) || PyErr_Occurred()) {
             goto EXIT_ERROR;
         }
     }
 
     object = (*env)->NewObjectA(env, clazz->clazz, self->md_id, jargs);
-    if (!object) {
+    if (!object || JcpJavaErr_Throw(env)) {
         // failed to construct the object.
         goto EXIT_ERROR;
     }
@@ -141,7 +144,7 @@ JcpPyJConstructor_New(JNIEnv *env, jobject constructor)
     self->md = (*env)->NewGlobalRef(env, constructor);
     self->md_name = PyUnicode_FromString("<init>");
 
-    if (pyjconstructor_init(env, self) < 0) {
+    if (pyjconstructor_init(env, self) < 0 || JcpJavaErr_Throw(env)) {
         Py_DECREF(self);
         return NULL;
     }

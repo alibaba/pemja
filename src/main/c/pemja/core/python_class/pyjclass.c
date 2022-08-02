@@ -66,9 +66,9 @@ pyjclass_init_constructors(PyJClassObject *self)
             }
             JcpPyJMultiMethod_Append(methods, (PyJMethodObject*) pyjconstructor);
             callable = (PyObject*) methods;
-        }
 
-        Py_DECREF(pyjconstructor);
+            Py_DECREF(pyjconstructor);
+        }
     }
 
     (*env)->DeleteLocalRef(env, constructors);
