@@ -148,11 +148,15 @@ pyjmethod_call(PyJMethodObject *self, PyObject *args, PyObject *kwargs)
         case JBOOLEAN_ID: {
             jboolean object;
 
+            Py_BEGIN_ALLOW_THREADS
+
             if (self->md_is_static) {
                 object = (*env)->CallStaticBooleanMethodA(env, instance->clazz, self->md_id, jargs);
             } else {
                 object = (*env)->CallBooleanMethodA(env, instance->object, self->md_id, jargs);
             }
+
+            Py_END_ALLOW_THREADS
 
             if (JcpJavaErr_Throw(env)) {
                 goto EXIT_ERROR;
@@ -164,11 +168,15 @@ pyjmethod_call(PyJMethodObject *self, PyObject *args, PyObject *kwargs)
         case JBYTE_ID: {
             jbyte object;
 
+            Py_BEGIN_ALLOW_THREADS
+
             if (self->md_is_static) {
                 object = (*env)->CallStaticByteMethodA(env, instance->clazz, self->md_id, jargs);
             } else {
                 object = (*env)->CallByteMethodA(env, instance->object, self->md_id, jargs);
             }
+
+            Py_END_ALLOW_THREADS
 
             if (JcpJavaErr_Throw(env)) {
                 goto EXIT_ERROR;
@@ -180,11 +188,15 @@ pyjmethod_call(PyJMethodObject *self, PyObject *args, PyObject *kwargs)
         case JSHORT_ID: {
             jshort object;
 
+            Py_BEGIN_ALLOW_THREADS
+
             if (self->md_is_static) {
                 object = (*env)->CallStaticShortMethodA(env, instance->clazz, self->md_id, jargs);
             } else {
                 object = (*env)->CallShortMethodA(env, instance->object, self->md_id, jargs);
             }
+
+            Py_END_ALLOW_THREADS
 
             if (JcpJavaErr_Throw(env)) {
                 goto EXIT_ERROR;
@@ -196,11 +208,15 @@ pyjmethod_call(PyJMethodObject *self, PyObject *args, PyObject *kwargs)
         case JINT_ID: {
             jint object;
 
+            Py_BEGIN_ALLOW_THREADS
+
             if (self->md_is_static) {
                 object = (*env)->CallStaticIntMethodA(env, instance->clazz, self->md_id, jargs);
             } else {
                 object = (*env)->CallIntMethodA(env, instance->object, self->md_id, jargs);
             }
+
+            Py_END_ALLOW_THREADS
 
             if (JcpJavaErr_Throw(env)) {
                 goto EXIT_ERROR;
@@ -212,11 +228,15 @@ pyjmethod_call(PyJMethodObject *self, PyObject *args, PyObject *kwargs)
         case JLONG_ID: {
             jlong object;
 
+            Py_BEGIN_ALLOW_THREADS
+
             if (self->md_is_static) {
                 object = (*env)->CallStaticLongMethodA(env, instance->clazz, self->md_id, jargs);
             } else {
                 object = (*env)->CallLongMethodA(env, instance->object, self->md_id, jargs);
             }
+
+            Py_END_ALLOW_THREADS
 
             if (JcpJavaErr_Throw(env)) {
                 goto EXIT_ERROR;
@@ -228,11 +248,15 @@ pyjmethod_call(PyJMethodObject *self, PyObject *args, PyObject *kwargs)
         case JFLOAT_ID: {
             jfloat object;
 
+            Py_BEGIN_ALLOW_THREADS
+
             if (self->md_is_static) {
                 object = (*env)->CallStaticFloatMethodA(env, instance->clazz, self->md_id, jargs);
             } else {
                 object = (*env)->CallFloatMethodA(env, instance->object, self->md_id, jargs);
             }
+
+            Py_END_ALLOW_THREADS
 
             if (JcpJavaErr_Throw(env)) {
                 goto EXIT_ERROR;
@@ -244,11 +268,15 @@ pyjmethod_call(PyJMethodObject *self, PyObject *args, PyObject *kwargs)
         case JDOUBLE_ID: {
             jdouble object;
 
+            Py_BEGIN_ALLOW_THREADS
+
             if (self->md_is_static) {
                 object = (*env)->CallStaticDoubleMethodA(env, instance->clazz, self->md_id, jargs);
             } else {
                 object = (*env)->CallDoubleMethodA(env, instance->object, self->md_id, jargs);
             }
+
+            Py_END_ALLOW_THREADS
 
             if (JcpJavaErr_Throw(env)) {
                 goto EXIT_ERROR;
@@ -260,11 +288,15 @@ pyjmethod_call(PyJMethodObject *self, PyObject *args, PyObject *kwargs)
         case JSTRING_ID: {
             jobject object;
 
+            Py_BEGIN_ALLOW_THREADS
+
             if (self->md_is_static) {
                 object = (*env)->CallStaticObjectMethodA(env, instance->clazz, self->md_id, jargs);
             } else {
                 object = (*env)->CallObjectMethodA(env, instance->object, self->md_id, jargs);
             }
+
+            Py_END_ALLOW_THREADS
 
             if (JcpJavaErr_Throw(env)) {
                 goto EXIT_ERROR;
@@ -275,11 +307,15 @@ pyjmethod_call(PyJMethodObject *self, PyObject *args, PyObject *kwargs)
         }
         case JVOID_ID: {
 
+            Py_BEGIN_ALLOW_THREADS
+
             if (self->md_is_static) {
                 (*env)->CallStaticVoidMethodA(env, instance->clazz, self->md_id, jargs);
             } else {
                 (*env)->CallVoidMethodA(env, instance->object, self->md_id, jargs);
             }
+
+            Py_END_ALLOW_THREADS
 
             if (JcpJavaErr_Throw(env)) {
                 goto EXIT_ERROR;
@@ -296,11 +332,15 @@ pyjmethod_call(PyJMethodObject *self, PyObject *args, PyObject *kwargs)
         case JOBJECT_ID: {
             jobject object;
 
+            Py_BEGIN_ALLOW_THREADS
+
             if (self->md_is_static) {
                 object = (*env)->CallStaticObjectMethodA(env, instance->clazz, self->md_id, jargs);
             } else {
                 object = (*env)->CallObjectMethodA(env, instance->object, self->md_id, jargs);
             }
+
+            Py_END_ALLOW_THREADS
 
             if (JcpJavaErr_Throw(env)) {
                 goto EXIT_ERROR;

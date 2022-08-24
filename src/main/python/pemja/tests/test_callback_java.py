@@ -74,5 +74,9 @@ def test_callback_with_all_types(self):
     assert_equals(self.NAME, "TestObject")
 
 
+def test_java_call_python(self, interpreter):
+    assert_equals(self.testJavaCallPython(interpreter), 'testJavaCallPython')
+
+
 def assert_equals(actual, expected):
     assert actual == expected, "{0} is different expected {1}".format(actual, expected)
