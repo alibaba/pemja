@@ -655,6 +655,7 @@ public class PythonInterpreterTest {
 
                 TestObject object = new TestObject();
                 interpreter.invoke("test_callback_java.test_callback_with_all_types", object);
+                interpreter.invoke("test_callback_java.test_java_call_python", object, interpreter);
             }
         } catch (Exception e) {
             throw new RuntimeException("Failed to call test_call_java in test_callback_java.py", e);
@@ -912,6 +913,12 @@ public class PythonInterpreterTest {
 
         /* -------------------------------------------------------------------------------------- */
 
+        /* ----------------------------------- test Java Call Python ---------------------------- */
+        public String testJavaCallPython(Interpreter interpreter) {
+            interpreter.exec("a = 'testJavaCallPython'");
+            return interpreter.get("a", String.class);
+        }
+        /* -------------------------------------------------------------------------------------- */
     }
 
     private static void deleteDirectory(File directory) throws IOException {
