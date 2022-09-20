@@ -35,7 +35,7 @@ public class CommonUtils {
     private boolean initialized = false;
 
     private static final String GET_PYTHON_LIB_PATH_SCRIPT =
-            "import sysconfig;" + "print(sysconfig.get_config_var('LIBDIR'))";
+            "from find_libpython import find_libpython;" + "print(find_libpython())";
 
     private static final String GET_SITE_PACKAGES_PATH_SCRIPT =
             "import sysconfig; print(sysconfig.get_paths()[\"purelib\"])";
@@ -143,7 +143,6 @@ public class CommonUtils {
     }
 
     public String getPythonLibrary(String pythonExec) {
-        String libPath;
         try {
             String out;
             if (pythonExec == null) {
@@ -152,38 +151,15 @@ public class CommonUtils {
             } else {
                 out = execute(new String[] {pythonExec, "-c", GET_PYTHON_LIB_PATH_SCRIPT});
             }
-            libPath = String.join(File.pathSeparator, out.trim().split("\n"));
+            return String.join(File.pathSeparator, out.trim().split("\n"));
         } catch (IOException e) {
-            throw new RuntimeException("Failed to get python lib path", e);
+            throw new RuntimeException("Failed to find libpython", e);
         }
-        File libFile = new File(libPath);
-
-        String libPythonPathPattern;
-        if (isLinuxOs()) {
-            libPythonPathPattern = "^libpython.*so$";
-        } else if (isMacOs()) {
-            libPythonPathPattern = "^libpython.*dylib$";
-        } else {
-            throw new RuntimeException("Unsupported os ");
-        }
-        if (libFile.isDirectory()) {
-            for (File f : Objects.requireNonNull(libFile.listFiles())) {
-                if (f.isFile() && Pattern.matches(libPythonPathPattern, f.getName())) {
-                    return f.getAbsolutePath();
-                }
-            }
-        }
-        throw new RuntimeException("Failed to find libpython");
     }
 
     public boolean isLinuxOs() {
         String os = System.getProperty("os.name");
         return os.startsWith("Linux");
-    }
-
-    public boolean isMacOs() {
-        String os = System.getProperty("os.name");
-        return os.startsWith("Mac OS X");
     }
 
     private String execute(String[] commands) throws IOException {

@@ -211,7 +211,7 @@ setup(
     license='https://www.apache.org/licenses/LICENSE-2.0',
     author_email='hxbks2ks@gmai.com',
     python_requires='>=3.7',
-    install_requires=['numpy==1.21.4'],
+    install_requires=['numpy==1.21.4', 'find-libpython'],
     cmdclass={'build_ext': build_ext},
     description='PemJa',
     long_description=long_description,
