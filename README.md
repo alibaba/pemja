@@ -61,7 +61,7 @@ PythonInterpreter interpreter = new PythonInterpreter(config);
 // set & get
 interpreter.set("a", 12345);
 interpreter.get("a"); // Object
-interpreter.get("a", int.class); // int
+interpreter.get("a", Integer.class); // Integer
 
 // exec & eval
 interpreter.exec("print(a)");
