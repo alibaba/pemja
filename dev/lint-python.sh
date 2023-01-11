@@ -217,7 +217,7 @@ function install_miniconda() {
 
 # Install some kinds of py env.
 function install_py_env() {
-    py_env=("3.7" "3.8" "3.9", "3.10")
+    py_env=("3.7" "3.8" "3.9" "3.10")
     for ((i=0;i<${#py_env[@]};i++)) do
         if [[ -d "$CURRENT_DIR/.conda/envs/${py_env[i]}" ]]; then
             rm -rf "$CURRENT_DIR/.conda/envs/${py_env[i]}"
@@ -391,7 +391,7 @@ function install_environment() {
     print_function "STEP" "install miniconda... [SUCCESS]"
 
     # step-3 install python environment which includes
-    # 3.7 3.8 3.9
+    # 3.7 3.8 3.9 3.10
     if [[ ${STEP} -lt 3 ]] && [[ `need_install_component "py_env"` = true ]]; then
         print_function "STEP" "installing python environment..."
         install_py_env
@@ -585,7 +585,7 @@ usage: $0 [options]
                 so do not use this option with -e,-i simultaneously.
 Examples:
   ./lint-python -s basic        =>  install environment with basic components.
-  ./lint-python -s py_env       =>  install environment with python env(3.7,3.8,3.9).
+  ./lint-python -s py_env       =>  install environment with python env(3.7,3.8,3.9,3.10).
   ./lint-python -s all          =>  install environment with all components such as python env,tox,flake8,sphinx,mypy etc.
   ./lint-python -s tox,flake8   =>  install environment with tox,flake8.
   ./lint-python -s tox -f       =>  reinstall environment with tox.
