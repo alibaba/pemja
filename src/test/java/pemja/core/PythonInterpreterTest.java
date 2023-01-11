@@ -504,10 +504,9 @@ public class PythonInterpreterTest {
                                     new PythonInterpreter(
                                             PythonInterpreterConfig.newBuilder().build())) {
                                 try {
-                                    interpreter.exec("import numpy as np");
                                     interpreter.exec("import math");
                                     interpreter.exec(
-                                            "in_array = (0, math.pi / 2, np.pi / 3, np.pi)");
+                                            "in_array = (0, math.pi / 2, math.pi / 3, math.pi)");
                                     Object[] res =
                                             new Object[] {
                                                 0L,
@@ -532,10 +531,9 @@ public class PythonInterpreterTest {
                                     new PythonInterpreter(
                                             PythonInterpreterConfig.newBuilder().build())) {
                                 try {
-                                    interpreter.exec("import numpy as np");
                                     interpreter.exec("import math");
                                     interpreter.exec(
-                                            "in_array = (0, math.pi / 2, np.pi / 3, np.pi)");
+                                            "in_array = (0, math.pi / 2, math.pi / 3, math.pi)");
                                     Object[] res =
                                             new Object[] {
                                                 0L,

@@ -217,7 +217,7 @@ function install_miniconda() {
 
 # Install some kinds of py env.
 function install_py_env() {
-    py_env=("3.7" "3.8" "3.9")
+    py_env=("3.7" "3.8" "3.9", "3.10")
     for ((i=0;i<${#py_env[@]};i++)) do
         if [[ -d "$CURRENT_DIR/.conda/envs/${py_env[i]}" ]]; then
             rm -rf "$CURRENT_DIR/.conda/envs/${py_env[i]}"
