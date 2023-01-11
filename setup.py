@@ -29,7 +29,7 @@ if sys.version_info < (3, 7):
           file=sys.stderr)
     sys.exit(-1)
 
-if sys.version_info >= (3, 10):
+if sys.version_info >= (3, 11):
     fmt = "Pemja may not yet support Python {}.{}."
     warnings.warn(
         fmt.format(*sys.version_info[:2]),
@@ -137,22 +137,6 @@ def get_java_include():
         paths.append(include_bsd)
     return paths
 
-
-def get_numpy_include():
-    numpy_include = []
-    try:
-        import numpy
-
-        include_path = os.path.join(numpy.__path__[0], 'core', 'include')
-        if os.path.exists(include_path):
-            print('numpy include found at', include_path)
-            numpy_include = [include_path]
-    except ImportError:
-        print('numpy not found', file=sys.stderr)
-        sys.exit(-1)
-    return numpy_include
-
-
 def get_src_include():
     return ['src/main/c/Include']
 
@@ -181,7 +165,7 @@ extensions = ([
         sources=get_files('src/main/c/pemja/core', '.c'),
         libraries=get_python_libs(),
         extra_link_args=get_java_linker_args(),
-        include_dirs=get_java_include() + ['src/main/c/pemja/core/include'] + get_numpy_include(),
+        include_dirs=get_java_include() + ['src/main/c/pemja/core/include'],
         language=3),
     Extension(
         name="pemja_utils",
@@ -210,7 +194,7 @@ setup(
     license='https://www.apache.org/licenses/LICENSE-2.0',
     author_email='hxbks2ks@gmail.com',
     python_requires='>=3.7',
-    install_requires=['numpy==1.21.4', 'find-libpython'],
+    install_requires=['find-libpython'],
     cmdclass={'build_ext': build_ext},
     description='PemJa',
     long_description=long_description,
@@ -222,6 +206,7 @@ setup(
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
         'Programming Language :: Python :: Implementation :: CPython',
         'Operating System :: Unix',
         'Operating System :: MacOS', ],

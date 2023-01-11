@@ -14,5 +14,4 @@
 # limitations under the License.
 setuptools>=18.0
 wheel
-numpy==1.21.4
 find-libpython

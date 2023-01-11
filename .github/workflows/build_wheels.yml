@@ -73,7 +73,7 @@ jobs:
       matrix:
         buildplat:
           - [macos-latest, macosx_*]
-        python: ["cp37", "cp38", "cp39"]
+        python: ["cp37", "cp38", "cp39", "cp310"]
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
