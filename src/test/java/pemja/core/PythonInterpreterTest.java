@@ -408,7 +408,7 @@ public class PythonInterpreterTest {
                                             .build();
                             PythonInterpreter interpreter1 = new PythonInterpreter(config1);
                             interpreter1.exec("import sys");
-                            interpreter1.exec("a = str(sys.path)");
+                            interpreter1.exec("a = str(set(sys.path))");
                             path1.set(interpreter1.get("a", String.class));
                             interpreter1.close();
                         });
@@ -426,7 +426,7 @@ public class PythonInterpreterTest {
                                             .build();
                             PythonInterpreter interpreter2 = new PythonInterpreter(config2);
                             interpreter2.exec("import sys");
-                            interpreter2.exec("a = str(sys.path)");
+                            interpreter2.exec("a = str(set(sys.path))");
                             path2.set(interpreter2.get("a", String.class));
                             interpreter2.close();
                         });
@@ -436,12 +436,9 @@ public class PythonInterpreterTest {
         threadA.join();
         threadB.join();
         String path1String = path1.get();
-        String path2String = path1.get();
-        if (path1String.length() > path2String.length()) {
-            assertEquals(path1String.substring(0, path2String.length()), path2String);
-        } else {
-            assertEquals(path1String, path2String.substring(0, path1String.length()));
-        }
+        String path2String = path2.get();
+
+        assertEquals(path1String, path2String);
     }
 
     @Test

@@ -11,8 +11,8 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#ifndef _Included_java_math_BigDecmal
-#define _Included_java_math_BigDecmal
+#ifndef _Included_java_math_BigDecimal
+#define _Included_java_math_BigDecimal
 
 jobject JavaBigDecimal_New(JNIEnv*, jstring);
 jstring JavaBigDecimal_toString(JNIEnv*, jobject);
