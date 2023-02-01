@@ -23,7 +23,7 @@ def test_call_collection(collection):
 
     iterator = iter(collection)
     values = [value for value in iterator]
-    sorted(values)
+    values = sorted(values, reverse=True)
 
     assert values == [3, 2, 1]
 
@@ -32,7 +32,7 @@ def test_call_collection(collection):
 
 def test_call_iterator(iterator):
     values = [value for value in iterator]
-    sorted(values)
+    values = sorted(values, reverse=True)
 
     assert values == [3, 2, 1]
 
