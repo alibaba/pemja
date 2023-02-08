@@ -190,6 +190,12 @@ class build_ext(old_build_ext):
                 ext.extra_compile_args.append('-std=c99')
         old_build_ext.build_extension(self, ext)
 
+    def run(self):
+        old_build_ext.run(self)
+        if is_windows():
+            for lib in self.get_outputs():
+                dll = lib.replace('.pyd', '.dll')
+                self.copy_file(lib, dll)
 
 extensions = ([
     Extension(

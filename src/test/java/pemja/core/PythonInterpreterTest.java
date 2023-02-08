@@ -71,7 +71,6 @@ public class PythonInterpreterTest {
                 new String[] {
                     String.join(
                             File.separator,
-                            File.separator,
                             System.getProperty("user.dir"),
                             "src",
                             "main",

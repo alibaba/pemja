@@ -155,7 +155,7 @@ public final class PythonInterpreter implements Interpreter {
         if (paths != null) {
             exec("import sys");
             for (int i = paths.length - 1; i >= 0; i--) {
-                exec(String.format("sys.path.insert(0, '%s')", paths[i]));
+                exec(String.format("sys.path.insert(0, r'%s')", paths[i]));
             }
         }
     }
@@ -335,6 +335,10 @@ public final class PythonInterpreter implements Interpreter {
 
         private static final MainInterpreter instance = new MainInterpreter();
 
+        private static final String unixLibPattern = "^pemja_core\\.cpython-.*\\.so$";
+
+        private static final String windowsLibPattern = "^pemja_core\\.cp.*\\.dll$";
+
         private final CountDownLatch damonThreadStart = new CountDownLatch(1);
 
         private final CountDownLatch damonThreadFinish = new CountDownLatch(1);
@@ -352,9 +356,9 @@ public final class PythonInterpreter implements Interpreter {
         @SuppressWarnings("unchecked")
         synchronized void initialize(String pythonExec) {
             if (!isStarted) {
+                String pattern = CommonUtils.INSTANCE.isWindows() ? windowsLibPattern : unixLibPattern;
                 String pemjaLibPath =
-                        CommonUtils.INSTANCE.getLibraryPathWithPattern(
-                                pythonExec, "^pemja_core\\.cpython-.*\\.so$");
+                        CommonUtils.INSTANCE.getLibraryPathWithPattern(pythonExec, pattern);
                 String pythonLibPath = CommonUtils.INSTANCE.getPythonLibrary(pythonExec);
                 String pemjaModulePath = CommonUtils.INSTANCE.getPemJaModulePath(pythonExec);
 
