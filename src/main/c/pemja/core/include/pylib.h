@@ -167,7 +167,7 @@ _JcpPyFunction_Load(JNIEnv* env, JcpThread* jcp_thread, const char *name)
         return jcp_thread->cache_callable;
     } else {
         globals = jcp_thread->globals;
-        callable = PyObject_GetAttrString(globals, name);
+        callable = PyDict_GetItemString(globals, name);
 
         if (!callable) {
 
