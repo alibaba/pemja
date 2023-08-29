@@ -640,6 +640,17 @@ public class PythonInterpreterTest {
     }
 
     @Test
+    public void testExec2() {
+        PythonInterpreterConfig config = PythonInterpreterConfig.newBuilder().build();
+        try (PythonInterpreter interpreter = new PythonInterpreter(config)) {
+            interpreter.exec("a = 123");
+            interpreter.exec("def process():\n" + "   return a");
+            interpreter.exec("a += 1");
+            assertEquals(124L, interpreter.invoke("process"));
+        }
+    }
+
+    @Test
     public void testCallbackJavaWithAllTypes() {
         try {
             PythonInterpreterConfig config =
