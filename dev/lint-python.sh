@@ -183,8 +183,8 @@ function install_wget() {
 # some pakcages including checks such as tox and flake8.
 
 function install_miniconda() {
-    OS_TO_CONDA_URL=("https://repo.continuum.io/miniconda/Miniconda3-4.7.10-MacOSX-x86_64.sh" \
-        "https://repo.continuum.io/miniconda/Miniconda3-4.7.10-Linux-x86_64.sh")
+    OS_TO_CONDA_URL=("https://repo.anaconda.com/miniconda/Miniconda3-py39_23.5.2-0-MacOSX-x86_64.sh" \
+        "https://repo.anaconda.com/miniconda/Miniconda3-py39_23.5.2-0-Linux-x86_64.sh")
     print_function "STEP" "download miniconda..."
     if [ ! -f "$CONDA_INSTALL" ]; then
         download ${OS_TO_CONDA_URL[$1]} $CONDA_INSTALL_SH
