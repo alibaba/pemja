@@ -35,7 +35,7 @@ Prerequisites for building PemJa:
 * Git
 * Maven (we recommend version 3.2.5 and require at least 3.1.1)
 * Java 8 or 11 (Java 9 or 10 may work)
-* Python >= 3.7 (we recommend version 3.7, 3.8, 3.9)
+* Python >= 3.8 (we recommend version 3.8, 3.9, 3.10, 3.11)
 
 ```
 git clone https://github.com/alibaba/pemja.git

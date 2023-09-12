@@ -24,7 +24,7 @@ from distutils.command.build_ext import build_ext as old_build_ext
 
 from setuptools import setup, Extension
 
-if sys.version_info < (3, 7):
+if sys.version_info < (3, 8):
     print('Python versions prior to 3.7 are not supported for PemJa.',
           file=sys.stderr)
     sys.exit(-1)
@@ -194,7 +194,7 @@ setup(
     author='Apache Software Foundation',
     license='https://www.apache.org/licenses/LICENSE-2.0',
     author_email='hxbks2ks@gmail.com',
-    python_requires='>=3.7',
+    python_requires='>=3.8',
     install_requires=['find-libpython'],
     cmdclass={'build_ext': build_ext},
     description='PemJa',
@@ -204,7 +204,6 @@ setup(
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'License :: OSI Approved :: Apache Software License',
-        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
