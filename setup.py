@@ -29,7 +29,7 @@ if sys.version_info < (3, 7):
           file=sys.stderr)
     sys.exit(-1)
 
-if sys.version_info >= (3, 11):
+if sys.version_info >= (3, 12):
     fmt = "Pemja may not yet support Python {}.{}."
     warnings.warn(
         fmt.format(*sys.version_info[:2]),
@@ -137,6 +137,7 @@ def get_java_include():
         paths.append(include_bsd)
     return paths
 
+
 def get_src_include():
     return ['src/main/c/Include']
 
@@ -207,6 +208,7 @@ setup(
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
         'Programming Language :: Python :: Implementation :: CPython',
         'Operating System :: Unix',
         'Operating System :: MacOS', ],
