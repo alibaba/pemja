@@ -50,8 +50,9 @@ public class CommonUtils {
     @SuppressWarnings("unchecked")
     public void loadLibrary(String pythonExec, String library) {
         if (!initialized) {
+            String pattern = isWindows() ? "^pemja_utils\\.cp.*\\.dll$" : "^pemja_utils\\.cpython-.*\\.so$";
             String utilsLibPath =
-                    getLibraryPathWithPattern(pythonExec, "^pemja_utils\\.cpython-.*\\.so$");
+                    getLibraryPathWithPattern(pythonExec, pattern);
             try {
                 System.load(utilsLibPath);
             } catch (UnsatisfiedLinkError error) {
@@ -159,6 +160,10 @@ public class CommonUtils {
     public boolean isLinuxOs() {
         String os = System.getProperty("os.name");
         return os.startsWith("Linux");
+    }
+
+    public boolean isWindows() {
+        return System.getProperty("os.name", "").startsWith("Windows");
     }
 
     private String execute(String[] commands) throws IOException {

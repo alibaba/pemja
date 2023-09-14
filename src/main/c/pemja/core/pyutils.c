@@ -446,7 +446,7 @@ JcpPyInt_FromInt(int value)
 /* Function to return a Python Float from a float value */
 
 PyObject*
-JcpPyInt_FromLong(long value)
+JcpPyInt_FromLong(jlong value)
 {
 
     return PyLong_FromLongLong(value);
@@ -600,7 +600,7 @@ JcpPyInt_FromJLong(JNIEnv* env, jobject value)
         return NULL;
     }
 
-    return JcpPyInt_FromLong((long) l);
+    return JcpPyInt_FromLong(l);
 }
 
 

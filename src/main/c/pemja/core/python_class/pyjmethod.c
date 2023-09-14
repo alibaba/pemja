@@ -242,7 +242,7 @@ pyjmethod_call(PyJMethodObject *self, PyObject *args, PyObject *kwargs)
                 goto EXIT_ERROR;
             }
 
-            pyobject = JcpPyInt_FromLong((long) object);
+            pyobject = JcpPyInt_FromLong(object);
             break;
         }
         case JFLOAT_ID: {

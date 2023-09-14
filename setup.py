@@ -20,9 +20,8 @@ import os
 import sys
 import sysconfig
 import warnings
-from distutils.command.build_ext import build_ext as old_build_ext
-
 from setuptools import setup, Extension
+from distutils.command.build_ext import build_ext as old_build_ext
 
 if sys.version_info < (3, 8):
     print('Python versions prior to 3.7 are not supported for PemJa.',
@@ -77,6 +76,8 @@ def is_osx():
 def is_bsd():
     return 'bsd' in sysconfig.get_platform()
 
+def is_windows():
+    return 'win' in sysconfig.get_platform()
 
 def get_python_libs():
     libs = []
@@ -103,6 +104,33 @@ def get_java_linker_args():
         return ['-framework JavaVM']
     return []
 
+def get_java_libraries():
+    if is_windows():
+        return ['jvm']
+    return []
+
+def get_java_lib_folders():
+    if not is_osx():
+        import fnmatch
+        if is_windows():
+            jre = os.path.join(get_java_home(), 'lib')
+        else:
+            jre = os.path.join(get_java_home(), 'jre', 'lib')
+            if not os.path.exists(jre):
+                jre = os.path.join(get_java_home(), 'lib')
+        folders = []
+        for root, dirnames, filenames in os.walk(jre):
+            if is_windows():
+                for filename in fnmatch.filter(filenames, '*jvm.lib'):
+                    folders.append(os.path.join(
+                        root, os.path.dirname(filename)))
+            else:
+                for filename in fnmatch.filter(filenames, '*jvm.so'):
+                    folders.append(os.path.join(
+                        root, os.path.dirname(filename)))
+
+        return list(set(folders))
+    return []
 
 def get_java_include():
     inc_name = 'include'
@@ -132,6 +160,10 @@ def get_java_include():
     if os.path.exists(include_darwin):
         paths.append(include_darwin)
 
+    include_win32 = os.path.join(inc, 'win32')
+    if os.path.exists(include_win32):
+        paths.append(include_win32)
+
     include_bsd = os.path.join(inc, 'freebsd')
     if os.path.exists(include_bsd):
         paths.append(include_bsd)
@@ -159,18 +191,26 @@ class build_ext(old_build_ext):
                 ext.extra_compile_args.append('-std=c99')
         old_build_ext.build_extension(self, ext)
 
+    def run(self):
+        old_build_ext.run(self)
+        if is_windows():
+            for lib in self.get_outputs():
+                dll = lib.replace('.pyd', '.dll')
+                self.copy_file(lib, dll)
 
 extensions = ([
     Extension(
         name="pemja_core",
         sources=get_files('src/main/c/pemja/core', '.c'),
-        libraries=get_python_libs(),
+        libraries=get_java_libraries() + get_python_libs(),
+        library_dirs = get_java_lib_folders(),
         extra_link_args=get_java_linker_args(),
         include_dirs=get_java_include() + ['src/main/c/pemja/core/include'],
         language=3),
     Extension(
         name="pemja_utils",
         sources=get_files('src/main/c/pemja/utils', '.c'),
+        library_dirs = get_java_lib_folders(),
         extra_link_args=get_java_linker_args(),
         include_dirs=get_java_include() + ['src/main/c/pemja/utils/include'],
         language=3)
