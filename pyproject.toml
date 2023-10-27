@@ -8,3 +8,6 @@ requires = [
 
 [tool.cibuildwheel.macos]
 archs = "x86_64 arm64"
+
+[tool.cibuildwheel.linux]
+manylinux-aarch64-image = "manylinux2014"
