@@ -105,6 +105,7 @@ def get_java_linker_args():
 
 
 def get_java_include():
+    print("os.environ.get('JAVA_HOME') ", os.environ.get('JAVA_HOME'))
     inc_name = 'include'
     if is_apple_jdk():
         inc_name = 'Headers'
