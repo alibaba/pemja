@@ -113,7 +113,12 @@ public final class PythonInterpreterConfig {
          * @param paths Multiple search paths.
          */
         public PythonInterpreterConfigBuilder addPythonPaths(String... paths) {
-            this.paths.addAll(Arrays.asList(paths));
+            for (String path : paths) {
+                if (path.trim().isEmpty() || this.paths.contains(path)) {
+                    continue;
+                }
+                this.paths.add(path);
+            }
             return this;
         }
 
