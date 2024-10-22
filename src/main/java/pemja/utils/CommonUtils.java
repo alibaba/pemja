@@ -37,7 +37,7 @@ public class CommonUtils {
             "from find_libpython import find_libpython;" + "print(find_libpython())";
 
     private static final String GET_SITE_PACKAGES_PATH_SCRIPT =
-            "import sysconfig; print(sysconfig.get_paths()[\"purelib\"])";
+            "import sysconfig; print(sysconfig.get_paths()['purelib'])";
 
     private static final String GET_PEMJA_MODULE_PATH_SCRIPT =
             "import pemja;" + "import os;" + "print(os.path.dirname(pemja.__file__))";

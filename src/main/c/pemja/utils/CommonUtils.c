@@ -17,8 +17,12 @@
 #if (defined(_WIN32) || defined(_WIN64))
     #include <windows.h>
     #include <Python.h>
+
     PyMODINIT_FUNC PyInit_pemja_utils(void) {
-        // pass
+        // Sine pemja_utils is not a true Python extension module,
+        // we just use it to provide native functions, returning NULL
+        // to let "import pemja_utils" fail is enough.
+        return NULL;
     }
 #else
     // linux and macos

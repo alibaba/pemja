@@ -20,7 +20,10 @@
 // use windows mingw32
 #if (defined(_WIN32) || defined(_WIN64))
     PyMODINIT_FUNC PyInit_pemja_core(void) {
-        // pass
+        // Sine pemja_core is not a true Python extension module,
+        // we just use it to provide native functions, returning NULL
+        // is enough.
+        return NULL;
     }
 #else
 #endif
