@@ -118,12 +118,10 @@ def get_java_lib_folders():
         for root, dirnames, filenames in os.walk(jre):
             if is_windows():
                 for filename in fnmatch.filter(filenames, '*jvm.lib'):
-                    folders.append(os.path.join(
-                        root, os.path.dirname(filename)))
+                    folders.append(os.path.dirname(os.path.join(root, filename)))
             else:
                 for filename in fnmatch.filter(filenames, '*jvm.so'):
-                    folders.append(os.path.join(
-                        root, os.path.dirname(filename)))
+                    folders.append(os.path.dirname(os.path.join(root, filename)))
 
         return list(set(folders))
     return []
