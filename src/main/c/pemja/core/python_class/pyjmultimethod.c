@@ -35,7 +35,7 @@ multi_method_init(PyJMultiMethodObject* self)
 static PyObject *
 multi_method_call(PyJMultiMethodObject *self, PyObject *args, PyObject *kwargs)
 {
-    int             method_num;
+    Py_ssize_t      method_num;
 
     PyJMethodObject *method;
     PyObject        *matched_method = NULL;

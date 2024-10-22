@@ -39,7 +39,7 @@ JNI_OnLoad(JavaVM *vm, void *reserved)
 JNIEXPORT void JNICALL Java_pemja_utils_CommonUtils_loadLibrary0
   (JNIEnv *env, jobject obj, jstring library)
 {
-    char* fileName = (*env)->GetStringUTFChars(env, library, 0);
+    const char* fileName = (*env)->GetStringUTFChars(env, library, 0);
         #if (defined(_WIN32) || defined(_WIN64))
             HINSTANCE dlresult = LoadLibrary(fileName);
             if (dlresult) {
