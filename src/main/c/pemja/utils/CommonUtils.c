@@ -44,27 +44,27 @@ JNIEXPORT void JNICALL Java_pemja_utils_CommonUtils_loadLibrary0
   (JNIEnv *env, jobject obj, jstring library)
 {
     const char* fileName = (*env)->GetStringUTFChars(env, library, 0);
-        #if (defined(_WIN32) || defined(_WIN64))
-            HINSTANCE dlresult = LoadLibrary(fileName);
-            if (dlresult) {
-                FreeLibrary(dlresult);
-            } else {
-                fprintf(stderr, "load dll failed. 0x%x\n", GetLastError());
-                exit(EXIT_FAILURE);
-            }
-        #else
-            void* dlresult = dlopen(fileName, RTLD_NOW | RTLD_GLOBAL);
-            if (dlresult) {
-                // The dynamic linker maintains reference counts so closing it is a no-op.
-                dlclose(dlresult);
-            } else {
-                /*
-                 * Ignore errors and hope that the library is loaded globally or the
-                 * extensions are linked. If developers need to debug the cause they
-                 * should print the result of dlerror.
-                 */
-                fprintf(stderr, "%s\n", dlerror());
-                exit(EXIT_FAILURE);
-            }
-        #endif
+    #if (defined(_WIN32) || defined(_WIN64))
+        HINSTANCE dlresult = LoadLibrary(fileName);
+        if (dlresult) {
+            FreeLibrary(dlresult);
+        } else {
+            fprintf(stderr, "load dll failed. 0x%x\n", GetLastError());
+            exit(EXIT_FAILURE);
+        }
+    #else
+        void* dlresult = dlopen(fileName, RTLD_NOW | RTLD_GLOBAL);
+        if (dlresult) {
+            // The dynamic linker maintains reference counts so closing it is a no-op.
+            dlclose(dlresult);
+        } else {
+            /*
+                * Ignore errors and hope that the library is loaded globally or the
+                * extensions are linked. If developers need to debug the cause they
+                * should print the result of dlerror.
+                */
+            fprintf(stderr, "%s\n", dlerror());
+            exit(EXIT_FAILURE);
+        }
+    #endif
 }
