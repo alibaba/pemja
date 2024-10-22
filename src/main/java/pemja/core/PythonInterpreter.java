@@ -155,7 +155,7 @@ public final class PythonInterpreter implements Interpreter {
         if (paths != null) {
             exec("import sys");
             for (int i = paths.length - 1; i >= 0; i--) {
-                exec(String.format("sys.path.insert(0, '%s')", paths[i]));
+                exec(String.format("sys.path.insert(0, r'%s')", paths[i]));
             }
         }
     }
