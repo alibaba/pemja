@@ -17,6 +17,14 @@
 #include "MainInterpreter.h"
 #include "PythonInterpreter.h"
 
+// use windows mingw32
+#if (defined(_WIN32) || defined(_WIN64))
+    PyMODINIT_FUNC PyInit_pemja_core(void) {
+        // pass
+    }
+#else
+#endif
+
 // ---------------------------------- jni functions ------------------------
 
 

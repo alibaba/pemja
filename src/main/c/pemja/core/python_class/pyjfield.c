@@ -163,7 +163,7 @@ JcpPyJField_Get(PyJFieldObject* self, PyJObject* pyjobject)
                 object = (*env)->GetLongField(env, pyjobject->object, self->fd_id);
             }
 
-            result = JcpPyInt_FromLong((long) object);
+            result = JcpPyInt_FromLong(object);
             break;
         }
         case JFLOAT_ID: {

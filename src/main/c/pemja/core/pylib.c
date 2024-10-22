@@ -602,7 +602,7 @@ JcpPyObject_SetJLong(JNIEnv *env, intptr_t ptr, const char *name, jlong value)
 
     Jcp_BEGIN_ALLOW_THREADS
 
-    _JcpPyObject_SetPyObject(jcp_thread->globals, name, JcpPyInt_FromLong((long) value));
+    _JcpPyObject_SetPyObject(jcp_thread->globals, name, JcpPyInt_FromLong(value));
 
     Jcp_END_ALLOW_THREADS
 }
