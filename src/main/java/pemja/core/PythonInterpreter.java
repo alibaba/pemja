@@ -354,7 +354,7 @@ public final class PythonInterpreter implements Interpreter {
             if (!isStarted) {
                 String pemjaLibPath =
                         CommonUtils.INSTANCE.getLibraryPathWithPattern(
-                                pythonExec, "^pemja_core\\.(cpython-.*\\.so|cp.*-win.*\\.dll)$");
+                                pythonExec, "^pemja_core\\.(cpython-.*\\.so|cp.*-win.*\\.pyd)$");
                 String pythonLibPath = CommonUtils.INSTANCE.getPythonLibrary(pythonExec);
                 String pemjaModulePath = CommonUtils.INSTANCE.getPemJaModulePath(pythonExec);
 
