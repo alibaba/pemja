@@ -42,7 +42,7 @@ jobs:
       - name: Build source
         run: python setup.py sdist
       - name: Upload sources as artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: source_package
           path: ./dist/
@@ -61,7 +61,7 @@ jobs:
       - name: Build wheel
         run: bash dev/build-wheels.sh
       - name: Upload wheels as artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: wheel_ubuntu-20.04
           path: ./dist/
