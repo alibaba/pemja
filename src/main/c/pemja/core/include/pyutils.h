@@ -169,7 +169,7 @@ JcpAPI_FUNC(PyObject*) JcpPyObject_FromJObject(JNIEnv*, jobject);
 /* Functions to return a Python primitive object from a C primitive value */
 JcpAPI_FUNC(PyObject*) JcpPyBool_FromLong(long);
 JcpAPI_FUNC(PyObject*) JcpPyInt_FromInt(int);
-JcpAPI_FUNC(PyObject*) JcpPyInt_FromLong(long);
+JcpAPI_FUNC(PyObject*) JcpPyInt_FromLong(jlong);
 JcpAPI_FUNC(PyObject*) JcpPyFloat_FromDouble(double);
 JcpAPI_FUNC(PyObject*) JcpPyString_FromChar(jchar);
 

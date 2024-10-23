@@ -17,6 +17,7 @@
 
 import io
 import os
+import shutil
 import sys
 import sysconfig
 import warnings
@@ -69,6 +70,18 @@ def get_java_home():
                   file=sys.stderr)
             sys.exit(-1)
 
+    if is_windows():
+        java_path = shutil.which("java")
+        if java_path is None:
+            print('Can not determine JAVA_HOME from environment variable nor java executable path.',
+                  file=sys.stderr)
+            sys.exit(-1)
+        exe_home = os.path.dirname(os.path.dirname(java_path))
+        _java_home = exe_home
+        return exe_home
+
+    return None
+
 
 def is_osx():
     return 'macosx' in sysconfig.get_platform()
@@ -77,13 +90,41 @@ def is_osx():
 def is_bsd():
     return 'bsd' in sysconfig.get_platform()
 
+def is_windows():
+    return 'win' in sysconfig.get_platform()
+
 
 def get_python_libs():
     libs = []
-    if not is_bsd():
+    if not (is_bsd() or is_windows()):
         libs.append('dl')
     return libs
 
+def get_java_libraries():
+    if is_windows():
+        return ['jvm']
+    return []
+
+def get_java_lib_folders():
+    if not is_osx():
+        import fnmatch
+        if is_windows():
+            jre = os.path.join(get_java_home(), 'lib')
+        else:
+            jre = os.path.join(get_java_home(), 'jre', 'lib')
+            if not os.path.exists(jre):
+                jre = os.path.join(get_java_home(), 'lib')
+        folders = []
+        for root, dirnames, filenames in os.walk(jre):
+            if is_windows():
+                for filename in fnmatch.filter(filenames, '*jvm.lib'):
+                    folders.append(os.path.dirname(os.path.join(root, filename)))
+            else:
+                for filename in fnmatch.filter(filenames, '*jvm.so'):
+                    folders.append(os.path.dirname(os.path.join(root, filename)))
+
+        return list(set(folders))
+    return []
 
 def get_files(dir, pattern):
     ret = []
@@ -135,6 +176,10 @@ def get_java_include():
     include_bsd = os.path.join(inc, 'freebsd')
     if os.path.exists(include_bsd):
         paths.append(include_bsd)
+
+    include_win32 = os.path.join(inc, 'win32')
+    if os.path.exists(include_win32):
+        paths.append(include_win32)
     return paths
 
 
@@ -164,13 +209,15 @@ extensions = ([
     Extension(
         name="pemja_core",
         sources=get_files('src/main/c/pemja/core', '.c'),
-        libraries=get_python_libs(),
+        libraries=get_java_libraries() + get_python_libs(),
+        library_dirs = get_java_lib_folders(),
         extra_link_args=get_java_linker_args(),
         include_dirs=get_java_include() + ['src/main/c/pemja/core/include'],
         language=3),
     Extension(
         name="pemja_utils",
         sources=get_files('src/main/c/pemja/utils', '.c'),
+        library_dirs = get_java_lib_folders(),
         extra_link_args=get_java_linker_args(),
         include_dirs=get_java_include() + ['src/main/c/pemja/utils/include'],
         language=3)
@@ -210,5 +257,7 @@ setup(
         'Programming Language :: Python :: 3.11',
         'Programming Language :: Python :: Implementation :: CPython',
         'Operating System :: Unix',
-        'Operating System :: MacOS', ],
+        'Operating System :: MacOS',
+        'Operating System :: Microsoft :: Windows',
+    ],
     ext_modules=extensions)

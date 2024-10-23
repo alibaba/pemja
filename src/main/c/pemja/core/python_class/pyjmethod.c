@@ -76,7 +76,7 @@ pyjmethod_call(PyJMethodObject *self, PyObject *args, PyObject *kwargs)
 
     JNIEnv *env;
     jvalue *jargs;
-    int nargs, input_nargs;
+    Py_ssize_t nargs, input_nargs;
 
     if (kwargs != NULL) {
         PyErr_SetString(PyExc_RuntimeError, "Keywords are not supported in calling Java method.");
@@ -135,7 +135,7 @@ pyjmethod_call(PyJMethodObject *self, PyObject *args, PyObject *kwargs)
     }
 
     if (nargs < self->md_params_num && nargs < input_nargs - 1) {
-        jclass paramType = (*env)->GetObjectArrayElement(env, self->md_params, nargs);
+        jclass paramType = (*env)->GetObjectArrayElement(env, self->md_params, (jsize)nargs);
         PyObject *param = PyTuple_GetSlice(args, nargs, input_nargs);
         jargs[nargs] = JcpPyObject_AsJValue(env, param, paramType);
         (*env)->DeleteLocalRef(env, paramType);
@@ -242,7 +242,7 @@ pyjmethod_call(PyJMethodObject *self, PyObject *args, PyObject *kwargs)
                 goto EXIT_ERROR;
             }
 
-            pyobject = JcpPyInt_FromLong((long) object);
+            pyobject = JcpPyInt_FromLong(object);
             break;
         }
         case JFLOAT_ID: {

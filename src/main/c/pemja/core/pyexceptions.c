@@ -104,7 +104,7 @@ JcpPyErr_Throw(JNIEnv* env)
                 PyObject* frame_line = PySequence_GetItem(stack_frame, 3);
 
                 if (frame_line != Py_None) {
-                    int name_size = strlen(frame_filename);
+                    size_t name_size = strlen(frame_filename);
                     // create the file name without `.py` suffix.
                     char* frame_filename_no_suffix = malloc(sizeof(char) * (name_size + 1));
                     strcpy(frame_filename_no_suffix, frame_filename);

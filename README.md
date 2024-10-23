@@ -30,12 +30,17 @@ Java Maven Dependency
 ## Installation from sources
 
 Prerequisites for building PemJa:
-
-* Unix-like environment (we use Linux, Mac OS X)
+* Unix-like environment (we use Linux, Mac OS X), Windows
 * Git
 * Maven (we recommend version 3.2.5 and require at least 3.1.1)
-* Java 8 or 11 (Java 9 or 10 may work)
+* Java 8 or 11 (Java 9 or 10 may work) with $JAVA_HOME set correctly
 * Python >= 3.8 (we recommend version 3.8, 3.9, 3.10, 3.11)
+
+
+**NOTE for windows:**
+* Microsoft Visual C++ 14.0 or greater is required. Get it with ["Microsoft C++ Build Tools"](https://www.microsoft.com/en-in/download/details.aspx?id=48159)
+* The compressed package in folder *dist* must be uncompressed and use the following command to install ```pip install dist/$packageName$```
+
 
 ```
 git clone https://github.com/alibaba/pemja.git
@@ -52,7 +57,7 @@ pip install dist/*.tar.gz
 String path = ...;
 PythonInterpreterConfig config = PythonInterpreterConfig
     .newBuilder()
-    .setPythonExec("python3") // specify python exec
+    .setPythonExec("python3") // specify python exec, use "python" on Windows
     .addPythonPaths(path) // add path to search path
     .build();
 

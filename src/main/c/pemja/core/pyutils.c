@@ -446,7 +446,7 @@ JcpPyInt_FromInt(int value)
 /* Function to return a Python Float from a float value */
 
 PyObject*
-JcpPyInt_FromLong(long value)
+JcpPyInt_FromLong(jlong value)
 {
 
     return PyLong_FromLongLong(value);
@@ -600,7 +600,7 @@ JcpPyInt_FromJLong(JNIEnv* env, jobject value)
         return NULL;
     }
 
-    return JcpPyInt_FromLong((long) l);
+    return JcpPyInt_FromLong(l);
 }
 
 
@@ -1002,11 +1002,11 @@ JcpPyTime_FromJSqlTime(JNIEnv* env, jobject value)
         PyDateTime_IMPORT;
     }
 
-    long time = JavaSqlTime_getTime(env, value);
+    jlong time = JavaSqlTime_getTime(env, value);
 
-    int milliseconds = time % 1000;
+    int milliseconds = (int)(time % 1000);
 
-    int seconds = time / 1000;
+    int seconds = (int)(time / 1000);
 
     int minutes = seconds / 60;
 
@@ -1703,7 +1703,7 @@ jobject
 JcpPyList_AsJObject(JNIEnv* env, PyObject* pyobject)
 {
 
-    int length;
+    Py_ssize_t length;
     jobject element;
     jobject list;
 
@@ -1711,7 +1711,7 @@ JcpPyList_AsJObject(JNIEnv* env, PyObject* pyobject)
 
     list = JavaList_NewArrayList(env);
 
-    for (int i = 0; i < length; i++) {
+    for (Py_ssize_t i = 0; i < length; i++) {
         element = JcpPyObject_AsJObject(env, PyList_GetItem(pyobject, i), JOBJECT_TYPE);
         JavaList_Add(env, list, element);
     }
@@ -1732,7 +1732,7 @@ JcpPyTuple_AsJObject(JNIEnv* env, PyObject* pyobject, jclass clazz)
     jobjectArray array = NULL;
     jobject element;
 
-    length = PyTuple_Size(pyobject);
+    length = (int)PyTuple_Size(pyobject);
 
     if ((*env)->IsSameObject(env, clazz, JOBJECT_TYPE)) {
 

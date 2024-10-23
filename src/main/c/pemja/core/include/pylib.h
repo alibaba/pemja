@@ -138,7 +138,7 @@ static inline char*
 _str_create_and_copy(const char* s)
 {
 
-    int size;
+    size_t size;
     char* ns;
 
     size = sizeof(char) * (strlen(s) + 1);
