@@ -142,7 +142,7 @@ public final class PythonInterpreter implements Interpreter {
      * @param config the specified {@link PythonInterpreterConfig}.
      */
     private void initialize(PythonInterpreterConfig config) {
-        mainInterpreter.initialize(config.getPythonExec());
+        mainInterpreter.initializeInterpreter(config.getPythonExec(), config.getPythonHome());
         this.tState = init(config.getExecType().ordinal());
 
         synchronized (PythonInterpreter.class) {
@@ -350,7 +350,7 @@ public final class PythonInterpreter implements Interpreter {
 
         /** Initializes CPython. */
         @SuppressWarnings("unchecked")
-        synchronized void initialize(String pythonExec) {
+        synchronized void initializeInterpreter(String pythonExec, String pythonHome) {
             if (!isStarted) {
                 String pemjaLibPath =
                         CommonUtils.INSTANCE.getLibraryPathWithPattern(
@@ -397,7 +397,7 @@ public final class PythonInterpreter implements Interpreter {
                             @Override
                             public void run() {
                                 try {
-                                    initialize();
+                                    initialize(pythonHome);
                                     // add shared modules
                                     addToPath(pemjaModulePath);
                                     importModule("redirect_stream");
@@ -440,7 +440,7 @@ public final class PythonInterpreter implements Interpreter {
         }
 
         /** Initialize Python Interpreter. */
-        private native void initialize();
+        private native void initialize(String pythonInterpreterPath);
 
         /** Adds the search path to the main interpreter. */
         private native void addToPath(String path);

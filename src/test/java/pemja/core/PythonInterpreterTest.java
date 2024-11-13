@@ -21,6 +21,7 @@ import org.junit.Before;
 import org.junit.Test;
 import pemja.core.object.PyIterator;
 import pemja.core.object.PyObject;
+import pemja.utils.CommonUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -216,6 +217,39 @@ public class PythonInterpreterTest {
         try {
             PythonInterpreterConfig config =
                     PythonInterpreterConfig.newBuilder().addPythonPaths(testDir).build();
+            Object[] args = new Object[] {1};
+            Map<String, Object> kwargs = new HashMap<>();
+            kwargs.put("a", 2);
+            try (PythonInterpreter interpreter = new PythonInterpreter(config)) {
+                interpreter.exec("import test_call");
+                assertEquals("no arg", interpreter.invoke("test_call.test_call_no_args"));
+                assertEquals(1L, interpreter.invoke("test_call.test_call_one_arg", args));
+                assertEquals(1L, interpreter.invoke("test_call.test_call_variable_args", args));
+                assertEquals(2L, interpreter.invoke("test_call.test_call_keywords_args", kwargs));
+                assertEquals(3L, interpreter.invoke("test_call.test_call_all_args", args, kwargs));
+                interpreter.exec("a = test_call.A()");
+                assertEquals(3L, interpreter.invokeMethod("a", "add", 3));
+                assertEquals(1L, interpreter.invokeMethod("a", "minus", 2));
+                assertEquals(7L, interpreter.invokeMethod("a", "add_all", 1, 2, 3));
+
+                Object javaObject = new TestObject();
+                assertEquals(
+                        javaObject, interpreter.invoke("test_call.test_call_one_arg", javaObject));
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to invoke test_call.py", e);
+        }
+    }
+
+    @Test
+    public void testCallPythonWithPythonHome() {
+        try {
+            String pythonHome = CommonUtils.INSTANCE.getPythonHome(null);
+            PythonInterpreterConfig config =
+                    PythonInterpreterConfig.newBuilder()
+                            .addPythonPaths(testDir)
+                            .setPythonHome(pythonHome)
+                            .build();
             Object[] args = new Object[] {1};
             Map<String, Object> kwargs = new HashMap<>();
             kwargs.put("a", 2);

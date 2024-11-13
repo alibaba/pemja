@@ -42,6 +42,9 @@ public class CommonUtils {
     private static final String GET_PEMJA_MODULE_PATH_SCRIPT =
             "import pemja;" + "import os;" + "print(os.path.dirname(pemja.__file__))";
 
+    private static final String GET_PYTHON_HOME_SCRIPT =
+            "import sys; print(sys.prefix)";
+
     private CommonUtils() {}
 
     /**
@@ -153,6 +156,21 @@ public class CommonUtils {
             return String.join(File.pathSeparator, out.trim().split("\n"));
         } catch (IOException e) {
             throw new RuntimeException("Failed to find libpython", e);
+        }
+    }
+
+    public String getPythonHome(String pythonExec) {
+        try {
+            String out;
+            if (pythonExec == null) {
+                // run in source code, use default `python3` to find python lib library.
+                out = execute(new String[] {"python3", "-c", GET_PYTHON_LIB_PATH_SCRIPT});
+            } else {
+                out = execute(new String[] {pythonExec, "-c", GET_PYTHON_LIB_PATH_SCRIPT});
+            }
+            return String.join(File.pathSeparator, out.trim().split("\n"));
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to find python home", e);
         }
     }
 

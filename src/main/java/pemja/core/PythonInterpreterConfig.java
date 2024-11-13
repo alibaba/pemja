@@ -50,10 +50,14 @@ public final class PythonInterpreterConfig {
     /** Defines the execution type of python interpreter. */
     private final ExecType execType;
 
-    private PythonInterpreterConfig(String[] paths, String pythonExec, ExecType execType) {
+    /** Defines whether the python interpreter is custom. */
+    private final String pythonHome;
+
+    private PythonInterpreterConfig(String[] paths, String pythonExec, ExecType execType, String pythonHome) {
         this.paths = paths;
         this.pythonExec = pythonExec;
         this.execType = execType;
+        this.pythonHome = pythonHome;
     }
 
     /** Returns the search paths. */
@@ -71,6 +75,11 @@ public final class PythonInterpreterConfig {
         return execType;
     }
 
+    /** Returns the isCustom of python interpreter. */
+    public String getPythonHome() {
+        return pythonHome;
+    }
+
     /** A builder for configuring the {@link PythonInterpreterConfig}. */
     public static PythonInterpreterConfigBuilder newBuilder() {
         return new PythonInterpreterConfigBuilder();
@@ -82,6 +91,8 @@ public final class PythonInterpreterConfig {
         private String pythonExec = null;
 
         private ExecType execType = ExecType.MULTI_THREAD;
+
+        private String pythonHome = null;
 
         /**
          * Adds the search paths for module files. One or more directory path names separated by
@@ -140,9 +151,15 @@ public final class PythonInterpreterConfig {
             return this;
         }
 
+        /** Configures whether the python interpreter is custom. */
+        public PythonInterpreterConfigBuilder setPythonHome(String pythonHome) {
+            this.pythonHome = pythonHome;
+            return this;
+        }
+
         /** Creates the actual {@link PythonInterpreterConfig}. */
         public PythonInterpreterConfig build() {
-            return new PythonInterpreterConfig(paths.toArray(new String[0]), pythonExec, execType);
+            return new PythonInterpreterConfig(paths.toArray(new String[0]), pythonExec, execType, pythonHome);
         }
     }
 
