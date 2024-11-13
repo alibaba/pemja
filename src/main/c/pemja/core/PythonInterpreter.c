@@ -55,9 +55,9 @@ JNI_OnUnload(JavaVM *vm, void *reserved)
  * Signature: (V)V
  */
 JNIEXPORT void JNICALL Java_pemja_core_PythonInterpreter_00024MainInterpreter_initialize
-  (JNIEnv *env, jobject obj)
+  (JNIEnv *env, jobject obj, jstring pythonInterpreterPath)
 {
-    JcpPy_Initialize(env);
+    JcpPy_Initialize(env, pythonInterpreterPath);
 }
 
 /*

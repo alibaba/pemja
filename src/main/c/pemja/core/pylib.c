@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include "Pemja.h"
+#include "wchar.h"
 
 #include "python_class/PythonClass.h"
 #include "java_class/JavaClass.h"
@@ -277,7 +278,7 @@ pyjtypes_init()
 }
 
 void
-JcpPy_Initialize(JNIEnv *env)
+JcpPy_Initialize(JNIEnv *env, jstring pythonInterpreterPath)
 {
 
     PyObject* sys_modules        = NULL;
@@ -290,6 +291,14 @@ JcpPy_Initialize(JNIEnv *env)
 
     // Cache java classes
     Jcp_CacheClasses(env);
+
+    if (pythonInterpreterPath != NULL) {
+        const char* python_interpreter_path = JcpString_FromJString(env, pythonInterpreterPath);
+        size_t len = mbstowcs(NULL, python_interpreter_path, 0);
+        wchar_t* wstr = malloc((len + 1) * sizeof(wchar_t));
+        mbstowcs(wstr, python_interpreter_path, len + 1);
+        Py_SetPythonHome(wstr);
+    }
 
     // Initialize Python
     Py_Initialize();
