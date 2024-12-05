@@ -142,7 +142,7 @@ public final class PythonInterpreter implements Interpreter {
      * @param config the specified {@link PythonInterpreterConfig}.
      */
     private void initialize(PythonInterpreterConfig config) {
-        mainInterpreter.initialize(config.getPythonExec());
+        mainInterpreter.initialize(config.getPythonHome(), config.getPythonExec());
         this.tState = init(config.getExecType().ordinal());
 
         synchronized (PythonInterpreter.class) {
@@ -350,7 +350,7 @@ public final class PythonInterpreter implements Interpreter {
 
         /** Initializes CPython. */
         @SuppressWarnings("unchecked")
-        synchronized void initialize(String pythonExec) {
+        synchronized void initialize(String pythonHome, String pythonExec) {
             if (!isStarted) {
                 String pemjaLibPath =
                         CommonUtils.INSTANCE.getLibraryPathWithPattern(
@@ -388,6 +388,10 @@ public final class PythonInterpreter implements Interpreter {
                     } catch (Throwable throwable) {
                         // ignore
                     }
+                }
+
+                if (pythonHome != null) {
+                    setPythonHome(pythonHome);
                 }
 
                 // We load on a separate thread to try and avoid GIL issues that come about from a
@@ -438,6 +442,9 @@ public final class PythonInterpreter implements Interpreter {
                 damonThreadFinish.countDown();
             }
         }
+
+        /** Sets Python Home. */
+        private native void setPythonHome(String pythonHome);
 
         /** Initialize Python Interpreter. */
         private native void initialize();

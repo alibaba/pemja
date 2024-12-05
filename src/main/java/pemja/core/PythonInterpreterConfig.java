@@ -41,6 +41,9 @@ import java.util.Set;
  */
 public final class PythonInterpreterConfig {
 
+    /** Sets python home. */
+    private final String pythonHome;
+
     /** Defines the search paths for module files. */
     private final String[] paths;
 
@@ -50,10 +53,16 @@ public final class PythonInterpreterConfig {
     /** Defines the execution type of python interpreter. */
     private final ExecType execType;
 
-    private PythonInterpreterConfig(String[] paths, String pythonExec, ExecType execType) {
+    private PythonInterpreterConfig(String pythonHome, String[] paths, String pythonExec, ExecType execType) {
+        this.pythonHome = pythonHome;
         this.paths = paths;
         this.pythonExec = pythonExec;
         this.execType = execType;
+    }
+
+    /** Returns the python home.*/
+    public String getPythonHome() {
+        return pythonHome;
     }
 
     /** Returns the search paths. */
@@ -77,11 +86,17 @@ public final class PythonInterpreterConfig {
     }
 
     public static class PythonInterpreterConfigBuilder {
+        private String pythonHome = null;
         private Set<String> paths = new LinkedHashSet<>();
 
         private String pythonExec = null;
 
         private ExecType execType = ExecType.MULTI_THREAD;
+
+        public PythonInterpreterConfigBuilder setPythonHome(String pythonHome) {
+            this.pythonHome = pythonHome;
+            return this;
+        }
 
         /**
          * Adds the search paths for module files. One or more directory path names separated by
@@ -142,7 +157,7 @@ public final class PythonInterpreterConfig {
 
         /** Creates the actual {@link PythonInterpreterConfig}. */
         public PythonInterpreterConfig build() {
-            return new PythonInterpreterConfig(paths.toArray(new String[0]), pythonExec, execType);
+            return new PythonInterpreterConfig(pythonHome, paths.toArray(new String[0]), pythonExec, execType);
         }
     }
 

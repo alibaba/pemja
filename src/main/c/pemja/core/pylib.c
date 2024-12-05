@@ -277,6 +277,16 @@ pyjtypes_init()
 }
 
 void
+JcpPy_setPythonHome(JNIEnv *env, jstring home)
+{
+    const char* home_as_utf = (*env)->GetStringUTFChars(env, home, NULL);
+    wchar_t* home_for_python = Py_DecodeLocale(home_as_utf, NULL);
+    (*env)->ReleaseStringUTFChars(env, home, home_as_utf);
+    Py_SetPythonHome(home_for_python);
+}
+
+
+void
 JcpPy_Initialize(JNIEnv *env)
 {
 
