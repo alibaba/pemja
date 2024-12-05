@@ -21,6 +21,15 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/*
+ * Class:     pemja_core_PythonInterpreter_MainInterpreter
+ * Method:    setPythonHome
+ * Signature: (Ljava/lang/String;)V
+ */
+ JNIEXPORT void JNICALL Java_pemja_core_PythonInterpreter_00024MainInterpreter_setPythonHome
+   (JNIEnv *, jobject, jstring);
+
 /*
  * Class:     pemja_core_PythonInterpreter
  * Method:    init

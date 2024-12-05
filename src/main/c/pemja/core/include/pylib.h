@@ -64,6 +64,7 @@ JcpAPI_FUNC(JNIEnv*) JcpThreadEnv_Get(void);
 
 
 /* Initialization and finalization */
+JcpAPI_FUNC(void) JcpPy_setPythonHome(JNIEnv *, jstring);
 JcpAPI_FUNC(void) JcpPy_Initialize(JNIEnv *);
 JcpAPI_FUNC(void) JcpPy_Finalize(JavaVM *);
 JcpAPI_FUNC(intptr_t) JcpPy_InitThread(JNIEnv *, int);

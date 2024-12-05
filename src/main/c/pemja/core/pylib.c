@@ -277,6 +277,16 @@ pyjtypes_init()
 }
 
 void
+JcpPy_setPythonHome(JNIEnv *env, jstring home)
+{
+    const char* home_as_utf = (*env)->GetStringUTFChars(env, home, NULL);
+    wchar_t* home_for_python = Py_DecodeLocale(home_as_utf, NULL);
+    (*env)->ReleaseStringUTFChars(env, home, home_as_utf);
+    Py_SetPythonHome(home_for_python);
+}
+
+
+void
 JcpPy_Initialize(JNIEnv *env)
 {
 
@@ -602,7 +612,7 @@ JcpPyObject_SetJLong(JNIEnv *env, intptr_t ptr, const char *name, jlong value)
 
     Jcp_BEGIN_ALLOW_THREADS
 
-    _JcpPyObject_SetPyObject(jcp_thread->globals, name, JcpPyInt_FromLong((long) value));
+    _JcpPyObject_SetPyObject(jcp_thread->globals, name, JcpPyInt_FromLong(value));
 
     Jcp_END_ALLOW_THREADS
 }
