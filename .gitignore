@@ -1,7 +1,9 @@
 .classpath
 *.jar
 .idea/*
+.venv/*
 *.pyc
+*.pyd
 .DS_Store
 dist/
 build/

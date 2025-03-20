@@ -145,8 +145,8 @@ public class CommonUtils {
         try {
             String out;
             if (pythonExec == null) {
-                // run in source code, use default `python3` to find python lib library.
-                out = execute(new String[] {"python3", "-c", GET_PYTHON_LIB_PATH_SCRIPT});
+                // run in source code, use default `python3` / `python` to find python lib library.
+                out = execute(new String[] {getPythonCommand(), "-c", GET_PYTHON_LIB_PATH_SCRIPT});
             } else {
                 out = execute(new String[] {pythonExec, "-c", GET_PYTHON_LIB_PATH_SCRIPT});
             }
@@ -159,6 +159,15 @@ public class CommonUtils {
     public boolean isLinuxOs() {
         String os = System.getProperty("os.name");
         return os.startsWith("Linux");
+    }
+
+    public boolean isWindowsOs() {
+        String os = System.getProperty("os.name");
+        return os.startsWith("Windows");
+    }
+
+    public String getPythonCommand() {
+        return isWindowsOs() ? "python" : "python3";
     }
 
     private String execute(String[] commands) throws IOException {
