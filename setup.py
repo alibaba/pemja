@@ -21,7 +21,7 @@ import shutil
 import sys
 import sysconfig
 import warnings
-from distutils.command.build_ext import build_ext as old_build_ext
+from setuptools.command.build_ext import build_ext as old_build_ext
 
 from setuptools import setup, Extension
 
@@ -29,13 +29,6 @@ if sys.version_info < (3, 8):
     print('Python versions prior to 3.7 are not supported for PemJa.',
           file=sys.stderr)
     sys.exit(-1)
-
-if sys.version_info >= (3, 12):
-    fmt = "Pemja may not yet support Python {}.{}."
-    warnings.warn(
-        fmt.format(*sys.version_info[:2]),
-        RuntimeWarning)
-    del fmt
 
 this_directory = os.path.abspath(os.path.dirname(__file__))
 version_file = os.path.join(this_directory, 'src/main/python/pemja/version.py')
@@ -213,14 +206,14 @@ extensions = ([
         library_dirs = get_java_lib_folders(),
         extra_link_args=get_java_linker_args(),
         include_dirs=get_java_include() + ['src/main/c/pemja/core/include'],
-        language=3),
+        language="3"),
     Extension(
         name="pemja_utils",
         sources=get_files('src/main/c/pemja/utils', '.c'),
         library_dirs = get_java_lib_folders(),
         extra_link_args=get_java_linker_args(),
         include_dirs=get_java_include() + ['src/main/c/pemja/utils/include'],
-        language=3)
+        language="3")
 ])
 
 PACKAGE_DATA = {
