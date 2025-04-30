@@ -2,7 +2,8 @@
 # Minimum requirements for the build system to execute.
 requires = [
     "packaging==20.5; platform_machine=='arm64'",  # macos M1
-    "setuptools==59.2.0",
+    "setuptools==65.5.1 ; python_version < '3.12'",
+    "setuptools         ; python_version >= '3.12'",
     "wheel==0.37.0",
 ]
 
