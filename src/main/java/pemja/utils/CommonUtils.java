@@ -75,7 +75,8 @@ public class CommonUtils {
     private void loadPythonLibrary(String pythonExec, String packageName) {
         String packageLibPath =
                 getLibraryPathWithPattern(
-                        pythonExec, String.format("^%s\\.(cpython-.*\\.so|cp.*-win.*\\.pyd)$", packageName));
+                        pythonExec,
+                        String.format("^%s\\.(cpython-.*\\.so|cp.*-win.*\\.pyd)$", packageName));
         loadLibrary(packageLibPath, packageName);
     }
 
