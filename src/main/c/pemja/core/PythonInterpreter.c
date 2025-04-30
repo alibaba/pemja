@@ -51,24 +51,13 @@ JNI_OnUnload(JavaVM *vm, void *reserved)
 
 /*
  * Class:     pemja_core_PythonInterpreter_MainInterpreter
- * Method:    setPythonHome
+ * Method:    initialize
  * Signature: (Ljava/lang/String;)V
  */
- JNIEXPORT void JNICALL Java_pemja_core_PythonInterpreter_00024MainInterpreter_setPythonHome
-   (JNIEnv *env, jobject obj, jstring home)
- {
-     JcpPy_setPythonHome(env, home);
- }
-
-/*
- * Class:     pemja_core_PythonInterpreter_MainInterpreter
- * Method:    initialize
- * Signature: (V)V
- */
 JNIEXPORT void JNICALL Java_pemja_core_PythonInterpreter_00024MainInterpreter_initialize
-  (JNIEnv *env, jobject obj)
+  (JNIEnv *env, jobject obj, jstring python_home)
 {
-    JcpPy_Initialize(env);
+    JcpPy_Initialize(env, python_home);
 }
 
 /*

@@ -19,9 +19,7 @@ package pemja.core;
 import pemja.utils.CommonUtils;
 
 import java.io.Serializable;
-import java.lang.reflect.Field;
 import java.util.Map;
-import java.util.Vector;
 import java.util.concurrent.CountDownLatch;
 
 /** The Interpreter implementation for Python Interpreter. */
@@ -56,7 +54,7 @@ public final class PythonInterpreter implements Interpreter {
         } else if (value instanceof Byte) {
             set(tState, name, ((Byte) value).byteValue());
         } else if (value instanceof Character) {
-            set(tState, name, new String(new char[] {(char) value}));
+            set(tState, name, String.valueOf((char) value));
         } else if (value instanceof Short) {
             set(tState, name, ((Short) value).shortValue());
         } else if (value instanceof Integer) {
@@ -142,7 +140,7 @@ public final class PythonInterpreter implements Interpreter {
      * @param config the specified {@link PythonInterpreterConfig}.
      */
     private void initialize(PythonInterpreterConfig config) {
-        mainInterpreter.initialize(config.getPythonHome(), config.getPythonExec());
+        mainInterpreter.initialize(config);
         this.tState = init(config.getExecType().ordinal());
 
         synchronized (PythonInterpreter.class) {
@@ -189,7 +187,7 @@ public final class PythonInterpreter implements Interpreter {
         } else if (arg instanceof Long) {
             return invokeOneArgLong(tState, name, (Long) arg);
         } else if (arg instanceof Character) {
-            return invokeOneArgString(tState, name, new String(new char[] {(char) arg}));
+            return invokeOneArgString(tState, name, String.valueOf((char) arg));
         } else if (arg instanceof Byte) {
             return invokeOneArgInt(tState, name, (Byte) arg);
         } else if (arg instanceof Short) {
@@ -222,7 +220,7 @@ public final class PythonInterpreter implements Interpreter {
             return invokeMethodOneArgLong(tState, obj, method, (Long) arg);
         } else if (arg instanceof Character) {
             return invokeMethodOneArgString(
-                    tState, obj, method, new String(new char[] {(char) arg}));
+                    tState, obj, method, String.valueOf((char) arg));
         } else if (arg instanceof Byte) {
             return invokeMethodOneArgInt(tState, obj, method, (Byte) arg);
         } else if (arg instanceof Short) {
@@ -349,50 +347,9 @@ public final class PythonInterpreter implements Interpreter {
         private MainInterpreter() {}
 
         /** Initializes CPython. */
-        @SuppressWarnings("unchecked")
-        synchronized void initialize(String pythonHome, String pythonExec) {
+        synchronized void initialize(PythonInterpreterConfig config) {
             if (!isStarted) {
-                String pemjaLibPath =
-                        CommonUtils.INSTANCE.getLibraryPathWithPattern(
-                                pythonExec, "^pemja_core\\.(cpython-.*\\.so|cp.*-win.*\\.pyd)$");
-                String pythonLibPath = CommonUtils.INSTANCE.getPythonLibrary(pythonExec);
-                String pemjaModulePath = CommonUtils.INSTANCE.getPemJaModulePath(pythonExec);
-
-                try {
-                    System.load(pythonLibPath);
-                    if (CommonUtils.INSTANCE.isLinuxOs()) {
-                        // We need to load libpython in unix globally.
-                        CommonUtils.INSTANCE.loadLibrary(pythonExec, pythonLibPath);
-                    }
-                } catch (UnsatisfiedLinkError error) {
-                    // ignore
-                }
-
-                try {
-                    System.load(pemjaLibPath);
-                } catch (UnsatisfiedLinkError error) {
-                    try {
-                        Field field = ClassLoader.class.getDeclaredField("loadedLibraryNames");
-                        field.setAccessible(true);
-                        Vector<String> libs = (Vector<String>) field.get(null);
-                        synchronized (libs) {
-                            int size = libs.size();
-                            for (int i = 0; i < size; i++) {
-                                String element = libs.elementAt(i);
-                                if (element.contains("pemja_core")) {
-                                    libs.removeElementAt(i);
-                                }
-                            }
-                        }
-                        System.load(pemjaLibPath);
-                    } catch (Throwable throwable) {
-                        // ignore
-                    }
-                }
-
-                if (pythonHome != null) {
-                    setPythonHome(pythonHome);
-                }
+                CommonUtils.INSTANCE.loadPython(config.getPythonExec());
 
                 // We load on a separate thread to try and avoid GIL issues that come about from a
                 // being on the same thread as the main interpreter.
@@ -401,9 +358,9 @@ public final class PythonInterpreter implements Interpreter {
                             @Override
                             public void run() {
                                 try {
-                                    initialize();
+                                    initialize(config.getPythonHome());
                                     // add shared modules
-                                    addToPath(pemjaModulePath);
+                                    addToPath(CommonUtils.INSTANCE.getPemJaModulePath(config.getPythonExec()));
                                     importModule("redirect_stream");
                                 } catch (Throwable t) {
                                     error = t;
@@ -443,11 +400,8 @@ public final class PythonInterpreter implements Interpreter {
             }
         }
 
-        /** Sets Python Home. */
-        private native void setPythonHome(String pythonHome);
-
         /** Initialize Python Interpreter. */
-        private native void initialize();
+        private native void initialize(String pythonHome);
 
         /** Adds the search path to the main interpreter. */
         private native void addToPath(String path);
