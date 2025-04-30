@@ -219,8 +219,7 @@ public final class PythonInterpreter implements Interpreter {
         } else if (arg instanceof Long) {
             return invokeMethodOneArgLong(tState, obj, method, (Long) arg);
         } else if (arg instanceof Character) {
-            return invokeMethodOneArgString(
-                    tState, obj, method, String.valueOf((char) arg));
+            return invokeMethodOneArgString(tState, obj, method, String.valueOf((char) arg));
         } else if (arg instanceof Byte) {
             return invokeMethodOneArgInt(tState, obj, method, (Byte) arg);
         } else if (arg instanceof Short) {
@@ -360,7 +359,9 @@ public final class PythonInterpreter implements Interpreter {
                                 try {
                                     initialize(config.getPythonHome());
                                     // add shared modules
-                                    addToPath(CommonUtils.INSTANCE.getPemJaModulePath(config.getPythonExec()));
+                                    addToPath(
+                                            CommonUtils.INSTANCE.getPemJaModulePath(
+                                                    config.getPythonExec()));
                                     importModule("redirect_stream");
                                 } catch (Throwable t) {
                                     error = t;

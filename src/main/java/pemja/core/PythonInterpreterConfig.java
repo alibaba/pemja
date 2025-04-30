@@ -18,7 +18,6 @@ package pemja.core;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -53,14 +52,15 @@ public final class PythonInterpreterConfig {
     /** Defines the execution type of python interpreter. */
     private final ExecType execType;
 
-    private PythonInterpreterConfig(String pythonHome, String[] paths, String pythonExec, ExecType execType) {
+    private PythonInterpreterConfig(
+            String pythonHome, String[] paths, String pythonExec, ExecType execType) {
         this.pythonHome = pythonHome;
         this.paths = paths;
         this.pythonExec = pythonExec;
         this.execType = execType;
     }
 
-    /** Returns the python home.*/
+    /** Returns the python home. */
     public String getPythonHome() {
         return pythonHome;
     }
@@ -157,7 +157,8 @@ public final class PythonInterpreterConfig {
 
         /** Creates the actual {@link PythonInterpreterConfig}. */
         public PythonInterpreterConfig build() {
-            return new PythonInterpreterConfig(pythonHome, paths.toArray(new String[0]), pythonExec, execType);
+            return new PythonInterpreterConfig(
+                    pythonHome, paths.toArray(new String[0]), pythonExec, execType);
         }
     }
 
