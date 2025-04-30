@@ -31,8 +31,6 @@ import java.util.regex.Pattern;
 public class CommonUtils {
     public static final CommonUtils INSTANCE = new CommonUtils();
 
-    private boolean initialized = false;
-
     private static final String GET_PYTHON_LIB_PATH_SCRIPT =
             "from find_libpython import find_libpython;" + "print(find_libpython())";
 
@@ -44,41 +42,63 @@ public class CommonUtils {
 
     private CommonUtils() {}
 
-    /**
-     * Because JVM can't load library globally, so we support this method to load library globally.
-     */
-    @SuppressWarnings("unchecked")
-    public void loadLibrary(String pythonExec, String library) {
-        if (!initialized) {
-            String utilsLibPath =
-                    getLibraryPathWithPattern(pythonExec, "^pemja_utils\\.cpython-.*\\.so$");
-            try {
-                System.load(utilsLibPath);
-            } catch (UnsatisfiedLinkError error) {
-                try {
-                    Field field = ClassLoader.class.getDeclaredField("loadedLibraryNames");
-                    field.setAccessible(true);
-                    Vector<String> libs = (Vector<String>) field.get(null);
-                    synchronized (libs) {
-                        int size = libs.size();
-                        for (int i = 0; i < size; i++) {
-                            String element = libs.elementAt(i);
-                            if (element.contains("pemja_utils")) {
-                                libs.removeElementAt(i);
-                            }
-                        }
-                    }
-                    System.load(utilsLibPath);
-                } catch (Throwable throwable) {
-                    // ignore
-                }
-            }
-            initialized = true;
-        }
-        loadLibrary0(library);
+    public void loadPython(String pythonExec) {
+        String pythonLibPath = getPythonLibrary(pythonExec);
+        loadLibrary(pythonLibPath, "libpython");
+        loadPythonLibrary(pythonExec, "pemja_utils");
+        // Because JVM can't load library globally, so we need to load CPython library globally.
+        loadLibrary0(pythonLibPath);
+        loadPythonLibrary(pythonExec, "pemja_core");
     }
 
-    public String getLibraryPathWithPattern(String pythonExec, String pattern) {
+    public String getPemJaModulePath(String pythonExec) {
+        if (pythonExec == null) {
+            // run in source code
+            return String.join(
+                    File.separator,
+                    System.getProperty("user.dir"),
+                    "src",
+                    "main",
+                    "python",
+                    "pemja");
+        } else {
+            String out;
+            try {
+                out = execute(new String[] {pythonExec, "-c", GET_PEMJA_MODULE_PATH_SCRIPT});
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to get PemJa module path", e);
+            }
+            return String.join(File.pathSeparator, out.trim().split("\n"));
+        }
+    }
+
+    private void loadPythonLibrary(String pythonExec, String packageName) {
+        String packageLibPath =
+                getLibraryPathWithPattern(
+                        pythonExec, String.format("^%s\\.(cpython-.*\\.so|cp.*-win.*\\.pyd)$", packageName));
+        loadLibrary(packageLibPath, packageName);
+    }
+
+    @SuppressWarnings("unchecked")
+    private void loadLibrary(String libraryPath, String packageName) {
+        try {
+            System.load(libraryPath);
+        } catch (UnsatisfiedLinkError error) {
+            try {
+                Field field = ClassLoader.class.getDeclaredField("loadedLibraryNames");
+                field.setAccessible(true);
+                Vector<String> libs = (Vector<String>) field.get(null);
+                synchronized (libs) {
+                    libs.removeIf(element -> element.contains(packageName));
+                }
+                System.load(libraryPath);
+            } catch (Throwable throwable) {
+                throw new RuntimeException(throwable);
+            }
+        }
+    }
+
+    private String getLibraryPathWithPattern(String pythonExec, String pattern) {
         if (pythonExec == null) {
             // run in source code
             String pythonModulePath =
@@ -120,28 +140,7 @@ public class CommonUtils {
         }
     }
 
-    public String getPemJaModulePath(String pythonExec) {
-        if (pythonExec == null) {
-            // run in source code
-            return String.join(
-                    File.separator,
-                    System.getProperty("user.dir"),
-                    "src",
-                    "main",
-                    "python",
-                    "pemja");
-        } else {
-            String out;
-            try {
-                out = execute(new String[] {pythonExec, "-c", GET_PEMJA_MODULE_PATH_SCRIPT});
-            } catch (IOException e) {
-                throw new RuntimeException("Failed to get PemJa module path", e);
-            }
-            return String.join(File.pathSeparator, out.trim().split("\n"));
-        }
-    }
-
-    public String getPythonLibrary(String pythonExec) {
+    private String getPythonLibrary(String pythonExec) {
         try {
             String out;
             if (pythonExec == null) {
@@ -154,20 +153,6 @@ public class CommonUtils {
         } catch (IOException e) {
             throw new RuntimeException("Failed to find libpython", e);
         }
-    }
-
-    public boolean isLinuxOs() {
-        String os = System.getProperty("os.name");
-        return os.startsWith("Linux");
-    }
-
-    public boolean isWindowsOs() {
-        String os = System.getProperty("os.name");
-        return os.startsWith("Windows");
-    }
-
-    public String getPythonCommand() {
-        return isWindowsOs() ? "python" : "python3";
     }
 
     private String execute(String[] commands) throws IOException {
@@ -194,6 +179,20 @@ public class CommonUtils {
             // "waitFor" should return intermediately.
         }
         return out.toString();
+    }
+
+    private boolean isLinuxOs() {
+        String os = System.getProperty("os.name");
+        return os.startsWith("Linux");
+    }
+
+    private boolean isWindowsOs() {
+        String os = System.getProperty("os.name");
+        return os.startsWith("Windows");
+    }
+
+    private String getPythonCommand() {
+        return isWindowsOs() ? "python" : "python3";
     }
 
     private native void loadLibrary0(String library);

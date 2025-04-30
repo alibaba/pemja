@@ -287,7 +287,7 @@ JcpPy_setPythonHome(JNIEnv *env, jstring home)
 
 
 void
-JcpPy_Initialize(JNIEnv *env)
+JcpPy_Initialize(JNIEnv *env, jstring python_home)
 {
 
     PyObject* sys_modules        = NULL;
@@ -343,6 +343,12 @@ JcpPy_Initialize(JNIEnv *env)
     wchar_t *argv[] = {L"jcp", 0};
 
     PySys_SetArgv(1, argv);
+
+    if (python_home) {
+        const char* python_home_chars = (*env)->GetStringUTFChars(env, python_home, NULL);
+        Py_SetPythonHome(Py_DecodeLocale(python_home_chars, NULL));
+        (*env)->ReleaseStringUTFChars(env, python_home, python_home_chars);
+    }
 
 EXIT:
     PyEval_ReleaseThread(JcpMainThreadState);
