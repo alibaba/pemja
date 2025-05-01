@@ -1205,6 +1205,11 @@ JcpAPI_FUNC(jvalue) JcpPyObject_AsJValue(JNIEnv* env, PyObject* pyobject, jclass
 
     object_id = JcpJObject_GetObjectId(env, clazz);
 
+    if (pyobject == Py_None) {
+        result.l = NULL;
+        return result;
+    }
+
     switch (object_id) {
         case JSTRING_ID:
             result.l = JcpPyString_AsJString(env, pyobject);

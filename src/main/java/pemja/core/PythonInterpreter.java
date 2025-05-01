@@ -146,6 +146,8 @@ public final class PythonInterpreter implements Interpreter {
         synchronized (PythonInterpreter.class) {
             configSearchPaths(config.getPaths());
         }
+
+        exec("from pemja import logger");
     }
 
     /** Config Search Paths in the current {@link PythonInterpreter} instance */
