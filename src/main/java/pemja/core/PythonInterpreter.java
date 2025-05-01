@@ -146,8 +146,6 @@ public final class PythonInterpreter implements Interpreter {
         synchronized (PythonInterpreter.class) {
             configSearchPaths(config.getPaths());
         }
-
-        exec("from pemja import logger");
     }
 
     /** Config Search Paths in the current {@link PythonInterpreter} instance */
@@ -365,6 +363,7 @@ public final class PythonInterpreter implements Interpreter {
                                             CommonUtils.INSTANCE.getPemJaModulePath(
                                                     config.getPythonExec()));
                                     importModule("redirect_stream");
+                                    importModule("logger");
                                 } catch (Throwable t) {
                                     error = t;
                                 } finally {
