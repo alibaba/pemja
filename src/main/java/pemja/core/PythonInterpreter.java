@@ -18,6 +18,7 @@ package pemja.core;
 
 import pemja.utils.CommonUtils;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
@@ -144,17 +145,30 @@ public final class PythonInterpreter implements Interpreter {
         this.tState = init(config.getExecType().ordinal());
 
         synchronized (PythonInterpreter.class) {
-            configSearchPaths(config.getPaths());
+            configSearchPaths(config);
         }
+
+        exec("from pemja import logger");
     }
 
     /** Config Search Paths in the current {@link PythonInterpreter} instance */
-    private void configSearchPaths(String[] paths) {
+    private void configSearchPaths(PythonInterpreterConfig config) {
+        String[] paths = config.getPaths();
         if (paths != null) {
             exec("import sys");
             for (int i = paths.length - 1; i >= 0; i--) {
                 exec(String.format("sys.path.insert(0, r'%s')", paths[i]));
             }
+        }
+        if (config.getPythonExec() == null) {
+            String pythonModulePath =
+                    String.join(
+                            File.separator,
+                            System.getProperty("user.dir"),
+                            "src",
+                            "main",
+                            "python");
+            exec(String.format("sys.path.insert(0, r'%s')", pythonModulePath));
         }
     }
 
