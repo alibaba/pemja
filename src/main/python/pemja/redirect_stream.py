@@ -16,7 +16,6 @@
 ################################################################################
 
 import sys
-import logging
 
 import redirection
 
@@ -47,5 +46,3 @@ class StdErrCatcher(object):
 
 sys.stdout = StdOutCatcher()
 sys.stderr = StdErrCatcher()
-logging.getLogger().info = sys.stdout.write
-logging.getLogger().error = sys.stderr.write
