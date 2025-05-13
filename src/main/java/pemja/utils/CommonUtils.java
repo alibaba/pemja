@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.util.Objects;
+import java.util.Set;
 import java.util.Vector;
 import java.util.regex.Pattern;
 
@@ -88,9 +89,17 @@ public class CommonUtils {
             try {
                 Field field = ClassLoader.class.getDeclaredField("loadedLibraryNames");
                 field.setAccessible(true);
-                Vector<String> libs = (Vector<String>) field.get(null);
-                synchronized (libs) {
-                    libs.removeIf(element -> element.contains(packageName));
+                Object libsObject = field.get(null);
+                if (libsObject instanceof Vector) {
+                    Vector<String> libs = (Vector<String>) libsObject;
+                    synchronized (libsObject) {
+                        libs.removeIf(element -> element.contains(packageName));
+                    }
+                } else {
+                    Set<String> libs = (Set<String>) libsObject;
+                    synchronized (libsObject) {
+                        libs.removeIf(element -> element.contains(packageName));
+                    }
                 }
                 System.load(libraryPath);
             } catch (Throwable throwable) {
