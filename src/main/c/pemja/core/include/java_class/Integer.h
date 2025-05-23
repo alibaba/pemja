@@ -14,6 +14,8 @@
 #ifndef _Included_java_lang_Integer
 #define _Included_java_lang_Integer
 
+#include <jni.h>
+
 jobject JavaInteger_New(JNIEnv*, jint);
 
 #endif

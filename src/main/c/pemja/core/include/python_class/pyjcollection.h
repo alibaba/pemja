@@ -19,8 +19,7 @@ JcpAPI_DATA(PyTypeObject) PyJCollection_Type;
 /* Public interface */
 JcpAPI_FUNC(PyObject*) JcpPyJCollection_New(JNIEnv*, jobject, jclass);
 
-#define PyJCollection_Check(op) \
-        PyObject_TypeCheck(op, &PyJICollection_Type)
+#define PyJCollection_Check(op) PyObject_TypeCheck(op, &PyJICollection_Type)
 #define PyJCollection_CheckExact(op) op->ob_type == &PyJICollection_Type
 
 #endif

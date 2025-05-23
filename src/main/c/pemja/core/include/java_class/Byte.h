@@ -14,6 +14,8 @@
 #ifndef _Included_java_lang_Byte
 #define _Included_java_lang_Byte
 
+#include <jni.h>
+
 jobject JavaByte_New(JNIEnv*, jbyte);
 
 #endif

@@ -14,6 +14,8 @@
 #ifndef _Included_java_lang_reflect_Modifier
 #define _Included_java_lang_reflect_Modifier
 
+#include <jni.h>
+
 jboolean JavaModifier_isStatic(JNIEnv*, jint mod);
 
 #endif

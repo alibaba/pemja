@@ -14,6 +14,8 @@
 #ifndef _Included_java_lang_Short
 #define _Included_java_lang_Short
 
+#include <jni.h>
+
 jobject JavaShort_New(JNIEnv*, jshort);
 
 #endif

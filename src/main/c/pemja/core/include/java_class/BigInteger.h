@@ -14,6 +14,8 @@
 #ifndef _Included_java_math_Integer
 #define _Included_java_math_Integer
 
+#include <jni.h>
+
 jobject JavaBigInteger_New(JNIEnv*, jstring);
 jstring JavaBigInteger_toString(JNIEnv*, jobject);
 

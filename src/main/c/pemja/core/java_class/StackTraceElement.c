@@ -12,25 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "Pemja.h"
-
 #include "java_class/StackTraceElement.h"
+
+#include "Pemja.h"
 
 static jmethodID init_StackTraceElement = 0;
 
-jobject
-JavaStackTraceElement_New(JNIEnv* env, jstring declaringClass, jstring methodName, jstring fileName, jint lineNumber)
-{
-    if (!init_StackTraceElement) {
-        init_StackTraceElement = (*env)->GetMethodID(
-            env, JSTACK_TRACE_ELEMENT_TYPE, "<init>", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)V");
-    }
-    return (*env)->NewObject(
-        env,
-        JSTACK_TRACE_ELEMENT_TYPE,
-        init_StackTraceElement,
-        declaringClass,
-        methodName,
-        fileName,
-        lineNumber);
+jobject JavaStackTraceElement_New(JNIEnv* env, jstring declaringClass,
+                                  jstring methodName, jstring fileName,
+                                  jint lineNumber) {
+  if (!init_StackTraceElement) {
+    init_StackTraceElement = (*env)->GetMethodID(
+        env, JSTACK_TRACE_ELEMENT_TYPE, "<init>",
+        "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)V");
+  }
+  return (*env)->NewObject(env, JSTACK_TRACE_ELEMENT_TYPE,
+                           init_StackTraceElement, declaringClass, methodName,
+                           fileName, lineNumber);
 }

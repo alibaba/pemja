@@ -12,27 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "Pemja.h"
-
 #include "java_class/LocalDate.h"
+
+#include "Pemja.h"
 
 static jmethodID ofEpochDay = 0;
 static jmethodID toEpochDay = 0;
 
-jobject
-JavaLocalDate_ofEpochDay(JNIEnv* env, jlong epochDay)
-{
-    if (!ofEpochDay) {
-        ofEpochDay = (*env)->GetStaticMethodID(env, JLOCALDATE_TYPE, "ofEpochDay", "(J)Ljava/time/LocalDate;");
-    }
-    return (*env)->CallStaticObjectMethod(env, JLOCALDATE_TYPE, ofEpochDay, epochDay);
+jobject JavaLocalDate_ofEpochDay(JNIEnv* env, jlong epochDay) {
+  if (!ofEpochDay) {
+    ofEpochDay = (*env)->GetStaticMethodID(env, JLOCALDATE_TYPE, "ofEpochDay",
+                                           "(J)Ljava/time/LocalDate;");
+  }
+  return (*env)->CallStaticObjectMethod(env, JLOCALDATE_TYPE, ofEpochDay,
+                                        epochDay);
 }
 
-jlong
-JavaLocalDate_toEpochDay(JNIEnv* env, jobject object)
-{
-    if (!toEpochDay) {
-        toEpochDay = (*env)->GetMethodID(env, JLOCALDATE_TYPE, "toEpochDay", "()J");
-    }
-    return (*env)->CallLongMethod(env, object, toEpochDay);
+jlong JavaLocalDate_toEpochDay(JNIEnv* env, jobject object) {
+  if (!toEpochDay) {
+    toEpochDay = (*env)->GetMethodID(env, JLOCALDATE_TYPE, "toEpochDay", "()J");
+  }
+  return (*env)->CallLongMethod(env, object, toEpochDay);
 }

@@ -14,6 +14,8 @@
 #ifndef _Included_java_lang_Boolean
 #define _Included_java_lang_Boolean
 
+#include <jni.h>
+
 jobject JavaBoolean_New(JNIEnv*, jboolean);
 jboolean JavaBoolean_booleanValue(JNIEnv*, jobject);
 

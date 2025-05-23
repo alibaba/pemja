@@ -12,17 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "Pemja.h"
-
 #include "java_class/Iterable.h"
+
+#include "Pemja.h"
 
 static jmethodID iterator = 0;
 
-jobject
-JavaIterable_iterator(JNIEnv* env, jobject jval)
-{
-    if (!iterator) {
-        iterator = (*env)->GetMethodID(env, JITERABLE_TYPE, "iterator", "()Ljava/util/Iterator;");
-    }
-    return (*env)->CallObjectMethod(env, jval, iterator);
+jobject JavaIterable_iterator(JNIEnv* env, jobject jval) {
+  if (!iterator) {
+    iterator = (*env)->GetMethodID(env, JITERABLE_TYPE, "iterator",
+                                   "()Ljava/util/Iterator;");
+  }
+  return (*env)->CallObjectMethod(env, jval, iterator);
 }

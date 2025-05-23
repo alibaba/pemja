@@ -14,6 +14,8 @@
 #ifndef _Included_java_util_Collection
 #define _Included_java_util_Collection
 
+#include <jni.h>
+
 jint JavaCollection_size(JNIEnv*, jobject);
 jboolean JavaCollection_contains(JNIEnv*, jobject, jobject);
 

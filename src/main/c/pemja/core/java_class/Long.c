@@ -12,17 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "Pemja.h"
-
 #include "java_class/Long.h"
+
+#include "Pemja.h"
 
 static jmethodID init_J = 0;
 
-jobject
-JavaLong_New(JNIEnv* env, jlong jval)
-{
-    if (!init_J) {
-        init_J = (*env)->GetMethodID(env, JLONG_OBJ_TYPE, "<init>", "(J)V");
-    }
-    return (*env)->NewObject(env, JLONG_OBJ_TYPE, init_J, jval);
+jobject JavaLong_New(JNIEnv* env, jlong jval) {
+  if (!init_J) {
+    init_J = (*env)->GetMethodID(env, JLONG_OBJ_TYPE, "<init>", "(J)V");
+  }
+  return (*env)->NewObject(env, JLONG_OBJ_TYPE, init_J, jval);
 }

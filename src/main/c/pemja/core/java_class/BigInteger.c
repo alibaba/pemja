@@ -11,32 +11,27 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#include "Pemja.h"
-
 #include "java_class/BigInteger.h"
+
+#include "Pemja.h"
 
 static jmethodID init_BigInteger = 0;
 static jmethodID toString = 0;
 
-jobject
-JavaBigInteger_New(JNIEnv* env, jstring value)
-{
+jobject JavaBigInteger_New(JNIEnv* env, jstring value) {
+  if (!init_BigInteger) {
+    init_BigInteger = (*env)->GetMethodID(env, JBIGINTEGER_TYPE, "<init>",
+                                          "(Ljava/lang/String;)V");
+  }
 
-    if (!init_BigInteger) {
-        init_BigInteger = (*env)->GetMethodID(env, JBIGINTEGER_TYPE, "<init>",
-                                             "(Ljava/lang/String;)V");
-    }
-
-    return (*env)->NewObject(env, JBIGINTEGER_TYPE, init_BigInteger, value);
+  return (*env)->NewObject(env, JBIGINTEGER_TYPE, init_BigInteger, value);
 }
 
-jstring
-JavaBigInteger_toString(JNIEnv* env, jobject obj)
-{
+jstring JavaBigInteger_toString(JNIEnv* env, jobject obj) {
+  if (!toString) {
+    toString = (*env)->GetMethodID(env, JBIGINTEGER_TYPE, "toString",
+                                   "()Ljava/lang/String;");
+  }
 
-    if (!toString) {
-        toString = (*env)->GetMethodID(env, JBIGINTEGER_TYPE, "toString", "()Ljava/lang/String;");
-    }
-
-    return (*env)->CallObjectMethod(env, obj, toString);
+  return (*env)->CallObjectMethod(env, obj, toString);
 }

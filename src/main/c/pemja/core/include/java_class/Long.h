@@ -14,6 +14,8 @@
 #ifndef _Included_java_lang_Long
 #define _Included_java_lang_Long
 
+#include <jni.h>
+
 jobject JavaLong_New(JNIEnv*, jlong);
 
 #endif

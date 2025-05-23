@@ -14,6 +14,8 @@
 #ifndef _Included_java_sql_Date
 #define _Included_java_sql_Date
 
+#include <jni.h>
+
 jobject JavaSqlDate_New(JNIEnv*, jint, jint, jint);
 jint JavaSqlDate_getYear(JNIEnv*, jobject);
 jint JavaSqlDate_getMonth(JNIEnv*, jobject);

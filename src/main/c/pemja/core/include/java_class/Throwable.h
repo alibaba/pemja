@@ -14,6 +14,8 @@
 #ifndef _Included_java_lang_Throwable
 #define _Included_java_lang_Throwable
 
+#include <jni.h>
+
 jobjectArray JavaThrowable_getStackTrace(JNIEnv*, jobject);
 void JavaThrowable_setStackTrace(JNIEnv*, jobject, jobjectArray);
 

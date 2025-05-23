@@ -12,37 +12,36 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "Pemja.h"
-
 #include "java_class/LocalDateTime.h"
+
+#include "Pemja.h"
 
 static jmethodID of = 0;
 static jmethodID toLocalDate = 0;
 static jmethodID toLocalTime = 0;
 
-jobject
-JavaLocalDateTime_of(JNIEnv* env, jobject date, jobject time)
-{
-    if (!of) {
-        of = (*env)->GetStaticMethodID(env, JLOCALDATETIME_TYPE, "of", "(Ljava/time/LocalDate;Ljava/time/LocalTime;)Ljava/time/LocalDateTime;");
-    }
-    return (*env)->CallStaticObjectMethod(env, JLOCALDATETIME_TYPE, of, date, time);
+jobject JavaLocalDateTime_of(JNIEnv* env, jobject date, jobject time) {
+  if (!of) {
+    of = (*env)->GetStaticMethodID(env, JLOCALDATETIME_TYPE, "of",
+                                   "(Ljava/time/LocalDate;Ljava/time/"
+                                   "LocalTime;)Ljava/time/LocalDateTime;");
+  }
+  return (*env)->CallStaticObjectMethod(env, JLOCALDATETIME_TYPE, of, date,
+                                        time);
 }
 
-jobject
-JavaLocalDateTime_toLocalDate(JNIEnv* env, jobject object)
-{
-    if (!toLocalDate) {
-        toLocalDate = (*env)->GetMethodID(env, JLOCALDATETIME_TYPE, "toLocalDate", "()Ljava/time/LocalDate;");
-    }
-    return (*env)->CallObjectMethod(env, object, toLocalDate);
+jobject JavaLocalDateTime_toLocalDate(JNIEnv* env, jobject object) {
+  if (!toLocalDate) {
+    toLocalDate = (*env)->GetMethodID(env, JLOCALDATETIME_TYPE, "toLocalDate",
+                                      "()Ljava/time/LocalDate;");
+  }
+  return (*env)->CallObjectMethod(env, object, toLocalDate);
 }
 
-jobject
-JavaLocalDateTime_toLocalTime(JNIEnv* env, jobject object)
-{
-    if (!toLocalTime) {
-        toLocalTime = (*env)->GetMethodID(env, JLOCALDATETIME_TYPE, "toLocalTime", "()Ljava/time/LocalTime;");
-    }
-    return (*env)->CallObjectMethod(env, object, toLocalTime);
+jobject JavaLocalDateTime_toLocalTime(JNIEnv* env, jobject object) {
+  if (!toLocalTime) {
+    toLocalTime = (*env)->GetMethodID(env, JLOCALDATETIME_TYPE, "toLocalTime",
+                                      "()Ljava/time/LocalTime;");
+  }
+  return (*env)->CallObjectMethod(env, object, toLocalTime);
 }

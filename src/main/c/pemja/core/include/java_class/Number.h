@@ -14,6 +14,8 @@
 #ifndef _Included_java_lang_Number
 #define _Included_java_lang_Number
 
+#include <jni.h>
+
 jbyte JavaNumber_byteValue(JNIEnv*, jobject);
 jshort JavaNumber_shortValue(JNIEnv*, jobject);
 jint JavaNumber_intValue(JNIEnv*, jobject);

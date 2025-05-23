@@ -14,6 +14,8 @@
 #ifndef _Included_java_lang_StackTraceElement
 #define _Included_java_lang_StackTraceElement
 
+#include <jni.h>
+
 jobject JavaStackTraceElement_New(JNIEnv*, jstring, jstring, jstring, jint);
 
 #endif

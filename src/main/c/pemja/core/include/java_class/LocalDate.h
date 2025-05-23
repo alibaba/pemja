@@ -14,6 +14,8 @@
 #ifndef _Included_java_time_LocalDate
 #define _Included_java_time_LocalDate
 
+#include <jni.h>
+
 jobject JavaLocalDate_ofEpochDay(JNIEnv*, jlong);
 jlong JavaLocalDate_toEpochDay(JNIEnv*, jobject);
 

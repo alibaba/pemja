@@ -14,6 +14,8 @@
 #ifndef _Included_java_sql_Time
 #define _Included_java_sql_Time
 
+#include <jni.h>
+
 jobject JavaSqlTime_New(JNIEnv*, jlong);
 jlong JavaSqlTime_getTime(JNIEnv*, jobject);
 

@@ -14,6 +14,8 @@
 #ifndef _Included_java_lang_reflect_Member
 #define _Included_java_lang_reflect_Member
 
+#include <jni.h>
+
 jobject JavaMember_getName(JNIEnv*, jobject);
 
 #endif

@@ -15,10 +15,10 @@
 #define _Included_pyjmultimethod
 
 typedef struct {
-    PyObject_HEAD
+  PyObject_HEAD
 
-    /* A list stores the underling PyJMethodObjects.*/
-    PyObject*   methods;
+      /* A list stores the underling PyJMethodObjects.*/
+      PyObject* methods;
 } PyJMultiMethodObject;
 
 JcpAPI_DATA(PyTypeObject) PyJMultiMethod_Type;
@@ -29,10 +29,10 @@ JcpAPI_DATA(PyTypeObject) PyJMultiMethod_Type;
 JcpAPI_FUNC(PyJMultiMethodObject*) JcpPyJMultiMethod_New(void);
 
 /* Appends a PyJMethodObject to the PyJMultiMethodObject. */
-JcpAPI_FUNC(int) JcpPyJMultiMethod_Append(PyJMultiMethodObject*, PyJMethodObject*);
+JcpAPI_FUNC(int)
+    JcpPyJMultiMethod_Append(PyJMultiMethodObject*, PyJMethodObject*);
 
-#define PyJMultiMethod_Check(op) \
-        PyObject_TypeCheck(op, &PyJMultiMethod_Type)
+#define PyJMultiMethod_Check(op) PyObject_TypeCheck(op, &PyJMultiMethod_Type)
 #define PyJMultiMethod_CheckExact(op) Py_IS_TYPE(op, &PyJMultiMethod_Type)
 
 #endif

@@ -12,18 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "Pemja.h"
-
 #include "java_class/Modifier.h"
+
+#include "Pemja.h"
 
 static jmethodID isStatic = 0;
 
-jboolean
-JavaModifier_isStatic(JNIEnv* env, jint mod)
-{
-    if (!isStatic) {
-        isStatic = (*env)->GetStaticMethodID(env, JMODIFIER_TYPE, "isStatic",
-                                             "(I)Z");
-    }
-    return (*env)->CallStaticBooleanMethod(env, JMODIFIER_TYPE, isStatic, mod);
+jboolean JavaModifier_isStatic(JNIEnv* env, jint mod) {
+  if (!isStatic) {
+    isStatic =
+        (*env)->GetStaticMethodID(env, JMODIFIER_TYPE, "isStatic", "(I)Z");
+  }
+  return (*env)->CallStaticBooleanMethod(env, JMODIFIER_TYPE, isStatic, mod);
 }

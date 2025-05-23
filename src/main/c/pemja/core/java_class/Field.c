@@ -12,29 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "Pemja.h"
-
 #include "java_class/Field.h"
+
+#include "Pemja.h"
 
 static jmethodID getType = 0;
 static jmethodID getModifiers = 0;
 
-jclass
-JavaField_getType(JNIEnv* env, jobject this)
-{
-    if (!getType) {
-        getType = (*env)->GetMethodID(env, JFIELD_TYPE, "getType",
-                                      "()Ljava/lang/Class;");
-    }
-    return (jclass) (*env)->CallObjectMethod(env, this, getType);
+jclass JavaField_getType(JNIEnv* env, jobject this) {
+  if (!getType) {
+    getType =
+        (*env)->GetMethodID(env, JFIELD_TYPE, "getType", "()Ljava/lang/Class;");
+  }
+  return (jclass)(*env)->CallObjectMethod(env, this, getType);
 }
 
-jint
-JavaField_getModifiers(JNIEnv* env, jobject this)
-{
-    if (!getModifiers) {
-        getModifiers = (*env)->GetMethodID(env, JFIELD_TYPE, "getModifiers",
-                                           "()I");
-    }
-    return (*env)->CallIntMethod(env, this, getModifiers);
+jint JavaField_getModifiers(JNIEnv* env, jobject this) {
+  if (!getModifiers) {
+    getModifiers = (*env)->GetMethodID(env, JFIELD_TYPE, "getModifiers", "()I");
+  }
+  return (*env)->CallIntMethod(env, this, getModifiers);
 }

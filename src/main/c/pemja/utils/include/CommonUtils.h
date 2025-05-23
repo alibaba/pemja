@@ -26,8 +26,9 @@ extern "C" {
  * Method:    loadLibrary0
  * Signature: (Ljava/lang/String;)V
  */
-JNIEXPORT void JNICALL Java_pemja_utils_CommonUtils_loadLibrary0
-  (JNIEnv *, jobject, jstring);
+JNIEXPORT void JNICALL Java_pemja_utils_CommonUtils_loadLibrary0(JNIEnv *,
+                                                                 jobject,
+                                                                 jstring);
 
 #ifdef __cplusplus
 }

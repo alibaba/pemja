@@ -14,6 +14,8 @@
 #ifndef _Included_java_lang_reflect_Method
 #define _Included_java_lang_reflect_Method
 
+#include <jni.h>
+
 jobjectArray JavaMethod_getParameterTypes(JNIEnv*, jobject);
 jint JavaMethod_getModifiers(JNIEnv*, jobject);
 jclass JavaMethod_getReturnType(JNIEnv*, jobject);

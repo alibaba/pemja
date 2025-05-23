@@ -21,8 +21,7 @@ JcpAPI_DATA(PyTypeObject) PyJConstructor_Type;
 /* Creates a new PyJConstructor with a Java Object. */
 JcpAPI_FUNC(PyObject*) JcpPyJConstructor_New(JNIEnv*, jobject);
 
-#define PyJConstructor_Check(op) \
-        PyObject_TypeCheck(op, &PyJConstructor_Type)
+#define PyJConstructor_Check(op) PyObject_TypeCheck(op, &PyJConstructor_Type)
 #define PyJConstructor_CheckExact(op) Py_IS_TYPE(op, &PyJConstructor_Type)
 
 #endif

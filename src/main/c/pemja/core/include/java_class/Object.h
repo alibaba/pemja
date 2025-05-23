@@ -14,6 +14,8 @@
 #ifndef _Included_java_lang_Object
 #define _Included_java_lang_Object
 
+#include <jni.h>
+
 jboolean JavaObject_equals(JNIEnv*, jobject, jobject);
 jstring JavaObject_toString(JNIEnv*, jobject);
 

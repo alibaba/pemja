@@ -12,17 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "Pemja.h"
-
 #include "java_class/Float.h"
+
+#include "Pemja.h"
 
 static jmethodID init_F = 0;
 
-jobject
-JavaFloat_New(JNIEnv* env, jfloat jval)
-{
-    if (!init_F) {
-        init_F = (*env)->GetMethodID(env, JFLOAT_OBJ_TYPE, "<init>", "(F)V");
-    }
-    return (*env)->NewObject(env, JFLOAT_OBJ_TYPE, init_F, jval);
+jobject JavaFloat_New(JNIEnv* env, jfloat jval) {
+  if (!init_F) {
+    init_F = (*env)->GetMethodID(env, JFLOAT_OBJ_TYPE, "<init>", "(F)V");
+  }
+  return (*env)->NewObject(env, JFLOAT_OBJ_TYPE, init_F, jval);
 }

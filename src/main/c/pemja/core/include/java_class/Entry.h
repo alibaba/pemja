@@ -14,6 +14,8 @@
 #ifndef _Included_java_util_Map_Entry
 #define _Included_java_util_Map_Entry
 
+#include <jni.h>
+
 jobject JavaMapEntry_getKey(JNIEnv*, jobject);
 jobject JavaMapEntry_getValue(JNIEnv*, jobject);
 

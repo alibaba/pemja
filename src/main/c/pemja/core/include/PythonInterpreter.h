@@ -27,16 +27,17 @@ extern "C" {
  * Method:    init
  * Signature: (I)J
  */
-JNIEXPORT jlong JNICALL Java_pemja_core_PythonInterpreter_init
-  (JNIEnv *, jobject, jint);
+JNIEXPORT jlong JNICALL Java_pemja_core_PythonInterpreter_init(JNIEnv *,
+                                                               jobject, jint);
 
 /*
  * Class:     pemja_core_PythonInterpreter
  * Method:    finalize
  * Signature: (J)V
  */
-JNIEXPORT void JNICALL Java_pemja_core_PythonInterpreter_finalize
-  (JNIEnv *, jobject, jlong);
+JNIEXPORT void JNICALL Java_pemja_core_PythonInterpreter_finalize(JNIEnv *,
+                                                                  jobject,
+                                                                  jlong);
 
 // ------------------------------ set()/get methods----------------------
 
@@ -45,57 +46,68 @@ JNIEXPORT void JNICALL Java_pemja_core_PythonInterpreter_finalize
  * Method:    set
  * Signature: (JLjava/lang/String;Z)V
  */
-JNIEXPORT void JNICALL Java_pemja_core_PythonInterpreter_set__JLjava_lang_String_2Z
-  (JNIEnv *, jobject, jlong, jstring, jboolean);
+JNIEXPORT void JNICALL
+Java_pemja_core_PythonInterpreter_set__JLjava_lang_String_2Z(JNIEnv *, jobject,
+                                                             jlong, jstring,
+                                                             jboolean);
 
 /*
  * Class:     pemja_core_PythonInterpreter
  * Method:    set
  * Signature: (JLjava/lang/String;I)V
  */
-JNIEXPORT void JNICALL Java_pemja_core_PythonInterpreter_set__JLjava_lang_String_2I
-  (JNIEnv *, jobject, jlong, jstring, jint);
+JNIEXPORT void JNICALL
+Java_pemja_core_PythonInterpreter_set__JLjava_lang_String_2I(JNIEnv *, jobject,
+                                                             jlong, jstring,
+                                                             jint);
 
 /*
  * Class:     pemja_core_PythonInterpreter
  * Method:    set
  * Signature: (JLjava/lang/String;J)V
  */
-JNIEXPORT void JNICALL Java_pemja_core_PythonInterpreter_set__JLjava_lang_String_2J
-  (JNIEnv *, jobject, jlong, jstring, jlong);
+JNIEXPORT void JNICALL
+Java_pemja_core_PythonInterpreter_set__JLjava_lang_String_2J(JNIEnv *, jobject,
+                                                             jlong, jstring,
+                                                             jlong);
 
 /*
  * Class:     pemja_core_PythonInterpreter
  * Method:    set
  * Signature: (JLjava/lang/String;D)V
  */
-JNIEXPORT void JNICALL Java_pemja_core_PythonInterpreter_set__JLjava_lang_String_2D
-  (JNIEnv *, jobject, jlong, jstring, jdouble);
+JNIEXPORT void JNICALL
+Java_pemja_core_PythonInterpreter_set__JLjava_lang_String_2D(JNIEnv *, jobject,
+                                                             jlong, jstring,
+                                                             jdouble);
 
 /*
  * Class:     pemja_core_PythonInterpreter
  * Method:    set
  * Signature: (JLjava/lang/String;Ljava/lang/String;)V
  */
-JNIEXPORT void JNICALL Java_pemja_core_PythonInterpreter_set__JLjava_lang_String_2Ljava_lang_String_2
-  (JNIEnv *, jobject, jlong, jstring, jstring);
+JNIEXPORT void JNICALL
+Java_pemja_core_PythonInterpreter_set__JLjava_lang_String_2Ljava_lang_String_2(
+    JNIEnv *, jobject, jlong, jstring, jstring);
 
 /*
  * Class:     pemja_core_PythonInterpreter
  * Method:    set
  * Signature: (JLjava/lang/String;Ljava/lang/Object;)V
  */
-JNIEXPORT void JNICALL Java_pemja_core_PythonInterpreter_set__JLjava_lang_String_2Ljava_lang_Object_2
-  (JNIEnv *, jobject, jlong, jstring, jobject);
+JNIEXPORT void JNICALL
+Java_pemja_core_PythonInterpreter_set__JLjava_lang_String_2Ljava_lang_Object_2(
+    JNIEnv *, jobject, jlong, jstring, jobject);
 
 /*
  * Class:     pemja_core_PythonInterpreter
  * Method:    get
  * Signature: (JLjava/lang/String;Ljava/lang/Class;)Ljava/lang/Object;
  */
-JNIEXPORT jobject JNICALL Java_pemja_core_PythonInterpreter_get
-  (JNIEnv *, jobject, jlong, jstring, jclass);
-
+JNIEXPORT jobject JNICALL Java_pemja_core_PythonInterpreter_get(JNIEnv *,
+                                                                jobject, jlong,
+                                                                jstring,
+                                                                jclass);
 
 // ------------------------------ invoke() methods----------------------
 
@@ -104,147 +116,164 @@ JNIEXPORT jobject JNICALL Java_pemja_core_PythonInterpreter_get
  * Method:    invokeNoArgs
  * Signature: (JLjava/lang/String;)Ljava/lang/Object;
  */
-JNIEXPORT jobject JNICALL Java_pemja_core_PythonInterpreter_invokeNoArgs
-  (JNIEnv *, jobject, jlong, jstring);
+JNIEXPORT jobject JNICALL Java_pemja_core_PythonInterpreter_invokeNoArgs(
+    JNIEnv *, jobject, jlong, jstring);
 
 /*
  * Class:     pemja_core_PythonInterpreter
  * Method:    invokeOneArgBoolean
  * Signature: (JLjava/lang/String;Z)Ljava/lang/Object;
  */
-JNIEXPORT jobject JNICALL Java_pemja_core_PythonInterpreter_invokeOneArgBoolean
-  (JNIEnv *, jobject, jlong, jstring, jboolean);
+JNIEXPORT jobject JNICALL Java_pemja_core_PythonInterpreter_invokeOneArgBoolean(
+    JNIEnv *, jobject, jlong, jstring, jboolean);
 
 /*
  * Class:     pemja_core_PythonInterpreter
  * Method:    invokeOneArgInt
  * Signature: (JLjava/lang/String;I)Ljava/lang/Object;
  */
-JNIEXPORT jobject JNICALL Java_pemja_core_PythonInterpreter_invokeOneArgInt
-  (JNIEnv *, jobject, jlong, jstring, jint);
+JNIEXPORT jobject JNICALL Java_pemja_core_PythonInterpreter_invokeOneArgInt(
+    JNIEnv *, jobject, jlong, jstring, jint);
 
 /*
  * Class:     pemja_core_PythonInterpreter
  * Method:    invokeOneArgLong
  * Signature: (JLjava/lang/String;J)Ljava/lang/Object;
  */
-JNIEXPORT jobject JNICALL Java_pemja_core_PythonInterpreter_invokeOneArgLong
-  (JNIEnv *, jobject, jlong, jstring, jlong);
+JNIEXPORT jobject JNICALL Java_pemja_core_PythonInterpreter_invokeOneArgLong(
+    JNIEnv *, jobject, jlong, jstring, jlong);
 
 /*
  * Class:     pemja_core_PythonInterpreter
  * Method:    invokeOneArgDouble
  * Signature: (JLjava/lang/String;D)Ljava/lang/Object;
  */
-JNIEXPORT jobject JNICALL Java_pemja_core_PythonInterpreter_invokeOneArgDouble
-  (JNIEnv *, jobject, jlong, jstring, jdouble);
+JNIEXPORT jobject JNICALL Java_pemja_core_PythonInterpreter_invokeOneArgDouble(
+    JNIEnv *, jobject, jlong, jstring, jdouble);
 
 /*
  * Class:     pemja_core_PythonInterpreter
  * Method:    invokeOneArgString
  * Signature: (JLjava/lang/String;Ljava/lang/String;)Ljava/lang/Object;
  */
-JNIEXPORT jobject JNICALL Java_pemja_core_PythonInterpreter_invokeOneArgString
-  (JNIEnv *, jobject, jlong, jstring, jstring);
+JNIEXPORT jobject JNICALL Java_pemja_core_PythonInterpreter_invokeOneArgString(
+    JNIEnv *, jobject, jlong, jstring, jstring);
 
 /*
  * Class:     pemja_core_PythonInterpreter
  * Method:    invokeOneArgObject
  * Signature: (JLjava/lang/String;Ljava/lang/Object;)Ljava/lang/Object;
  */
-JNIEXPORT jobject JNICALL Java_pemja_core_PythonInterpreter_invokeOneArgObject
-  (JNIEnv *, jobject, jlong, jstring, jobject);
+JNIEXPORT jobject JNICALL Java_pemja_core_PythonInterpreter_invokeOneArgObject(
+    JNIEnv *, jobject, jlong, jstring, jobject);
 
 /*
  * Class:     pemja_core_PythonInterpreter
  * Method:    invoke
- * Signature: (JLjava/lang/String;[Ljava/lang/Object;Ljava/util/Map;)Ljava/lang/Object;
+ * Signature:
+ * (JLjava/lang/String;[Ljava/lang/Object;Ljava/util/Map;)Ljava/lang/Object;
  */
-JNIEXPORT jobject JNICALL Java_pemja_core_PythonInterpreter_invoke
-  (JNIEnv *, jobject, jlong, jstring, jobjectArray, jobject);
+JNIEXPORT jobject JNICALL Java_pemja_core_PythonInterpreter_invoke(
+    JNIEnv *, jobject, jlong, jstring, jobjectArray, jobject);
 
+#define Jcp_BEGIN_INVOKE_METHODS                    \
+  {                                                 \
+    const char *objname;                            \
+    const char *methodname;                         \
+    objname = JcpString_FromJString(env, jobjname); \
+    methodname = JcpString_FromJString(env, jmethodname);
 
-#define Jcp_BEGIN_INVOKE_METHODS { \
-                            const char* objname; \
-                            const char* methodname; \
-                            objname = JcpString_FromJString(env, jobjname); \
-                            methodname = JcpString_FromJString(env, jmethodname); \
-
-#define Jcp_END_INVOKE_METHODS JcpString_Clear(env, jobjname, objname);\
-                               JcpString_Clear(env, jmethodname, methodname); \
-                    }
+#define Jcp_END_INVOKE_METHODS                   \
+  JcpString_Clear(env, jobjname, objname);       \
+  JcpString_Clear(env, jmethodname, methodname); \
+  }
 
 /*
  * Class:     pemja_core_PythonInterpreter
  * Method:    invokeMethodNoArgs
  * Signature: (JLjava/lang/String;Ljava/lang/String;)Ljava/lang/Object;
  */
-JNIEXPORT jobject JNICALL Java_pemja_core_PythonInterpreter_invokeMethodNoArgs
-  (JNIEnv *, jobject, jlong, jstring, jstring);
+JNIEXPORT jobject JNICALL Java_pemja_core_PythonInterpreter_invokeMethodNoArgs(
+    JNIEnv *, jobject, jlong, jstring, jstring);
 
 /*
  * Class:     pemja_core_PythonInterpreter
  * Method:    invokeMethodOneArgBoolean
  * Signature: (JLjava/lang/String;Ljava/lang/String;Z)Ljava/lang/Object;
  */
-JNIEXPORT jobject JNICALL Java_pemja_core_PythonInterpreter_invokeMethodOneArgBoolean
-  (JNIEnv *, jobject, jlong, jstring, jstring, jboolean);
+JNIEXPORT jobject JNICALL
+Java_pemja_core_PythonInterpreter_invokeMethodOneArgBoolean(JNIEnv *, jobject,
+                                                            jlong, jstring,
+                                                            jstring, jboolean);
 
 /*
  * Class:     pemja_core_PythonInterpreter
  * Method:    invokeMethodOneArgInt
  * Signature: (JLjava/lang/String;Ljava/lang/String;I)Ljava/lang/Object;
  */
-JNIEXPORT jobject JNICALL Java_pemja_core_PythonInterpreter_invokeMethodOneArgInt
-  (JNIEnv *, jobject, jlong, jstring, jstring, jint);
+JNIEXPORT jobject JNICALL
+Java_pemja_core_PythonInterpreter_invokeMethodOneArgInt(JNIEnv *, jobject,
+                                                        jlong, jstring, jstring,
+                                                        jint);
 
 /*
  * Class:     pemja_core_PythonInterpreter
  * Method:    invokeMethodOneArgLong
  * Signature: (JLjava/lang/String;Ljava/lang/String;J)Ljava/lang/Object;
  */
-JNIEXPORT jobject JNICALL Java_pemja_core_PythonInterpreter_invokeMethodOneArgLong
-  (JNIEnv *, jobject, jlong, jstring, jstring, jlong);
+JNIEXPORT jobject JNICALL
+Java_pemja_core_PythonInterpreter_invokeMethodOneArgLong(JNIEnv *, jobject,
+                                                         jlong, jstring,
+                                                         jstring, jlong);
 
 /*
  * Class:     pemja_core_PythonInterpreter
  * Method:    invokeMethodOneArgDouble
  * Signature: (JLjava/lang/String;Ljava/lang/String;D)Ljava/lang/Object;
  */
-JNIEXPORT jobject JNICALL Java_pemja_core_PythonInterpreter_invokeMethodOneArgDouble
-  (JNIEnv *, jobject, jlong, jstring, jstring, jdouble);
+JNIEXPORT jobject JNICALL
+Java_pemja_core_PythonInterpreter_invokeMethodOneArgDouble(JNIEnv *, jobject,
+                                                           jlong, jstring,
+                                                           jstring, jdouble);
 
 /*
  * Class:     pemja_core_PythonInterpreter
  * Method:    invokeMethodOneArgString
- * Signature: (JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;
+ * Signature:
+ * (JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;
  */
-JNIEXPORT jobject JNICALL Java_pemja_core_PythonInterpreter_invokeMethodOneArgString
-  (JNIEnv *, jobject, jlong, jstring, jstring, jstring);
+JNIEXPORT jobject JNICALL
+Java_pemja_core_PythonInterpreter_invokeMethodOneArgString(JNIEnv *, jobject,
+                                                           jlong, jstring,
+                                                           jstring, jstring);
 
 /*
  * Class:     pemja_core_PythonInterpreter
  * Method:    invokeMethodOneArgObject
- * Signature: (JLjava/lang/String;Ljava/lang/String;Ljava/lang/Object;)Ljava/lang/Object;
+ * Signature:
+ * (JLjava/lang/String;Ljava/lang/String;Ljava/lang/Object;)Ljava/lang/Object;
  */
-JNIEXPORT jobject JNICALL Java_pemja_core_PythonInterpreter_invokeMethodOneArgObject
-  (JNIEnv *, jobject, jlong, jstring, jstring, jobject);
+JNIEXPORT jobject JNICALL
+Java_pemja_core_PythonInterpreter_invokeMethodOneArgObject(JNIEnv *, jobject,
+                                                           jlong, jstring,
+                                                           jstring, jobject);
 
 /*
  * Class:     pemja_core_PythonInterpreter
  * Method:    invokeMethod
- * Signature: (JLjava/lang/String;Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/Object;
+ * Signature:
+ * (JLjava/lang/String;Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/Object;
  */
-JNIEXPORT jobject JNICALL Java_pemja_core_PythonInterpreter_invokeMethod
-  (JNIEnv *, jobject, jlong, jstring, jstring, jobjectArray);
+JNIEXPORT jobject JNICALL Java_pemja_core_PythonInterpreter_invokeMethod(
+    JNIEnv *, jobject, jlong, jstring, jstring, jobjectArray);
 
 /*
  * Class:     pemja_core_PythonInterpreter
  * Method:    exec
  * Signature: (JLjava/lang/String;)V
  */
-JNIEXPORT void JNICALL Java_pemja_core_PythonInterpreter_exec
-  (JNIEnv *, jobject, jlong, jstring);
+JNIEXPORT void JNICALL Java_pemja_core_PythonInterpreter_exec(JNIEnv *, jobject,
+                                                              jlong, jstring);
 
 #ifdef __cplusplus
 }

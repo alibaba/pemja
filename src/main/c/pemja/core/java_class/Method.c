@@ -12,52 +12,43 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "Pemja.h"
-
 #include "java_class/Method.h"
+
+#include "Pemja.h"
 
 static jmethodID getParameterTypes = 0;
 static jmethodID getModifiers = 0;
 static jmethodID getReturnType = 0;
 static jmethodID isVarArgs = 0;
 
-jobjectArray
-JavaMethod_getParameterTypes(JNIEnv* env, jobject this)
-{
-    if (!getParameterTypes) {
-        getParameterTypes = (*env)->GetMethodID(env, JMETHOD_TYPE, "getParameterTypes",
-                                                "()[Ljava/lang/Class;");
-    }
-    return (*env)->CallObjectMethod(env, this, getParameterTypes);
+jobjectArray JavaMethod_getParameterTypes(JNIEnv* env, jobject this) {
+  if (!getParameterTypes) {
+    getParameterTypes = (*env)->GetMethodID(
+        env, JMETHOD_TYPE, "getParameterTypes", "()[Ljava/lang/Class;");
+  }
+  return (*env)->CallObjectMethod(env, this, getParameterTypes);
 }
 
-jint
-JavaMethod_getModifiers(JNIEnv* env, jobject this)
-{
-    if (!getModifiers) {
-        getModifiers = (*env)->GetMethodID(env, JMETHOD_TYPE, "getModifiers",
-                                           "()I");
-    }
-    return (*env)->CallIntMethod(env, this, getModifiers);
+jint JavaMethod_getModifiers(JNIEnv* env, jobject this) {
+  if (!getModifiers) {
+    getModifiers =
+        (*env)->GetMethodID(env, JMETHOD_TYPE, "getModifiers", "()I");
+  }
+  return (*env)->CallIntMethod(env, this, getModifiers);
 }
 
-jclass
-JavaMethod_getReturnType(JNIEnv* env, jobject this)
-{
-    if (!getReturnType) {
-        getReturnType = (*env)->GetMethodID(env, JMETHOD_TYPE, "getReturnType",
-                                            "()Ljava/lang/Class;");
-    }
-    return (*env)->CallObjectMethod(env, this, getReturnType);
+jclass JavaMethod_getReturnType(JNIEnv* env, jobject this) {
+  if (!getReturnType) {
+    getReturnType = (*env)->GetMethodID(env, JMETHOD_TYPE, "getReturnType",
+                                        "()Ljava/lang/Class;");
+  }
+  return (*env)->CallObjectMethod(env, this, getReturnType);
 }
 
-jboolean
-JavaMethod_isVarArgs(JNIEnv* env, jobject this)
-{
+jboolean JavaMethod_isVarArgs(JNIEnv* env, jobject this) {
+  if (!isVarArgs) {
+    isVarArgs = (*env)->GetMethodID(env, JMETHOD_TYPE, "isVarArgs", "()Z");
+  }
 
-    if (!isVarArgs) {
-        isVarArgs = (*env)->GetMethodID(env, JMETHOD_TYPE, "isVarArgs", "()Z");
-    }
-
-    return (*env)->CallBooleanMethod(env, this, isVarArgs);
+  return (*env)->CallBooleanMethod(env, this, isVarArgs);
 }

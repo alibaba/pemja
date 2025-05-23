@@ -12,27 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "Pemja.h"
-
 #include "java_class/Time.h"
+
+#include "Pemja.h"
 
 static jmethodID init_time = 0;
 static jmethodID getTime = 0;
 
-jobject
-JavaSqlTime_New(JNIEnv* env, jlong jval)
-{
-    if (!init_time) {
-        init_time = (*env)->GetMethodID(env, JSQLTIME_TYPE, "<init>", "(J)V");
-    }
-    return (*env)->NewObject(env, JSQLTIME_TYPE, init_time, jval);
+jobject JavaSqlTime_New(JNIEnv* env, jlong jval) {
+  if (!init_time) {
+    init_time = (*env)->GetMethodID(env, JSQLTIME_TYPE, "<init>", "(J)V");
+  }
+  return (*env)->NewObject(env, JSQLTIME_TYPE, init_time, jval);
 }
 
-jlong
-JavaSqlTime_getTime(JNIEnv* env, jobject obj)
-{
-    if (!getTime) {
-        getTime = (*env)->GetMethodID(env, JSQLTIME_TYPE, "getTime", "()J");
-    }
-    return (*env)->CallLongMethod(env, obj, getTime);
+jlong JavaSqlTime_getTime(JNIEnv* env, jobject obj) {
+  if (!getTime) {
+    getTime = (*env)->GetMethodID(env, JSQLTIME_TYPE, "getTime", "()J");
+  }
+  return (*env)->CallLongMethod(env, obj, getTime);
 }

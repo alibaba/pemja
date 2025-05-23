@@ -14,6 +14,8 @@
 #ifndef _Included_java_util_Iterator
 #define _Included_java_util_Iterator
 
+#include <jni.h>
+
 jboolean JavaIterator_hasNext(JNIEnv*, jobject);
 jobject JavaIterator_next(JNIEnv*, jobject);
 

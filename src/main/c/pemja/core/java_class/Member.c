@@ -12,18 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "Pemja.h"
-
 #include "java_class/Member.h"
+
+#include "Pemja.h"
 
 static jmethodID getName = 0;
 
-jobject
-JavaMember_getName(JNIEnv* env, jobject this)
-{
-    if (!getName) {
-        getName = (*env)->GetMethodID(env, JMEMBER_TYPE, "getName",
-                                        "()Ljava/lang/String;");
-    }
-    return (*env)->CallObjectMethod(env, this, getName);
+jobject JavaMember_getName(JNIEnv* env, jobject this) {
+  if (!getName) {
+    getName = (*env)->GetMethodID(env, JMEMBER_TYPE, "getName",
+                                  "()Ljava/lang/String;");
+  }
+  return (*env)->CallObjectMethod(env, this, getName);
 }

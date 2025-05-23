@@ -14,6 +14,8 @@
 #ifndef _Included_java_time_LocalDateTime
 #define _Included_java_time_LocalDateTime
 
+#include <jni.h>
+
 jobject JavaLocalDateTime_of(JNIEnv*, jobject, jobject);
 jobject JavaLocalDateTime_toLocalDate(JNIEnv*, jobject);
 jobject JavaLocalDateTime_toLocalTime(JNIEnv*, jobject);
