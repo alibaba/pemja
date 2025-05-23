@@ -168,6 +168,11 @@
                             <style>AOSP</style>
                         </googleJavaFormat>
 
+                        <!-- \# refers to the static imports -->
+                        <importOrder>
+                            <order>,javax,java,scala,\#</order>
+                        </importOrder>
+
                         <removeUnusedImports />
                     </java>
                 </configuration>
