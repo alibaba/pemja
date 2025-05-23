@@ -11,32 +11,27 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#include "Pemja.h"
-
 #include "java_class/BigDecimal.h"
+
+#include "Pemja.h"
 
 static jmethodID init_BigDecimal = 0;
 static jmethodID toString = 0;
 
-jobject
-JavaBigDecimal_New(JNIEnv* env, jstring value)
-{
+jobject JavaBigDecimal_New(JNIEnv* env, jstring value) {
+  if (!init_BigDecimal) {
+    init_BigDecimal = (*env)->GetMethodID(env, JBIGDECIMAL_TYPE, "<init>",
+                                          "(Ljava/lang/String;)V");
+  }
 
-    if (!init_BigDecimal) {
-        init_BigDecimal = (*env)->GetMethodID(env, JBIGDECIMAL_TYPE, "<init>",
-                                             "(Ljava/lang/String;)V");
-    }
-
-    return (*env)->NewObject(env, JBIGDECIMAL_TYPE, init_BigDecimal, value);
+  return (*env)->NewObject(env, JBIGDECIMAL_TYPE, init_BigDecimal, value);
 }
 
-jstring
-JavaBigDecimal_toString(JNIEnv* env, jobject obj)
-{
+jstring JavaBigDecimal_toString(JNIEnv* env, jobject obj) {
+  if (!toString) {
+    toString = (*env)->GetMethodID(env, JBIGDECIMAL_TYPE, "toString",
+                                   "()Ljava/lang/String;");
+  }
 
-    if (!toString) {
-        toString = (*env)->GetMethodID(env, JBIGDECIMAL_TYPE, "toString", "()Ljava/lang/String;");
-    }
-
-    return (*env)->CallObjectMethod(env, obj, toString);
+  return (*env)->CallObjectMethod(env, obj, toString);
 }

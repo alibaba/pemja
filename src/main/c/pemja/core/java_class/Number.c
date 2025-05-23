@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "Pemja.h"
-
 #include "java_class/Number.h"
+
+#include "Pemja.h"
 
 static jmethodID byteValue = 0;
 static jmethodID shortValue = 0;
@@ -23,56 +23,45 @@ static jmethodID longValue = 0;
 static jmethodID floatValue = 0;
 static jmethodID doubleValue = 0;
 
-jbyte
-JavaNumber_byteValue(JNIEnv* env, jobject jval)
-{
-    if (!byteValue) {
-        byteValue = (*env)->GetMethodID(env, JNUMBER_TYPE, "byteValue", "()B");
-    }
-    return (*env)->CallByteMethod(env, jval, byteValue);;
+jbyte JavaNumber_byteValue(JNIEnv* env, jobject jval) {
+  if (!byteValue) {
+    byteValue = (*env)->GetMethodID(env, JNUMBER_TYPE, "byteValue", "()B");
+  }
+  return (*env)->CallByteMethod(env, jval, byteValue);
+  ;
 }
 
-jshort
-JavaNumber_shortValue(JNIEnv* env, jobject jval)
-{
-    if (!shortValue) {
-        shortValue = (*env)->GetMethodID(env, JNUMBER_TYPE, "shortValue", "()S");
-    }
-    return (*env)->CallShortMethod(env, jval, shortValue);
+jshort JavaNumber_shortValue(JNIEnv* env, jobject jval) {
+  if (!shortValue) {
+    shortValue = (*env)->GetMethodID(env, JNUMBER_TYPE, "shortValue", "()S");
+  }
+  return (*env)->CallShortMethod(env, jval, shortValue);
 }
 
-jint
-JavaNumber_intValue(JNIEnv* env, jobject jval)
-{
-    if (!intValue) {
-        intValue = (*env)->GetMethodID(env, JNUMBER_TYPE, "intValue", "()I");
-    }
-    return (*env)->CallIntMethod(env, jval, intValue);
+jint JavaNumber_intValue(JNIEnv* env, jobject jval) {
+  if (!intValue) {
+    intValue = (*env)->GetMethodID(env, JNUMBER_TYPE, "intValue", "()I");
+  }
+  return (*env)->CallIntMethod(env, jval, intValue);
 }
 
-jlong
-JavaNumber_longValue(JNIEnv* env, jobject jval)
-{
-    if (!longValue) {
-        longValue = (*env)->GetMethodID(env, JNUMBER_TYPE, "longValue", "()J");
-    }
-    return (*env)->CallLongMethod(env, jval, longValue);
+jlong JavaNumber_longValue(JNIEnv* env, jobject jval) {
+  if (!longValue) {
+    longValue = (*env)->GetMethodID(env, JNUMBER_TYPE, "longValue", "()J");
+  }
+  return (*env)->CallLongMethod(env, jval, longValue);
 }
 
-jfloat
-JavaNumber_floatValue(JNIEnv* env, jobject jval)
-{
-    if (!floatValue) {
-        floatValue = (*env)->GetMethodID(env, JNUMBER_TYPE, "floatValue", "()F");
-    }
-    return (*env)->CallFloatMethod(env, jval, floatValue);
+jfloat JavaNumber_floatValue(JNIEnv* env, jobject jval) {
+  if (!floatValue) {
+    floatValue = (*env)->GetMethodID(env, JNUMBER_TYPE, "floatValue", "()F");
+  }
+  return (*env)->CallFloatMethod(env, jval, floatValue);
 }
 
-jdouble
-JavaNumber_doubleValue(JNIEnv* env, jobject jval)
-{
-    if (!doubleValue) {
-        doubleValue = (*env)->GetMethodID(env, JNUMBER_TYPE, "doubleValue", "()D");
-    }
-    return (*env)->CallDoubleMethod(env, jval, doubleValue);
+jdouble JavaNumber_doubleValue(JNIEnv* env, jobject jval) {
+  if (!doubleValue) {
+    doubleValue = (*env)->GetMethodID(env, JNUMBER_TYPE, "doubleValue", "()D");
+  }
+  return (*env)->CallDoubleMethod(env, jval, doubleValue);
 }

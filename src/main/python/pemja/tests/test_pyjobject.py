@@ -15,6 +15,7 @@
 # limitations under the License.
 ################################################################################
 
+
 def test_call_collection(collection):
     assert len(collection) == 3
     assert 1 in collection

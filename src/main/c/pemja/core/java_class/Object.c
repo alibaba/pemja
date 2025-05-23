@@ -12,29 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "Pemja.h"
-
 #include "java_class/Object.h"
+
+#include "Pemja.h"
 
 static jmethodID equals = 0;
 static jmethodID toString = 0;
 
-jboolean
-JavaObject_equals(JNIEnv* env, jobject this, jobject other)
-{
-    if (!equals) {
-        equals = (*env)->GetMethodID(env, JOBJECT_TYPE, "equals", "(Ljava/lang/Object;)Z");
-    }
-    return (*env)->CallBooleanMethod(env, this, equals, other);
+jboolean JavaObject_equals(JNIEnv* env, jobject this, jobject other) {
+  if (!equals) {
+    equals = (*env)->GetMethodID(env, JOBJECT_TYPE, "equals",
+                                 "(Ljava/lang/Object;)Z");
+  }
+  return (*env)->CallBooleanMethod(env, this, equals, other);
 }
 
-jstring
-JavaObject_toString(JNIEnv* env, jobject obj)
-{
+jstring JavaObject_toString(JNIEnv* env, jobject obj) {
+  if (!toString) {
+    toString = (*env)->GetMethodID(env, JOBJECT_TYPE, "toString",
+                                   "()Ljava/lang/String;");
+  }
 
-    if (!toString) {
-        toString = (*env)->GetMethodID(env, JOBJECT_TYPE, "toString", "()Ljava/lang/String;");
-    }
-
-    return (*env)->CallObjectMethod(env, obj, toString);
+  return (*env)->CallObjectMethod(env, obj, toString);
 }

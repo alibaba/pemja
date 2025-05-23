@@ -19,8 +19,7 @@ JcpAPI_DATA(PyTypeObject) PyJIterable_Type;
 /* Public interface */
 JcpAPI_FUNC(PyObject*) JcpPyJIterable_New(JNIEnv*, jobject, jclass);
 
-#define PyJIterable_Check(op) \
-        PyObject_TypeCheck(op, &PyJIterable_Type)
+#define PyJIterable_Check(op) PyObject_TypeCheck(op, &PyJIterable_Type)
 #define PyJIterable_CheckExact(op) op->ob_type == &PyJIterable_Type
 
 #endif

@@ -14,14 +14,14 @@
 #ifndef PYTHON_CLASS_H
 #define PYTHON_CLASS_H
 
-#include <python_class/pyjobject.h>
-#include <python_class/pyjmethod.h>
-#include <python_class/pyjmultimethod.h>
 #include <python_class/pyjclass.h>
+#include <python_class/pyjcollection.h>
 #include <python_class/pyjconstructor.h>
 #include <python_class/pyjfield.h>
 #include <python_class/pyjiterable.h>
 #include <python_class/pyjiterator.h>
-#include <python_class/pyjcollection.h>
+#include <python_class/pyjmethod.h>
+#include <python_class/pyjmultimethod.h>
+#include <python_class/pyjobject.h>
 
 #endif

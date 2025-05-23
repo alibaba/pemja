@@ -12,17 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "Pemja.h"
-
 #include "java_class/Short.h"
+
+#include "Pemja.h"
 
 static jmethodID init_S = 0;
 
-jobject
-JavaShort_New(JNIEnv* env, jshort jval)
-{
-    if (!init_S) {
-        init_S = (*env)->GetMethodID(env, JSHORT_OBJ_TYPE, "<init>", "(S)V");
-    }
-    return (*env)->NewObject(env, JSHORT_OBJ_TYPE, init_S, jval);
+jobject JavaShort_New(JNIEnv* env, jshort jval) {
+  if (!init_S) {
+    init_S = (*env)->GetMethodID(env, JSHORT_OBJ_TYPE, "<init>", "(S)V");
+  }
+  return (*env)->NewObject(env, JSHORT_OBJ_TYPE, init_S, jval);
 }

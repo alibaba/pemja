@@ -25,19 +25,19 @@ LOG_LEVEL_TO_LOGENTRY_MAP = {
     logging.INFO: "INFO",
     logging.DEBUG: "DEBUG",
     logging.NOTSET: "UNSPECIFIED",
-    -float('inf'): "DEBUG",
+    -float("inf"): "DEBUG",
 }
 
 
-def _map_log_level(
-        level: int) -> str:
+def _map_log_level(level: int) -> str:
     try:
         return LOG_LEVEL_TO_LOGENTRY_MAP[level]
     except KeyError:
         return max(
-            beam_level for python_level,
-            beam_level in LOG_LEVEL_TO_LOGENTRY_MAP.items()
-            if python_level <= level)
+            beam_level
+            for python_level, beam_level in LOG_LEVEL_TO_LOGENTRY_MAP.items()
+            if python_level <= level
+        )
 
 
 class PythonLogHandler(logging.Handler):
@@ -48,15 +48,18 @@ class PythonLogHandler(logging.Handler):
     def emit(self, record: logging.LogRecord):
         if self._logger_writer is None:
             from pemja import findClass
-            PythonLogWriter = findClass('pemja.core.log.PythonLogWriter')
+
+            PythonLogWriter = findClass("pemja.core.log.PythonLogWriter")
             self._logger_writer = PythonLogWriter()
 
         message = self.format(record)
-        name = '%s:%s' % (
-            record.pathname or record.module, record.lineno or record.funcName)
+        name = "%s:%s" % (
+            record.pathname or record.module,
+            record.lineno or record.funcName,
+        )
         trace = None
         if record.exc_info:
-            trace = ''.join(traceback.format_exception(*record.exc_info))
+            trace = "".join(traceback.format_exception(*record.exc_info))
         severity = _map_log_level(record.levelno)
         self._logger_writer.log(name, severity, message, trace)
 

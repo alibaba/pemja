@@ -15,15 +15,12 @@
 #define PEMJA_H
 
 #include <Python.h>
-
 #include <jni.h>
 
 #include "jcpexports.h"
 #include "jcpport.h"
-
 #include "pyexceptions.h"
-
-#include "pyutils.h"
 #include "pylib.h"
+#include "pyutils.h"
 
 #endif

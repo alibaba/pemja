@@ -15,17 +15,18 @@
 # limitations under the License.
 ################################################################################
 
+
 def test_callback_java_basic():
     from pemja import findClass
 
-    StringBuilder = findClass('java.lang.StringBuilder')
-    Integer = findClass('java.lang.Integer')
-    String = findClass('java.lang.String')
+    StringBuilder = findClass("java.lang.StringBuilder")
+    Integer = findClass("java.lang.Integer")
+    String = findClass("java.lang.String")
 
     sb = StringBuilder()
-    sb.append('pemja')
-    sb.append('java')
-    sb.append('python')
+    sb.append("pemja")
+    sb.append("java")
+    sb.append("python")
     sb.append(Integer.toHexString(Integer.MAX_VALUE))
     sb.append(String.join("-", "Pemja", "is", "cool"))
     return sb.toString()
@@ -51,12 +52,14 @@ def test_callback_with_all_types(self):
 
     # String
     assert_equals(self.testString("abc"), "testString_String")
-    assert_equals(self.testStringCharSequence("abc"), "testStringCharSequence_CharSequence")
+    assert_equals(
+        self.testStringCharSequence("abc"), "testStringCharSequence_CharSequence"
+    )
     assert_equals(self.testStringGeneric("abc"), "testStringGeneric_T")
 
     # bytes
-    assert_equals(self.testBytes(b'123'), "testBytes_byte[]")
-    assert_equals(self.testBytesGeneric(b'123'), "testBytesGeneric_T")
+    assert_equals(self.testBytes(b"123"), "testBytes_byte[]")
+    assert_equals(self.testBytesGeneric(b"123"), "testBytesGeneric_T")
 
     # List
     assert_equals(self.testList([1, 2, 3]), "testList")
@@ -75,7 +78,7 @@ def test_callback_with_all_types(self):
 
 
 def test_java_call_python(self, interpreter):
-    assert_equals(self.testJavaCallPython(interpreter), 'testJavaCallPython')
+    assert_equals(self.testJavaCallPython(interpreter), "testJavaCallPython")
 
 
 def assert_equals(actual, expected):

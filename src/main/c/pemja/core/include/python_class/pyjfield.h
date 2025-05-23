@@ -15,28 +15,28 @@
 #define _Included_pyjfield
 
 typedef struct {
-    PyObject_HEAD
+  PyObject_HEAD
 
-    /* The corresponding Java Field Object */
-    jobject fd;
+      /* The corresponding Java Field Object */
+      jobject fd;
 
-    /* The field name */
-    PyObject* fd_name;
+  /* The field name */
+  PyObject* fd_name;
 
-    /* The corresponding Field ID for the Java Field object */
-    jfieldID fd_id;
+  /* The corresponding Field ID for the Java Field object */
+  jfieldID fd_id;
 
-    /* The field class Type */
-    jclass fd_type;
+  /* The field class Type */
+  jclass fd_type;
 
-    /* The field class type id */
-    int fd_type_id;
+  /* The field class type id */
+  int fd_type_id;
 
-    /* The flag decides whether it is a static field */
-    int fd_is_static;
+  /* The flag decides whether it is a static field */
+  int fd_is_static;
 
-    /* The flag decides whether the field has been initialized */
-    int fd_is_initialized;
+  /* The flag decides whether the field has been initialized */
+  int fd_is_initialized;
 } PyJFieldObject;
 
 JcpAPI_DATA(PyTypeObject) PyJField_Type;
@@ -52,8 +52,7 @@ JcpAPI_FUNC(PyObject*) JcpPyJField_Get(PyJFieldObject*, PyJObject*);
 /* Sets the field value of the PyJObject. */
 JcpAPI_FUNC(int) JcpPyJField_Set(PyJFieldObject*, PyJObject*, PyObject*);
 
-#define PyJField_Check(op) \
-        PyObject_TypeCheck(op, &PyJField_Type)
+#define PyJField_Check(op) PyObject_TypeCheck(op, &PyJField_Type)
 #define PyJField_CheckExact(op) Py_IS_TYPE(op, &PyJField_Type)
 
 #endif

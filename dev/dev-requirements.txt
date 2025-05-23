@@ -15,3 +15,5 @@
 setuptools>=18.0
 wheel
 find-libpython
+isort
+black

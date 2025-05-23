@@ -15,10 +15,10 @@
 #define _Included_pyjclass
 
 typedef struct {
-    PyJOjbect_HEAD
+  PyJOjbect_HEAD
 
-    /* The PyJConstructor Object used to create Java Object */
-    PyObject    *constructor;
+      /* The PyJConstructor Object used to create Java Object */
+      PyObject *constructor;
 } PyJClassObject;
 
 JcpAPI_DATA(PyTypeObject) PyJClass_Type;
@@ -26,10 +26,9 @@ JcpAPI_DATA(PyTypeObject) PyJClass_Type;
 /* Public interface */
 
 /* Creates a new PyJClassObject with a Java Class Object. */
-JcpAPI_FUNC(PyObject*) JcpPyJClass_New(JNIEnv*, jclass);
+JcpAPI_FUNC(PyObject *) JcpPyJClass_New(JNIEnv *, jclass);
 
-#define PyJClass_Check(op) \
-        PyObject_TypeCheck(op, &PyJClass_Type)
+#define PyJClass_Check(op) PyObject_TypeCheck(op, &PyJClass_Type)
 #define PyJClass_CheckExact(op) op->ob_type == &PyJClass_Type
 
 #endif

@@ -12,27 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "Pemja.h"
-
 #include "java_class/LocalTime.h"
+
+#include "Pemja.h"
 
 static jmethodID ofNanoOfDay = 0;
 static jmethodID toNanoOfDay = 0;
 
-jobject
-JavaLocalTime_ofNanoOfDay(JNIEnv* env, jlong nanoOfDay)
-{
-    if (!ofNanoOfDay) {
-        ofNanoOfDay = (*env)->GetStaticMethodID(env, JLOCALTIME_TYPE, "ofNanoOfDay", "(J)Ljava/time/LocalTime;");
-    }
-    return (*env)->CallStaticObjectMethod(env, JLOCALTIME_TYPE, ofNanoOfDay, nanoOfDay);
+jobject JavaLocalTime_ofNanoOfDay(JNIEnv* env, jlong nanoOfDay) {
+  if (!ofNanoOfDay) {
+    ofNanoOfDay = (*env)->GetStaticMethodID(env, JLOCALTIME_TYPE, "ofNanoOfDay",
+                                            "(J)Ljava/time/LocalTime;");
+  }
+  return (*env)->CallStaticObjectMethod(env, JLOCALTIME_TYPE, ofNanoOfDay,
+                                        nanoOfDay);
 }
 
-jlong
-JavaLocalTime_toNanoOfDay(JNIEnv* env, jobject object)
-{
-    if (!toNanoOfDay) {
-        toNanoOfDay = (*env)->GetMethodID(env, JLOCALTIME_TYPE, "toNanoOfDay", "()J");
-    }
-    return (*env)->CallLongMethod(env, object, toNanoOfDay);
+jlong JavaLocalTime_toNanoOfDay(JNIEnv* env, jobject object) {
+  if (!toNanoOfDay) {
+    toNanoOfDay =
+        (*env)->GetMethodID(env, JLOCALTIME_TYPE, "toNanoOfDay", "()J");
+  }
+  return (*env)->CallLongMethod(env, object, toNanoOfDay);
 }

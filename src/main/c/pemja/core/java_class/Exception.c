@@ -12,17 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "Pemja.h"
-
 #include "java_class/Exception.h"
+
+#include "Pemja.h"
 
 static jmethodID init_PythonException = 0;
 
-jobject
-JavaPythonException_New(JNIEnv* env, jstring jmg)
-{
-    if (!init_PythonException) {
-        init_PythonException = (*env)->GetMethodID(env, JPYTHONEXCE_TYPE, "<init>", "(Ljava/lang/String;)V");
-    }
-    return (*env)->NewObject(env, JPYTHONEXCE_TYPE, init_PythonException, jmg);
+jobject JavaPythonException_New(JNIEnv* env, jstring jmg) {
+  if (!init_PythonException) {
+    init_PythonException = (*env)->GetMethodID(env, JPYTHONEXCE_TYPE, "<init>",
+                                               "(Ljava/lang/String;)V");
+  }
+  return (*env)->NewObject(env, JPYTHONEXCE_TYPE, init_PythonException, jmg);
 }

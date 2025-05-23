@@ -17,21 +17,17 @@
 static jmethodID size = 0;
 static jmethodID contains = 0;
 
-jint
-JavaCollection_size(JNIEnv* env, jobject object)
-{
-    if (!size) {
-        size = (*env)->GetMethodID(env, JCOLLECTION_TYPE, "size", "()I");
-    }
-    return (*env)->CallIntMethod(env, object, size);
+jint JavaCollection_size(JNIEnv* env, jobject object) {
+  if (!size) {
+    size = (*env)->GetMethodID(env, JCOLLECTION_TYPE, "size", "()I");
+  }
+  return (*env)->CallIntMethod(env, object, size);
 }
 
-
-jboolean
-JavaCollection_contains(JNIEnv* env, jobject this, jobject object)
-{
-    if (!contains) {
-        contains = (*env)->GetMethodID(env, JCOLLECTION_TYPE, "contains", "(Ljava/lang/Object;)Z");
-    }
-    return (*env)->CallBooleanMethod(env, this, contains, object);
+jboolean JavaCollection_contains(JNIEnv* env, jobject this, jobject object) {
+  if (!contains) {
+    contains = (*env)->GetMethodID(env, JCOLLECTION_TYPE, "contains",
+                                   "(Ljava/lang/Object;)Z");
+  }
+  return (*env)->CallBooleanMethod(env, this, contains, object);
 }

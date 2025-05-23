@@ -12,17 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "Pemja.h"
-
 #include "java_class/Double.h"
+
+#include "Pemja.h"
 
 static jmethodID init_D = 0;
 
-jobject
-JavaDouble_New(JNIEnv* env, jdouble jval)
-{
-    if (!init_D) {
-        init_D = (*env)->GetMethodID(env, JDOUBLE_OBJ_TYPE, "<init>", "(D)V");
-    }
-    return (*env)->NewObject(env, JDOUBLE_OBJ_TYPE, init_D, jval);
+jobject JavaDouble_New(JNIEnv* env, jdouble jval) {
+  if (!init_D) {
+    init_D = (*env)->GetMethodID(env, JDOUBLE_OBJ_TYPE, "<init>", "(D)V");
+  }
+  return (*env)->NewObject(env, JDOUBLE_OBJ_TYPE, init_D, jval);
 }

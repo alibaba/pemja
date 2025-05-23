@@ -12,17 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "Pemja.h"
-
 #include "java_class/Integer.h"
+
+#include "Pemja.h"
 
 static jmethodID init_I = 0;
 
-jobject
-JavaInteger_New(JNIEnv* env, jint jval)
-{
-    if (!init_I) {
-        init_I = (*env)->GetMethodID(env, JINT_OBJ_TYPE, "<init>", "(I)V");
-    }
-    return (*env)->NewObject(env, JINT_OBJ_TYPE, init_I, jval);
+jobject JavaInteger_New(JNIEnv* env, jint jval) {
+  if (!init_I) {
+    init_I = (*env)->GetMethodID(env, JINT_OBJ_TYPE, "<init>", "(I)V");
+  }
+  return (*env)->NewObject(env, JINT_OBJ_TYPE, init_I, jval);
 }

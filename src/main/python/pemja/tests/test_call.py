@@ -15,6 +15,7 @@
 # limitations under the License.
 ################################################################################
 
+
 class A(object):
     def __init__(self):
         self._a = 0
@@ -37,7 +38,7 @@ class A(object):
 
 
 def test_call_no_args():
-    return 'no arg'
+    return "no arg"
 
 
 def test_call_one_arg(arg):
@@ -49,11 +50,11 @@ def test_call_variable_args(*args):
 
 
 def test_call_keywords_args(**kwargs):
-    return kwargs['a']
+    return kwargs["a"]
 
 
 def test_call_all_args(*args, **kwargs):
-    return args[0] + kwargs['a']
+    return args[0] + kwargs["a"]
 
 
 def test_return_generator(num: int):

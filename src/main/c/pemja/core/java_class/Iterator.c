@@ -12,27 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "Pemja.h"
-
 #include "java_class/Iterator.h"
+
+#include "Pemja.h"
 
 static jmethodID hasNext = 0;
 static jmethodID next = 0;
 
-jboolean
-JavaIterator_hasNext(JNIEnv* env, jobject jval)
-{
-    if (!hasNext) {
-        hasNext = (*env)->GetMethodID(env, JITERATOR_TYPE, "hasNext", "()Z");
-    }
-    return (*env)->CallBooleanMethod(env, jval, hasNext);
+jboolean JavaIterator_hasNext(JNIEnv* env, jobject jval) {
+  if (!hasNext) {
+    hasNext = (*env)->GetMethodID(env, JITERATOR_TYPE, "hasNext", "()Z");
+  }
+  return (*env)->CallBooleanMethod(env, jval, hasNext);
 }
 
-jobject
-JavaIterator_next(JNIEnv* env, jobject jval)
-{
-    if (!next) {
-        next = (*env)->GetMethodID(env, JITERATOR_TYPE, "next", "()Ljava/lang/Object;");
-    }
-    return (*env)->CallObjectMethod(env, jval, next);
+jobject JavaIterator_next(JNIEnv* env, jobject jval) {
+  if (!next) {
+    next = (*env)->GetMethodID(env, JITERATOR_TYPE, "next",
+                               "()Ljava/lang/Object;");
+  }
+  return (*env)->CallObjectMethod(env, jval, next);
 }

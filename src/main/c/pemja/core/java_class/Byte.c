@@ -11,17 +11,15 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#include "Pemja.h"
-
 #include "java_class/Byte.h"
+
+#include "Pemja.h"
 
 static jmethodID init_B = 0;
 
-jobject
-JavaByte_New(JNIEnv* env, jbyte jval)
-{
-    if (!init_B) {
-        init_B = (*env)->GetMethodID(env, JBYTE_OBJ_TYPE, "<init>", "(B)V");
-    }
-    return (*env)->NewObject(env, JBYTE_OBJ_TYPE, init_B, jval);
+jobject JavaByte_New(JNIEnv* env, jbyte jval) {
+  if (!init_B) {
+    init_B = (*env)->GetMethodID(env, JBYTE_OBJ_TYPE, "<init>", "(B)V");
+  }
+  return (*env)->NewObject(env, JBYTE_OBJ_TYPE, init_B, jval);
 }

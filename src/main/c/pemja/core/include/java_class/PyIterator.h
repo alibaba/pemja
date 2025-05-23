@@ -26,11 +26,11 @@ extern "C" {
  * Method:    next
  * Signature: (JJ)Ljava/lang/Object;
  */
-JNIEXPORT jobject JNICALL Java_pemja_core_object_PyIterator_next
-  (JNIEnv *, jobject, jlong, jlong);
+JNIEXPORT jobject JNICALL Java_pemja_core_object_PyIterator_next(JNIEnv *,
+                                                                 jobject, jlong,
+                                                                 jlong);
 
-
-jobject JavaPyIterator_New(JNIEnv*, jlong, jlong);
+jobject JavaPyIterator_New(JNIEnv *, jlong, jlong);
 
 #ifdef __cplusplus
 }

@@ -15,28 +15,28 @@
 #define _Included_pyjmethod
 
 typedef struct {
-    PyObject_HEAD
+  PyObject_HEAD
 
-    /* The corresponding Java Method object */
-    jobject md;
+      /* The corresponding Java Method object */
+      jobject md;
 
-    /* The corresponding Method ID for the Java Method object */
-    jmethodID md_id;
+  /* The corresponding Method ID for the Java Method object */
+  jmethodID md_id;
 
-    /* The method name */
-    PyObject *md_name;
+  /* The method name */
+  PyObject *md_name;
 
-    /* The param array class types of the method */
-    jobjectArray md_params;
+  /* The param array class types of the method */
+  jobjectArray md_params;
 
-    /* The num of the method params */
-    int md_params_num;
+  /* The num of the method params */
+  int md_params_num;
 
-    /* The return type id of the method */
-    int md_return_id;
+  /* The return type id of the method */
+  int md_return_id;
 
-    /* The flag decides whether it is a static method */
-    int md_is_static;
+  /* The flag decides whether it is a static method */
+  int md_is_static;
 } PyJMethodObject;
 
 JcpAPI_DATA(PyTypeObject) PyJMethod_Type;
@@ -44,13 +44,12 @@ JcpAPI_DATA(PyTypeObject) PyJMethod_Type;
 /* Public interface */
 
 /* Creates a new PyJMethodObject with a Java Method Object. */
-JcpAPI_FUNC(PyJMethodObject*) JcpPyJMethod_New(JNIEnv*, jobject);
+JcpAPI_FUNC(PyJMethodObject *) JcpPyJMethod_New(JNIEnv *, jobject);
 
 /* Returns whether the input arguments can match the params of the method. */
-JcpAPI_FUNC(int) JcpPyJMethodMatch(PyJMethodObject*, PyObject*);
+JcpAPI_FUNC(int) JcpPyJMethodMatch(PyJMethodObject *, PyObject *);
 
-#define PyJMethod_Check(op) \
-        PyObject_TypeCheck(op, &PyJMethod_Type)
+#define PyJMethod_Check(op) PyObject_TypeCheck(op, &PyJMethod_Type)
 #define PyJMethod_CheckExact(op) Py_IS_TYPE(op, &PyJMethod_Type)
 
 #endif

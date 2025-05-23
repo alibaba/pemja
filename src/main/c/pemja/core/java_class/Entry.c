@@ -12,27 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "Pemja.h"
-
 #include "java_class/Entry.h"
+
+#include "Pemja.h"
 
 static jmethodID getKey = 0;
 static jmethodID getValue = 0;
 
-jobject
-JavaMapEntry_getKey(JNIEnv* env, jobject jval)
-{
-    if (!getKey) {
-        getKey = (*env)->GetMethodID(env, JMAP_ENTRY_TYPE, "getKey", "()Ljava/lang/Object;");
-    }
-    return (*env)->CallObjectMethod(env, jval, getKey);
+jobject JavaMapEntry_getKey(JNIEnv* env, jobject jval) {
+  if (!getKey) {
+    getKey = (*env)->GetMethodID(env, JMAP_ENTRY_TYPE, "getKey",
+                                 "()Ljava/lang/Object;");
+  }
+  return (*env)->CallObjectMethod(env, jval, getKey);
 }
 
-jobject
-JavaMapEntry_getValue(JNIEnv* env, jobject jval)
-{
-    if (!getValue) {
-        getValue = (*env)->GetMethodID(env, JMAP_ENTRY_TYPE, "getValue", "()Ljava/lang/Object;");
-    }
-    return (*env)->CallObjectMethod(env, jval, getValue);
+jobject JavaMapEntry_getValue(JNIEnv* env, jobject jval) {
+  if (!getValue) {
+    getValue = (*env)->GetMethodID(env, JMAP_ENTRY_TYPE, "getValue",
+                                   "()Ljava/lang/Object;");
+  }
+  return (*env)->CallObjectMethod(env, jval, getValue);
 }

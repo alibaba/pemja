@@ -12,18 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "Pemja.h"
-
 #include "java_class/Constructor.h"
+
+#include "Pemja.h"
 
 static jmethodID getParameterTypes = 0;
 
-jobjectArray
-JavaConstructor_getParameterTypes(JNIEnv* env, jobject this)
-{
-    if (!getParameterTypes) {
-        getParameterTypes = (*env)->GetMethodID(env, JCONSTRUCTOR_TYPE, "getParameterTypes",
-                                                "()[Ljava/lang/Class;");
-    }
-    return (*env)->CallObjectMethod(env, this, getParameterTypes);
+jobjectArray JavaConstructor_getParameterTypes(JNIEnv* env, jobject this) {
+  if (!getParameterTypes) {
+    getParameterTypes = (*env)->GetMethodID(
+        env, JCONSTRUCTOR_TYPE, "getParameterTypes", "()[Ljava/lang/Class;");
+  }
+  return (*env)->CallObjectMethod(env, this, getParameterTypes);
 }

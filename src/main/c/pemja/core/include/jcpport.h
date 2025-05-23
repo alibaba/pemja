@@ -16,10 +16,10 @@
 
 /* If no external linkage macros defined by now, create defaults */
 #ifndef JcpAPI_FUNC
-    #define JcpAPI_FUNC(RTYPE) Jcp_EXPORTED_SYMBOL RTYPE
+#define JcpAPI_FUNC(RTYPE) Jcp_EXPORTED_SYMBOL RTYPE
 #endif
 #ifndef JcpAPI_DATA
-    #define JcpAPI_DATA(RTYPE) extern Jcp_EXPORTED_SYMBOL RTYPE
+#define JcpAPI_DATA(RTYPE) extern Jcp_EXPORTED_SYMBOL RTYPE
 #endif
 
 #endif
