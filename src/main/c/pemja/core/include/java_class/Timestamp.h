@@ -14,6 +14,8 @@
 #ifndef _Included_java_sql_Timestamp
 #define _Included_java_sql_Timestamp
 
+#include <jni.h>
+
 jobject JavaSqlTimestamp_New(JNIEnv*, jint, jint, jint, jint, jint, jint, jint);
 jobject JavaSqlTimestamp_valueOf(JNIEnv*, jobject);
 jobject JavaSqlTimestamp_toLocalDateTime(JNIEnv*, jobject);

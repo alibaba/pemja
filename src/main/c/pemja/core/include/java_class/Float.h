@@ -14,6 +14,8 @@
 #ifndef _Included_java_lang_Float
 #define _Included_java_lang_Float
 
+#include <jni.h>
+
 jobject JavaFloat_New(JNIEnv*, jfloat);
 
 #endif

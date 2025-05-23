@@ -14,6 +14,8 @@
 #ifndef _Included_java_time_LocalTime
 #define _Included_java_time_LocalTime
 
+#include <jni.h>
+
 jobject JavaLocalTime_ofNanoOfDay(JNIEnv*, jlong);
 jlong JavaLocalTime_toNanoOfDay(JNIEnv*, jobject);
 

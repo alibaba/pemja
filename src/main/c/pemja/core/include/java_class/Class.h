@@ -14,6 +14,8 @@
 #ifndef _Included_java_lang_Class
 #define _Included_java_lang_Class
 
+#include <jni.h>
+
 jstring JavaClass_getName(JNIEnv*, jobject);
 jobjectArray JavaClass_getConstructors(JNIEnv*, jobject);
 jobjectArray JavaClass_getMethods(JNIEnv*, jobject);

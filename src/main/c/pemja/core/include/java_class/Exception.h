@@ -14,6 +14,8 @@
 #ifndef _Included_java_lang_Exception
 #define _Included_java_lang_Exception
 
+#include <jni.h>
+
 jobject JavaPythonException_New(JNIEnv*, jstring);
 
 #endif

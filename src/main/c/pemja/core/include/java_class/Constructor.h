@@ -14,6 +14,8 @@
 #ifndef _Included_java_lang_reflect_Constructor
 #define _Included_java_lang_reflect_Constructor
 
+#include <jni.h>
+
 jobjectArray JavaConstructor_getParameterTypes(JNIEnv*, jobject);
 
 #endif

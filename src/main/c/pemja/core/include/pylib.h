@@ -14,6 +14,8 @@
 #ifndef _Included_pylib
 #define _Included_pylib
 
+#include "pyutils.h"
+
 #define DICT_KEY "jcp"
 
 struct __JcpThread {

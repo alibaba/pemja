@@ -14,6 +14,8 @@
 #ifndef _Included_java_lang_reflect_Field
 #define _Included_java_lang_reflect_Field
 
+#include <jni.h>
+
 jclass JavaField_getType(JNIEnv*, jobject);
 jint JavaField_getModifiers(JNIEnv*, jobject);
 

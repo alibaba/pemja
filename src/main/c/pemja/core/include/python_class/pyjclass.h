@@ -14,6 +14,8 @@
 #ifndef _Included_pyjclass
 #define _Included_pyjclass
 
+#include "pyjobject.h"
+
 typedef struct {
   PyJOjbect_HEAD
 

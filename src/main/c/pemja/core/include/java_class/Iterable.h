@@ -14,6 +14,8 @@
 #ifndef _Included_java_lang_Iterable
 #define _Included_java_lang_Iterable
 
+#include <jni.h>
+
 jobject JavaIterable_iterator(JNIEnv*, jobject);
 
 #endif

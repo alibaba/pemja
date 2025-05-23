@@ -14,6 +14,8 @@
 #ifndef _Included_java_math_BigDecimal
 #define _Included_java_math_BigDecimal
 
+#include <jni.h>
+
 jobject JavaBigDecimal_New(JNIEnv*, jstring);
 jstring JavaBigDecimal_toString(JNIEnv*, jobject);
 

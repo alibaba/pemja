@@ -14,6 +14,8 @@
 #ifndef _Included_java_lang_Character
 #define _Included_java_lang_Character
 
+#include <jni.h>
+
 jobject JavaCharacter_New(JNIEnv*, jchar);
 jchar JavaCharacter_charValue(JNIEnv*, jobject);
 

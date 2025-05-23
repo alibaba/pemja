@@ -14,6 +14,8 @@
 #ifndef _Included_java_util_List
 #define _Included_java_util_List
 
+#include <jni.h>
+
 jobject JavaList_NewArrayList(JNIEnv*);
 jboolean JavaList_Add(JNIEnv*, jobject, jobject);
 

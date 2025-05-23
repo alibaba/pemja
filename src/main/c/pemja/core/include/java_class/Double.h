@@ -14,6 +14,8 @@
 #ifndef _Included_java_lang_Double
 #define _Included_java_lang_Double
 
+#include <jni.h>
+
 jobject JavaDouble_New(JNIEnv*, jdouble);
 
 #endif
