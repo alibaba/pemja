@@ -170,7 +170,7 @@
 
                         <!-- \# refers to the static imports -->
                         <importOrder>
-                            <order>org.apache.flink,org.apache.flink.shaded,,javax,java,scala,\#</order>
+                            <order>,javax,java,scala,\#</order>
                         </importOrder>
 
                         <removeUnusedImports />
