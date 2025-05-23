@@ -23,10 +23,6 @@ Java Maven Dependency
 </dependency>
 ```
 
-## Dependencies
-
-- [NumPy - Adds support for large, multi-dimensional arrays, matrices and high-level mathematical functions to operate on these arrays](https://www.numpy.org)
-
 ## Installation from sources
 
 Prerequisites for building PemJa:
@@ -128,3 +124,6 @@ print(interpreter.invoke("call_back.callback_java"))
 ```
 
 ## Documentation
+
+### How To Contribute
+* [Contributing](CONTRIBUTING.md)
