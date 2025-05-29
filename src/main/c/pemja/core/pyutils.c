@@ -357,9 +357,9 @@ PyObject* JcpPyObject_FromJObject(JNIEnv* env, jobject value) {
       free(msg);
     }
   } else if ((*env)->IsAssignableFrom(env, clazz, JLIST_TYPE)) {
-    result = JcpPyList_FromJListObject(env, value);
+    result = JcpPyJList_New(env, value, clazz);
   } else if ((*env)->IsAssignableFrom(env, clazz, JMAP_TYPE)) {
-    result = JcpPyDict_FromJMap(env, value);
+    result = JcpPyJDict_New(env, value, clazz);
   } else if ((*env)->IsSameObject(env, clazz, JCHAR_OBJ_TYPE)) {
     result = JcpPyString_FromJChar(env, value);
   } else if ((*env)->IsAssignableFrom(env, clazz, JUTILDATE_TYPE)) {

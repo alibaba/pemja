@@ -11,19 +11,15 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#ifndef PYTHON_CLASS_H
-#define PYTHON_CLASS_H
+#ifndef PEMJA_PYJDICT_H
+#define PEMJA_PYJDICT_H
 
-#include <python_class/pyjclass.h>
-#include <python_class/pyjcollection.h>
-#include <python_class/pyjconstructor.h>
-#include <python_class/pyjdict.h>
-#include <python_class/pyjfield.h>
-#include <python_class/pyjiterable.h>
-#include <python_class/pyjiterator.h>
-#include <python_class/pyjlist.h>
-#include <python_class/pyjmethod.h>
-#include <python_class/pyjmultimethod.h>
-#include <python_class/pyjobject.h>
+JcpAPI_DATA(PyTypeObject) PyJDict_Type;
 
-#endif
+/* Public interface */
+JcpAPI_FUNC(PyObject*) JcpPyJDict_New(JNIEnv*, jobject, jclass);
+
+#define PyJDict_Check(op) PyObject_TypeCheck(op, &PyJDict_Type)
+#define PyJDict_CheckExact(op) op->ob_type == &PyJDict_Type
+
+#endif  // PEMJA_PYJDICT_H

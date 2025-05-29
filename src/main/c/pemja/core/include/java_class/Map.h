@@ -19,5 +19,9 @@
 jobject JavaMap_NewHashMap(JNIEnv*);
 jobject JavaMap_entrySet(JNIEnv*, jobject);
 jobject JavaMap_put(JNIEnv* env, jobject, jobject, jobject);
+jobject JavaMap_get(JNIEnv*, jobject, jobject);
+jobject JavaMap_remove(JNIEnv*, jobject, jobject);
+jboolean JavaMap_containsKey(JNIEnv*, jobject, jobject);
+jint JavaMap_size(JNIEnv*, jobject);
 
 #endif
