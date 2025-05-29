@@ -17,6 +17,11 @@
 #include <jni.h>
 
 jobject JavaList_NewArrayList(JNIEnv*);
+jobject JavaList_NewArrayListWithCapacity(JNIEnv* env, jint capacity);
+jobject JavaList_NewArrayListWithCollection(JNIEnv*, jobject);
 jboolean JavaList_Add(JNIEnv*, jobject, jobject);
+jboolean JavaList_AddAll(JNIEnv*, jobject, jobject);
+jobject JavaList_Get(JNIEnv*, jobject, jint);
+jobject JavaList_Set(JNIEnv*, jobject, jint, jobject);
 
 #endif

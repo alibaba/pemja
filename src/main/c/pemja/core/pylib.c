@@ -253,6 +253,24 @@ static int pyjtypes_init() {
     return -1;
   }
 
+  // list
+  if (!PyJList_Type.tp_base) {
+    PyJList_Type.tp_base = &PyJCollection_Type;
+  }
+
+  if (PyType_Ready(&PyJList_Type) < 0) {
+    return -1;
+  }
+
+  // dict
+  if (!PyJDict_Type.tp_base) {
+    PyJDict_Type.tp_base = &PyJObject_Type;
+  }
+
+  if (PyType_Ready(&PyJDict_Type) < 0) {
+    return -1;
+  }
+
   return 0;
 }
 
