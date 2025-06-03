@@ -35,9 +35,6 @@ public class CommonUtils {
     private static final String GET_PYTHON_LIB_PATH_SCRIPT =
             "from find_libpython import find_libpython;" + "print(find_libpython())";
 
-    private static final String GET_SITE_PACKAGES_PATH_SCRIPT =
-            "import sysconfig; print(sysconfig.get_paths()['purelib'])";
-
     private static final String GET_PEMJA_MODULE_PATH_SCRIPT =
             "import pemja;" + "import os;" + "print(os.path.dirname(pemja.__file__))";
 
@@ -117,7 +114,8 @@ public class CommonUtils {
                             System.getProperty("user.dir"),
                             "src",
                             "main",
-                            "python");
+                            "python",
+                            "pemja");
             File pythonModuleFile = new File(pythonModulePath);
             for (File f : Objects.requireNonNull(pythonModuleFile.listFiles())) {
                 if (f.isFile() && Pattern.matches(pattern, f.getName())) {
@@ -131,8 +129,7 @@ public class CommonUtils {
         } else {
             String sitePackagesPath;
             try {
-                String out =
-                        execute(new String[] {pythonExec, "-c", GET_SITE_PACKAGES_PATH_SCRIPT});
+                String out = execute(new String[] {pythonExec, "-c", GET_PEMJA_MODULE_PATH_SCRIPT});
                 sitePackagesPath = String.join(File.pathSeparator, out.trim().split("\n"));
             } catch (IOException e) {
                 throw new RuntimeException(
