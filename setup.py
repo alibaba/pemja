@@ -200,20 +200,20 @@ class build_ext(old_build_ext):
 
 extensions = ([
     Extension(
-        name="pemja_core",
+        name="pemja.pemja_core",
         sources=get_files('src/main/c/pemja/core', '.c'),
         libraries=get_java_libraries() + get_python_libs(),
         library_dirs = get_java_lib_folders(),
         extra_link_args=get_java_linker_args(),
         include_dirs=get_java_include() + ['src/main/c/pemja/core/include'],
-        language="3"),
+        language="c"),
     Extension(
-        name="pemja_utils",
+        name="pemja.pemja_utils",
         sources=get_files('src/main/c/pemja/utils', '.c'),
         library_dirs = get_java_lib_folders(),
         extra_link_args=get_java_linker_args(),
         include_dirs=get_java_include() + ['src/main/c/pemja/utils/include'],
-        language="3")
+        language="c")
 ])
 
 PACKAGE_DATA = {
