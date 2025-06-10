@@ -1317,6 +1317,22 @@ jobject JcpPyInt_AsJObject(JNIEnv* env, PyObject* pyobject, jclass clazz) {
     }
 
     result = JavaInteger_New(env, i);
+  } else if ((*env)->IsAssignableFrom(env, JDOUBLE_OBJ_TYPE, clazz)) {
+    l = JcpPyInt_AsJLong(pyobject);
+
+    if (l == -1 && PyErr_Occurred()) {
+      return NULL;
+    }
+
+    result = JavaDouble_New(env, (jdouble)l * 1.0);
+  } else if ((*env)->IsAssignableFrom(env, JFLOAT_OBJ_TYPE, clazz)) {
+    l = JcpPyInt_AsJLong(pyobject);
+
+    if (l == -1 && PyErr_Occurred()) {
+      return NULL;
+    }
+
+    result = JavaFloat_New(env, (jfloat)l * 1.0f);
   }
 
   if (!result) {
@@ -1361,6 +1377,29 @@ jobject JcpPyFloat_AsJObject(JNIEnv* env, PyObject* pyobject, jclass clazz) {
     }
 
     result = JavaFloat_New(env, f);
+  } else if ((*env)->IsAssignableFrom(env, JLONG_OBJ_TYPE, clazz)) {
+    d = JcpPyFloat_AsJDouble(pyobject);
+
+    if (d == -1.0 && PyErr_Occurred()) {
+      return NULL;
+    }
+    result = JavaLong_New(env, (jlong)d);
+  } else if ((*env)->IsAssignableFrom(env, JINT_OBJ_TYPE, clazz)) {
+    d = JcpPyFloat_AsJDouble(pyobject);
+
+    if (d == -1.0 && PyErr_Occurred()) {
+      return NULL;
+    }
+
+    result = JavaInteger_New(env, (jint)d);
+  } else if ((*env)->IsAssignableFrom(env, JSHORT_OBJ_TYPE, clazz)) {
+    d = JcpPyFloat_AsJDouble(pyobject);
+
+    if (d == -1.0 && PyErr_Occurred()) {
+      return NULL;
+    }
+
+    result = JavaShort_New(env, (jshort)d);
   }
 
   if (!result) {
