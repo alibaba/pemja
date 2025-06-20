@@ -409,6 +409,7 @@ JcpPyObject_FromJObject(JNIEnv* env, jobject value)
         result = JcpPyJIterator_New(env, value, clazz);
     } else if ((*env)->IsAssignableFrom(env, clazz, JPYOBJECT_TYPE)) {
         result = (PyObject*) JavaPyObject_GetPyobject(env, value);
+        Py_XINCREF(result);
     } else {
         result = JcpPyJObject_New(env, &PyJObject_Type, value, clazz);
     }
