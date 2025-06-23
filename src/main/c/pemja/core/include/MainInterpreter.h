@@ -24,11 +24,12 @@ extern "C" {
 /*
  * Class:     pemja_core_PythonInterpreter_MainInterpreter
  * Method:    initialize
- * Signature: (Ljava/lang/String;)V
+ * Signature: (Ljava/lang/String;Ljava/lang/String;)V
  */
 JNIEXPORT void JNICALL
 Java_pemja_core_PythonInterpreter_00024MainInterpreter_initialize(JNIEnv *,
                                                                   jobject,
+                                                                  jstring,
                                                                   jstring);
 
 /*

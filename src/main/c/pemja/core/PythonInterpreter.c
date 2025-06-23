@@ -46,12 +46,12 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
 /*
  * Class:     pemja_core_PythonInterpreter_MainInterpreter
  * Method:    initialize
- * Signature: (Ljava/lang/String;)V
+ * Signature: (Ljava/lang/String;Ljava/lang/String;)V
  */
 JNIEXPORT void JNICALL
 Java_pemja_core_PythonInterpreter_00024MainInterpreter_initialize(
-    JNIEnv *env, jobject obj, jstring python_home) {
-  JcpPy_Initialize(env, python_home);
+    JNIEnv *env, jobject obj, jstring python_home, jstring working_dir) {
+  JcpPy_Initialize(env, python_home, working_dir);
 }
 
 /*

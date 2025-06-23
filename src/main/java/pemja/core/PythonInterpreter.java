@@ -371,7 +371,8 @@ public final class PythonInterpreter implements Interpreter {
                             @Override
                             public void run() {
                                 try {
-                                    initialize(config.getPythonHome());
+                                    initialize(
+                                            config.getPythonHome(), config.getWorkingDirectory());
                                     // add shared modules
                                     addToPath(
                                             CommonUtils.INSTANCE.getPemJaModulePath(
@@ -416,7 +417,7 @@ public final class PythonInterpreter implements Interpreter {
         }
 
         /** Initialize Python Interpreter. */
-        private native void initialize(String pythonHome);
+        private native void initialize(String pythonHome, String workingDirectory);
 
         /** Adds the search path to the main interpreter. */
         private native void addToPath(String path);
