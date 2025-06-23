@@ -26,6 +26,11 @@ PyMODINIT_FUNC PyInit_pemja_utils(void) {
 }
 #else
 // linux and macos
+
+__asm__(".symver dlopen,dlopen@GLIBC_2.2.5");
+__asm__(".symver dlclose,dlclose@GLIBC_2.2.5");
+__asm__(".symver dlerror,dlerror@GLIBC_2.2.5");
+
 #include <dlfcn.h>
 #endif
 
