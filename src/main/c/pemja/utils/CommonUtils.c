@@ -25,6 +25,11 @@
         return NULL;
     }
 #else
+#if defined(__linux__) && defined(__GNUC__)
+__asm__(".symver dlopen,dlopen@GLIBC_2.2.5");
+__asm__(".symver dlclose,dlclose@GLIBC_2.2.5");
+__asm__(".symver dlerror,dlerror@GLIBC_2.2.5");
+#endif
     // linux and macos
     #include <dlfcn.h>
 #endif
