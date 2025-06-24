@@ -281,7 +281,7 @@ void JcpPy_setPythonHome(JNIEnv *env, jstring home) {
   Py_SetPythonHome(home_for_python);
 }
 
-void JcpPy_Initialize(JNIEnv *env, jstring python_home) {
+void JcpPy_Initialize(JNIEnv *env, jstring python_home, jstring working_dir) {
   PyObject *sys_modules = NULL;
   PyObject *redirection_module = NULL;
 
@@ -345,6 +345,13 @@ void JcpPy_Initialize(JNIEnv *env, jstring python_home) {
         (*env)->GetStringUTFChars(env, python_home, NULL);
     Py_SetPythonHome(Py_DecodeLocale(python_home_chars, NULL));
     (*env)->ReleaseStringUTFChars(env, python_home, python_home_chars);
+  }
+
+  if (working_dir) {
+    const char *working_dir_chars =
+        (*env)->GetStringUTFChars(env, working_dir, NULL);
+    chdir(working_dir_chars);
+    (*env)->ReleaseStringUTFChars(env, working_dir, working_dir_chars);
   }
 
 EXIT:
