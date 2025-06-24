@@ -15,3 +15,6 @@
 // specific language governing permissions and limitations
 // under the License.
 __asm__(".symver memcpy,memcpy@GLIBC_2.2.5");
+__asm__(".symver dlopen,dlopen@GLIBC_2.2.5");
+__asm__(".symver dlclose,dlclose@GLIBC_2.2.5");
+__asm__(".symver dlerror,dlerror@GLIBC_2.2.5");
