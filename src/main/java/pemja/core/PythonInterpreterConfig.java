@@ -43,6 +43,9 @@ public final class PythonInterpreterConfig {
     /** Sets python home. */
     private final String pythonHome;
 
+    /** Sets working directory. */
+    private final String workingDirectory;
+
     /** Defines the search paths for module files. */
     private final String[] paths;
 
@@ -53,8 +56,13 @@ public final class PythonInterpreterConfig {
     private final ExecType execType;
 
     private PythonInterpreterConfig(
-            String pythonHome, String[] paths, String pythonExec, ExecType execType) {
+            String pythonHome,
+            String workingDirectory,
+            String[] paths,
+            String pythonExec,
+            ExecType execType) {
         this.pythonHome = pythonHome;
+        this.workingDirectory = workingDirectory;
         this.paths = paths;
         this.pythonExec = pythonExec;
         this.execType = execType;
@@ -63,6 +71,11 @@ public final class PythonInterpreterConfig {
     /** Returns the python home. */
     public String getPythonHome() {
         return pythonHome;
+    }
+
+    /** Returns the working directory. */
+    public String getWorkingDirectory() {
+        return workingDirectory;
     }
 
     /** Returns the search paths. */
@@ -87,14 +100,22 @@ public final class PythonInterpreterConfig {
 
     public static class PythonInterpreterConfigBuilder {
         private String pythonHome = null;
-        private Set<String> paths = new LinkedHashSet<>();
+        private String workingDirectory = null;
+        private final Set<String> paths = new LinkedHashSet<>();
 
         private String pythonExec = null;
 
         private ExecType execType = ExecType.MULTI_THREAD;
 
+        /** Sets Python Home. */
         public PythonInterpreterConfigBuilder setPythonHome(String pythonHome) {
             this.pythonHome = pythonHome;
+            return this;
+        }
+
+        /** Sets the working directory. */
+        public PythonInterpreterConfigBuilder setWorkingDirectory(String workingDirectory) {
+            this.workingDirectory = workingDirectory;
             return this;
         }
 
@@ -158,7 +179,11 @@ public final class PythonInterpreterConfig {
         /** Creates the actual {@link PythonInterpreterConfig}. */
         public PythonInterpreterConfig build() {
             return new PythonInterpreterConfig(
-                    pythonHome, paths.toArray(new String[0]), pythonExec, execType);
+                    pythonHome,
+                    workingDirectory,
+                    paths.toArray(new String[0]),
+                    pythonExec,
+                    execType);
         }
     }
 
