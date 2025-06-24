@@ -8,5 +8,8 @@ requires = [
     "wheel==0.37.0",
 ]
 
+[tool.cibuildwheel]
+enable = ["cpython-freethreading"]
+
 [tool.cibuildwheel.macos]
 archs = "x86_64 arm64"
