@@ -231,7 +231,11 @@ function install_py_env() {
         print_function "STEP" "installing python${py_env[i]}..."
         max_retry_times=3
         retry_times=0
-        install_command="$CONDA_PATH create --name ${py_env[i]} -y -q python=${py_env[i]}"
+        if [[ ${py_env[i]} == "3.13t" ]]; then
+          install_command="$CONDA_PATH create --name ${py_env[i]} -y -q python-freethreading -c conda-forge"
+        else
+          install_command="$CONDA_PATH create --name ${py_env[i]} -y -q python=${py_env[i]}"
+        fi
         ${install_command} 2>&1 >/dev/null
         status=$?
         while [[ ${status} -ne 0 ]] && [[ ${retry_times} -lt ${max_retry_times} ]]; do
