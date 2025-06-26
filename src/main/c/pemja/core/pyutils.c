@@ -390,6 +390,8 @@ PyObject* JcpPyObject_FromJObject(JNIEnv* env, jobject value) {
   } else if ((*env)->IsAssignableFrom(env, clazz, JPYOBJECT_TYPE)) {
     result = (PyObject*)JavaPyObject_GetPyobject(env, value);
     Py_XINCREF(result);
+  } else if ((*env)->IsAssignableFrom(env, clazz, JMAP_ENTRY_TYPE)) {
+    result = JcpPyTuple_FromJMapEntry(env, value);
   } else {
     result = JcpPyJObject_New(env, &PyJObject_Type, value, clazz);
   }
@@ -762,6 +764,19 @@ PyObject* JcpPyTuple_FromJObjectArray(JNIEnv* env, jobjectArray value) {
     PyTuple_SetItem(result, i, JcpPyObject_FromJObject(env, element));
     (*env)->DeleteLocalRef(env, element);
   }
+
+  return result;
+}
+
+PyObject* JcpPyTuple_FromJMapEntry(JNIEnv* env, jobject value) {
+  PyObject* result;
+
+  result = PyTuple_New(2);
+  PyTuple_SetItem(
+      result, 0, JcpPyObject_FromJObject(env, JavaMapEntry_getKey(env, value)));
+  PyTuple_SetItem(
+      result, 1,
+      JcpPyObject_FromJObject(env, JavaMapEntry_getValue(env, value)));
 
   return result;
 }

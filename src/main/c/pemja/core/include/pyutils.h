@@ -215,6 +215,9 @@ JcpAPI_FUNC(PyObject *) JcpPyTuple_FromJDoubleArray(JNIEnv *, jdoubleArray);
 /* Function to return a Python Tuple from a Java object array */
 JcpAPI_FUNC(PyObject *) JcpPyTuple_FromJObjectArray(JNIEnv *, jobjectArray);
 
+/* Function to return a Python Tuple from a Java Map entry */
+JcpAPI_FUNC(PyObject *) JcpPyTuple_FromJMapEntry(JNIEnv *, jobject);
+
 /* Function to return a Python List from a Java List object */
 JcpAPI_FUNC(PyObject *) JcpPyList_FromJListObject(JNIEnv *, jobject);
 

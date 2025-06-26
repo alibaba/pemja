@@ -95,6 +95,39 @@ static PyMappingMethods pyjdict_as_mapping = {
     pyjdict_ass_sub,   /* mp_ass_subscript */
 };
 
+static PyObject* PyJObject_keys(PyObject* self) {
+  JNIEnv* env = JcpThreadEnv_Get();
+  return JcpPyObject_FromJObject(
+      env, JavaMap_keySet(env, ((PyJObject*)self)->object));
+}
+
+static PyObject* PyJObject_values(PyObject* self) {
+  JNIEnv* env = JcpThreadEnv_Get();
+  return JcpPyObject_FromJObject(
+      env, JavaMap_values(env, ((PyJObject*)self)->object));
+}
+
+static PyObject* PyJObject_items(PyObject* self) {
+  JNIEnv* env = JcpThreadEnv_Get();
+  return JcpPyObject_FromJObject(
+      env, JavaMap_entrySet(env, ((PyJObject*)self)->object));
+}
+
+static PyObject* PyJObject_to_dict(PyObject* self) {
+  JNIEnv* env = JcpThreadEnv_Get();
+  return JcpPyDict_FromJMap(env, ((PyJObject*)self)->object);
+}
+
+static PyMethodDef dict_methods[] = {
+    {"__getitem__", (PyCFunction)pyjdict_subscript, METH_O | METH_COEXIST,
+     NULL},
+    {"keys", (PyCFunction)PyJObject_keys, METH_NOARGS, NULL},
+    {"values", (PyCFunction)PyJObject_values, METH_NOARGS, NULL},
+    {"items", (PyCFunction)PyJObject_items, METH_NOARGS, NULL},
+    {"to_dict", (PyCFunction)PyJObject_to_dict, METH_NOARGS, NULL},
+    {NULL, NULL, 0, NULL},
+};
+
 PyTypeObject PyJDict_Type = {
     PyVarObject_HEAD_INIT(NULL, 0) "pemja.PyJDict", /* tp_name */
     sizeof(PyJObject),                              /* tp_basicsize */
@@ -122,7 +155,7 @@ PyTypeObject PyJDict_Type = {
     0,                                              /* tp_weaklistoffset */
     0,                                              /* tp_iter */
     0,                                              /* tp_iternext */
-    0,                                              /* tp_methods */
+    dict_methods,                                   /* tp_methods */
     0,                                              /* tp_members */
     0,                                              /* tp_getset */
     0,                                              /* tp_base */
