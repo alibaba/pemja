@@ -186,6 +186,9 @@ static PyObject *pyjobject_getattro(PyObject *self, PyObject *name) {
 
   result = NULL;
   if (attr == NULL) {
+    PyErr_Format(PyExc_AttributeError,
+                 "Unknown attributes %R, alternative attributes in %R", name,
+                 PyDict_Keys(cachedAttrs));
     return NULL;
   } else if (PyJMethod_Check(attr) || PyJMultiMethod_Check(attr)) {
     result = PyMethod_New(attr, self);
