@@ -196,7 +196,7 @@ pyjobject_getattro(PyObject *self, PyObject *name)
 
     result = NULL;
     if (attr == NULL) {
-        return NULL;
+      return PyObject_GenericGetAttr(self, name);
     } else if (PyJMethod_Check(attr) || PyJMultiMethod_Check(attr)) {
         result = PyMethod_New(attr, self);
     } else if (PyJField_Check(attr)) {
