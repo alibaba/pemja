@@ -383,6 +383,9 @@ public class PythonInterpreterTest {
             assertEquals(
                     valuesIter,
                     interpreter.invoke("test_pyjobject.test_call_iterator", valuesIter));
+            assertEquals(map.values(), interpreter.invoke("test_pyjobject.test_map", map));
+            ArrayList<String> keys = new ArrayList<>(map.keySet());
+            assertEquals(keys, interpreter.invoke("test_pyjobject.test_list", keys));
         }
     }
 
