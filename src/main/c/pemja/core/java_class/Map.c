@@ -23,6 +23,8 @@ static jmethodID get = 0;
 static jmethodID remove_key = 0;
 static jmethodID contains_key = 0;
 static jmethodID size = 0;
+static jmethodID key_set = 0;
+static jmethodID values = 0;
 
 jobject JavaMap_NewHashMap(JNIEnv* env) {
   if (!init_HashMap) {
@@ -79,4 +81,20 @@ jint JavaMap_size(JNIEnv* env, jobject object) {
     size = (*env)->GetMethodID(env, JMAP_TYPE, "size", "()I");
   }
   return (*env)->CallIntMethod(env, object, size);
+}
+
+jobject JavaMap_keySet(JNIEnv* env, jobject object) {
+  if (!key_set) {
+    key_set =
+        (*env)->GetMethodID(env, JMAP_TYPE, "keySet", "()Ljava/util/Set;");
+  }
+  return (*env)->CallObjectMethod(env, object, key_set);
+}
+
+jobject JavaMap_values(JNIEnv* env, jobject object) {
+  if (!values) {
+    values = (*env)->GetMethodID(env, JMAP_TYPE, "values",
+                                 "()Ljava/util/Collection;");
+  }
+  return (*env)->CallObjectMethod(env, object, values);
 }

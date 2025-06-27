@@ -186,7 +186,7 @@ static PyObject *pyjobject_getattro(PyObject *self, PyObject *name) {
 
   result = NULL;
   if (attr == NULL) {
-    return NULL;
+    return PyObject_GenericGetAttr(self, name);
   } else if (PyJMethod_Check(attr) || PyJMultiMethod_Check(attr)) {
     result = PyMethod_New(attr, self);
   } else if (PyJField_Check(attr)) {
@@ -203,8 +203,7 @@ static int pyjobject_setattro(PyJObject *self, PyObject *name,
   attr = PyDict_GetItem(cachedAttrs, name);
 
   if (attr == NULL) {
-    PyErr_Format(PyExc_AttributeError, "'%s' object has no attribute '%s'.",
-                 PyUnicode_AsUTF8(self->class_name), PyUnicode_AsUTF8(name));
+    return PyObject_GenericSetAttr(self->attr, name, value);
   }
 
   if (!PyJField_Check(attr)) {

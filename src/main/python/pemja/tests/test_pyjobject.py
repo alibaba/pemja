@@ -42,3 +42,26 @@ def test_call_iterator(iterator):
 
 def test_call_java_object(o):
     return o
+
+
+def test_map(o):
+    assert list(o.keys()) == ["python", "java", "pemja"]
+    for i, (k, v) in enumerate(o.items()):
+        if i == 0:
+            assert k == "python"
+            assert v == 3
+        if i == 1:
+            assert k == "java"
+            assert v == 2
+        if i == 2:
+            assert k == "pemja"
+            assert v == 1
+    return o.values()
+
+
+def test_list(o):
+    assert len(o) == 3
+    assert o[0] == "python"
+    assert o[1] == "java"
+    assert o[2] == "pemja"
+    return o
