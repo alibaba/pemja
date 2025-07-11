@@ -146,7 +146,7 @@ JcpPyErr_Throw(JNIEnv* env)
                         return 1;
                     }
 
-                    (*env)->SetObjectArrayElement(env, stack_elements, i, stack_trace_element);
+                    (*env)->SetObjectArrayElement(env, stack_elements, stackSize - i - 1, stack_trace_element);
                     free(frame_filename_no_suffix);
                     free(frame_filename_no_dir);
                     (*env)->DeleteLocalRef(env, jframe_filename_no_dir);
