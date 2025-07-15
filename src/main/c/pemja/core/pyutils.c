@@ -296,6 +296,9 @@ PyObject* JcpPyObject_FromJObject(JNIEnv* env, jobject value) {
 
   if ((*env)->IsSameObject(env, clazz, JSTRING_TYPE)) {
     result = JcpPyString_FromJString(env, value);
+  } else if ((*env)->IsAssignableFrom(env, clazz, JPYOBJECT_TYPE)) {
+    result = (PyObject*)JavaPyObject_GetPyobject(env, value);
+    Py_XINCREF(result);
   } else if ((*env)->IsSameObject(env, clazz, JBOOLEAN_OBJ_TYPE)) {
     result = JcpPyBool_FromJBoolean(env, value);
   } else if ((*env)->IsSameObject(env, clazz, JBYTE_ARRAY_TYPE)) {
@@ -387,9 +390,6 @@ PyObject* JcpPyObject_FromJObject(JNIEnv* env, jobject value) {
     result = JcpPyJIterable_New(env, value, clazz);
   } else if ((*env)->IsAssignableFrom(env, clazz, JITERATOR_TYPE)) {
     result = JcpPyJIterator_New(env, value, clazz);
-  } else if ((*env)->IsAssignableFrom(env, clazz, JPYOBJECT_TYPE)) {
-    result = (PyObject*)JavaPyObject_GetPyobject(env, value);
-    Py_XINCREF(result);
   } else if ((*env)->IsAssignableFrom(env, clazz, JMAP_ENTRY_TYPE)) {
     result = JcpPyTuple_FromJMapEntry(env, value);
   } else {
