@@ -23,7 +23,9 @@ on:
   push:
     branches: [ '*' ]
   pull_request:
-    branches: [ main ]
+    branches:
+      - main
+      - release-*
 
 jobs:
   build_source:
