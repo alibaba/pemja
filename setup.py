@@ -24,7 +24,7 @@ import warnings
 from setuptools.command.build_ext import build_ext as old_build_ext
 
 from setuptools import setup, Extension
-
+print("test")
 if sys.version_info < (3, 8):
     print('Python versions prior to 3.7 are not supported for PemJa.',
           file=sys.stderr)
