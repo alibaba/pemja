@@ -22,6 +22,7 @@ on:
     - cron: '10 2 * * *'
   push:
     branches: [ '*' ]
+    tags: [ 'release*' ]
   pull_request:
     branches:
       - main
