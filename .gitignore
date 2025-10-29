@@ -11,6 +11,7 @@ build/
 *.html
 *.egg-info
 *.iml
+hs_err*
 target
 **/c/cmake-build-debug/
 3rd_party/
