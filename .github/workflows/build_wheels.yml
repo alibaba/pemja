@@ -69,6 +69,48 @@ jobs:
           name: wheel_ubuntu-22.04
           path: ./dist/
 
+  build_wheels_linux_aarch64:
+    name: Build python wheel for Linux-aarch64
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Install java
+        uses: actions/setup-java@v2
+        with:
+          java-version: '8'
+          distribution: 'adopt'
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64
+
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.11'
+
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v2.23.3
+        env:
+          CIBW_BUILD_VERBOSITY: 3
+          CIBW_ARCHS_LINUX: aarch64
+          CIBW_BUILD: "cp38-manylinux_aarch64 cp39-manylinux_aarch64 cp310-manylinux_aarch64 cp311-manylinux_aarch64 cp312-manylinux_aarch64"
+          CIBW_BEFORE_ALL_LINUX: |
+            sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*.repo && \
+            sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*.repo && \
+            yum-config-manager --disable centos-sclo-rh centos-sclo-sclo && \
+            yum-config-manager --save --setopt=\*.skip_if_unavailable=true && \
+            yum install -y java-1.8.0-openjdk-devel
+          CIBW_ENVIRONMENT_LINUX: >
+            JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk
+            PATH=/usr/lib/jvm/java-1.8.0-openjdk/bin:$PATH
+      - name: Upload wheels as artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: all-manylinux-aarch64-wheels
+          path: ./wheelhouse/*.whl
+
   build_wheels_mac:
     name: Build python wheel for ${{ matrix.python }}-Mac
     runs-on: ${{ matrix.buildplat[0] }}
