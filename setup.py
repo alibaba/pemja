@@ -73,7 +73,8 @@ def get_java_home():
         _java_home = exe_home
         return exe_home
 
-    return None
+    print('JAVA_HOME is not set', file=sys.stderr)
+    sys.exit(-1)
 
 
 def is_osx():
