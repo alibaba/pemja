@@ -44,11 +44,18 @@ pyjobject_init(JNIEnv *env, PyJObject *self)
     self->class_name = JcpPyString_FromJString(env, className);
     jcpThread = JcpThread_Get();
 
-    if (jcpThread->name_to_attrs == NULL) {
-        jcpThread->name_to_attrs = PyDict_New();
+    if (jcpThread != NULL) {
+        if (jcpThread->name_to_attrs == NULL) {
+            jcpThread->name_to_attrs = PyDict_New();
+        }
+        cachedAttrs = PyDict_GetItem(jcpThread->name_to_attrs, self->class_name);
+    } else {
+        // On non-pemja threads (e.g., Python async threads), no JcpThread is
+        // available. Clear the error set by JcpThread_Get() and proceed without
+        // the per-thread attribute cache.
+        PyErr_Clear();
+        cachedAttrs = NULL;
     }
-
-    cachedAttrs = PyDict_GetItem(jcpThread->name_to_attrs, self->class_name);
 
     if (cachedAttrs == NULL) {
         cachedAttrs = PyDict_New();
@@ -129,8 +136,12 @@ pyjobject_init(JNIEnv *env, PyJObject *self)
         }
         (*env)->DeleteLocalRef(env, fields);
 
-        PyDict_SetItem(jcpThread->name_to_attrs, self->class_name, cachedAttrs);
-        Py_DECREF(cachedAttrs);
+        if (jcpThread != NULL) {
+            PyDict_SetItem(jcpThread->name_to_attrs, self->class_name, cachedAttrs);
+            Py_DECREF(cachedAttrs);
+        }
+        // When jcpThread is NULL, we still own the ref from PyDict_New().
+        // It will be balanced by the Py_DECREF after self->attr assignment below.
     }
 
     if (self->object) {
@@ -138,6 +149,12 @@ pyjobject_init(JNIEnv *env, PyJObject *self)
         self->attr = cachedAttrs;
     } else {
         self->attr = PyDict_Copy(cachedAttrs);
+    }
+
+    // When there is no JcpThread, no cache holds a reference to cachedAttrs,
+    // so we must release the owned ref from PyDict_New() here.
+    if (jcpThread == NULL) {
+        Py_DECREF(cachedAttrs);
     }
 
     (*env)->PopLocalFrame(env, NULL);
