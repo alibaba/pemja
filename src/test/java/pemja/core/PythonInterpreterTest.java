@@ -993,4 +993,42 @@ public class PythonInterpreterTest {
         }
         // else: already deleted
     }
+
+    /**
+     * Test that pythonPaths is used when executing Python subprocess to find libpython. This tests
+     * the fix for issue #94 where pythonPaths was not being used when initializing the Python
+     * interpreter, causing "ModuleNotFoundError: No module named 'find_libpython'" when
+     * find_libpython was installed in a custom path.
+     */
+    @Test
+    public void testPythonPathsUsedInSubprocessExecution() throws IOException {
+        // Create a temporary directory with a unique test module
+        File customPath = new File(tmpDirPath, "custom_python_path");
+        if (!customPath.mkdirs()) {
+            throw new RuntimeException("Failed to create custom python path directory");
+        }
+
+        // Create a unique test module that doesn't exist in standard Python paths
+        String uniqueModuleName =
+                "pemja_test_unique_module_" + UUID.randomUUID().toString().replace("-", "");
+        File moduleFile = new File(customPath, uniqueModuleName + ".py");
+        Files.write(moduleFile.toPath(), "test_value = 'hello_from_custom_path'\n".getBytes());
+
+        // Test: With pythonPaths, the module should be importable
+        PythonInterpreterConfig config =
+                PythonInterpreterConfig.newBuilder()
+                        .addPythonPaths(customPath.getAbsolutePath())
+                        .build();
+        try (PythonInterpreter interpreter = new PythonInterpreter(config)) {
+            // Import the module - this would fail if pythonPaths was not properly used
+            interpreter.exec("import " + uniqueModuleName);
+            // Verify the module was loaded correctly by accessing the variable
+            interpreter.exec("result_value = " + uniqueModuleName + ".test_value");
+            String result = interpreter.get("result_value", String.class);
+            assertEquals("hello_from_custom_path", result);
+        }
+
+        // Clean up
+        Files.deleteIfExists(moduleFile.toPath());
+    }
 }
