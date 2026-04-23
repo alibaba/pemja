@@ -43,6 +43,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 
 /** Tests for {@link PythonInterpreter}. */
 public class PythonInterpreterTest {
@@ -1025,10 +1026,11 @@ public class PythonInterpreterTest {
             // Verify the module was loaded correctly by accessing the variable
             interpreter.exec("result_value = " + uniqueModuleName + ".test_value");
             String result = interpreter.get("result_value", String.class);
+            assertNotNull(result);
             assertEquals("hello_from_custom_path", result);
+        } finally {
+            // Clean up the temporary directory and its contents
+            deleteDirectory(customPath);
         }
-
-        // Clean up
-        Files.deleteIfExists(moduleFile.toPath());
     }
 }

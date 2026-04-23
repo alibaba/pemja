@@ -60,7 +60,8 @@ public class CommonUtils {
 
     public String getPemJaModulePath(String pythonExec, String[] pythonPaths) {
         if (pythonExec == null) {
-            // run in source code
+            // run in source code — the module path is resolved from the working directory,
+            // no subprocess is launched, so pythonPaths is not applicable here.
             return String.join(
                     File.separator,
                     System.getProperty("user.dir"),
@@ -121,7 +122,8 @@ public class CommonUtils {
     private String getLibraryPathWithPattern(
             String pythonExec, String[] pythonPaths, String pattern) {
         if (pythonExec == null) {
-            // run in source code
+            // run in source code — the library is located by scanning the local filesystem,
+            // no subprocess is launched, so pythonPaths is not applicable here.
             String pythonModulePath =
                     String.join(
                             File.separator,
