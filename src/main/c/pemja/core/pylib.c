@@ -189,10 +189,6 @@ JcpThread *JcpThread_Get(void) {
     }
   }
   Py_XDECREF(key);
-  if (!ret && !PyErr_Occurred()) {
-    PyErr_Format(PyExc_RuntimeError,
-                 "No JcpThread instance available on current thread.");
-  }
   return ret;
 }
 

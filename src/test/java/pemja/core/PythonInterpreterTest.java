@@ -363,6 +363,36 @@ public class PythonInterpreterTest {
     }
 
     @Test
+    public void testCustomObjectInAsyncThread() {
+        PythonInterpreterConfig config =
+                PythonInterpreterConfig.newBuilder().addPythonPaths(testDir).build();
+        try (PythonInterpreter interpreter = new PythonInterpreter(config)) {
+            interpreter.exec("import test_async_thread");
+
+            TestObject obj = new TestObject();
+
+            // Control: returning String from asyncio should always work
+            Object stringResult =
+                    interpreter.invoke("test_async_thread.test_return_string_in_asyncio", obj);
+            assertEquals("hello from java", stringResult);
+
+            // Control: returning custom object on pemja thread should always work
+            Object sameThreadResult =
+                    interpreter.invoke(
+                            "test_async_thread.test_return_custom_object_in_same_thread", obj);
+            assertNotNull(sameThreadResult);
+
+            // This is the bug scenario: returning a custom Java object from
+            // an asyncio event loop (non-pemja thread). Without the fix, this
+            // crashes the JVM with SIGSEGV in JcpPyJObject_New.
+            Object asyncResult =
+                    interpreter.invoke(
+                            "test_async_thread.test_return_custom_object_in_asyncio", obj);
+            assertNotNull(asyncResult);
+        }
+    }
+
+    @Test
     public void testCallPyJObject() {
         PythonInterpreterConfig config =
                 PythonInterpreterConfig.newBuilder().addPythonPaths(testDir).build();
@@ -924,6 +954,16 @@ public class PythonInterpreterTest {
         public String testJavaCallPython(Interpreter interpreter) {
             interpreter.exec("a = 'testJavaCallPython'");
             return interpreter.get("a", String.class);
+        }
+        /* -------------------------------------------------------------------------------------- */
+
+        /* ----------------------------------- test return custom object ----------------------- */
+        public TestObject returnSelf() {
+            return this;
+        }
+
+        public String returnString() {
+            return "hello from java";
         }
         /* -------------------------------------------------------------------------------------- */
     }
