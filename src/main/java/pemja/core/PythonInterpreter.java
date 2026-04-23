@@ -362,7 +362,7 @@ public final class PythonInterpreter implements Interpreter {
         /** Initializes CPython. */
         synchronized void initialize(PythonInterpreterConfig config) {
             if (!isStarted) {
-                CommonUtils.INSTANCE.loadPython(config.getPythonExec());
+                CommonUtils.INSTANCE.loadPython(config.getPythonExec(), config.getPaths());
 
                 // We load on a separate thread to try and avoid GIL issues that come about from a
                 // being on the same thread as the main interpreter.
@@ -376,7 +376,7 @@ public final class PythonInterpreter implements Interpreter {
                                     // add shared modules
                                     addToPath(
                                             CommonUtils.INSTANCE.getPemJaModulePath(
-                                                    config.getPythonExec()));
+                                                    config.getPythonExec(), config.getPaths()));
                                     importModule("redirect_stream");
                                 } catch (Throwable t) {
                                     error = t;
