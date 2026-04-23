@@ -379,7 +379,7 @@ public class PythonInterpreterTest {
             Object sameThreadResult =
                     interpreter.invoke(
                             "test_async_thread.test_return_custom_object_in_same_thread", obj);
-            assert sameThreadResult != null;
+            assertNotNull(sameThreadResult);
 
             // This is the bug scenario: returning a custom Java object from
             // an asyncio event loop (non-pemja thread). Without the fix, this
@@ -387,7 +387,7 @@ public class PythonInterpreterTest {
             Object asyncResult =
                     interpreter.invoke(
                             "test_async_thread.test_return_custom_object_in_asyncio", obj);
-            assert asyncResult != null;
+            assertNotNull(asyncResult);
         }
     }
 
