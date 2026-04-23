@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.Vector;
@@ -41,17 +42,26 @@ public class CommonUtils {
     private CommonUtils() {}
 
     public void loadPython(String pythonExec) {
-        String pythonLibPath = getPythonLibrary(pythonExec);
+        loadPython(pythonExec, null);
+    }
+
+    public void loadPython(String pythonExec, String[] pythonPaths) {
+        String pythonLibPath = getPythonLibrary(pythonExec, pythonPaths);
         loadLibrary(pythonLibPath, "libpython");
-        loadPythonLibrary(pythonExec, "pemja_utils");
+        loadPythonLibrary(pythonExec, pythonPaths, "pemja_utils");
         // Because JVM can't load library globally, so we need to load CPython library globally.
         loadLibrary0(pythonLibPath);
-        loadPythonLibrary(pythonExec, "pemja_core");
+        loadPythonLibrary(pythonExec, pythonPaths, "pemja_core");
     }
 
     public String getPemJaModulePath(String pythonExec) {
+        return getPemJaModulePath(pythonExec, null);
+    }
+
+    public String getPemJaModulePath(String pythonExec, String[] pythonPaths) {
         if (pythonExec == null) {
-            // run in source code
+            // run in source code — the module path is resolved from the working directory,
+            // no subprocess is launched, so pythonPaths is not applicable here.
             return String.join(
                     File.separator,
                     System.getProperty("user.dir"),
@@ -62,7 +72,10 @@ public class CommonUtils {
         } else {
             String out;
             try {
-                out = execute(new String[] {pythonExec, "-c", GET_PEMJA_MODULE_PATH_SCRIPT});
+                out =
+                        execute(
+                                new String[] {pythonExec, "-c", GET_PEMJA_MODULE_PATH_SCRIPT},
+                                pythonPaths);
             } catch (IOException e) {
                 throw new RuntimeException("Failed to get PemJa module path", e);
             }
@@ -70,10 +83,11 @@ public class CommonUtils {
         }
     }
 
-    private void loadPythonLibrary(String pythonExec, String packageName) {
+    private void loadPythonLibrary(String pythonExec, String[] pythonPaths, String packageName) {
         String packageLibPath =
                 getLibraryPathWithPattern(
                         pythonExec,
+                        pythonPaths,
                         String.format("^%s\\.(cpython-.*\\.so|cp.*-win.*\\.pyd)$", packageName));
         loadLibrary(packageLibPath, packageName);
     }
@@ -105,9 +119,11 @@ public class CommonUtils {
         }
     }
 
-    private String getLibraryPathWithPattern(String pythonExec, String pattern) {
+    private String getLibraryPathWithPattern(
+            String pythonExec, String[] pythonPaths, String pattern) {
         if (pythonExec == null) {
-            // run in source code
+            // run in source code — the library is located by scanning the local filesystem,
+            // no subprocess is launched, so pythonPaths is not applicable here.
             String pythonModulePath =
                     String.join(
                             File.separator,
@@ -129,7 +145,10 @@ public class CommonUtils {
         } else {
             String sitePackagesPath;
             try {
-                String out = execute(new String[] {pythonExec, "-c", GET_PEMJA_MODULE_PATH_SCRIPT});
+                String out =
+                        execute(
+                                new String[] {pythonExec, "-c", GET_PEMJA_MODULE_PATH_SCRIPT},
+                                pythonPaths);
                 sitePackagesPath = String.join(File.pathSeparator, out.trim().split("\n"));
             } catch (IOException e) {
                 throw new RuntimeException(
@@ -147,14 +166,20 @@ public class CommonUtils {
         }
     }
 
-    private String getPythonLibrary(String pythonExec) {
+    private String getPythonLibrary(String pythonExec, String[] pythonPaths) {
         try {
             String out;
             if (pythonExec == null) {
                 // run in source code, use default `python3` / `python` to find python lib library.
-                out = execute(new String[] {getPythonCommand(), "-c", GET_PYTHON_LIB_PATH_SCRIPT});
+                out =
+                        execute(
+                                new String[] {getPythonCommand(), "-c", GET_PYTHON_LIB_PATH_SCRIPT},
+                                pythonPaths);
             } else {
-                out = execute(new String[] {pythonExec, "-c", GET_PYTHON_LIB_PATH_SCRIPT});
+                out =
+                        execute(
+                                new String[] {pythonExec, "-c", GET_PYTHON_LIB_PATH_SCRIPT},
+                                pythonPaths);
             }
             return String.join(File.pathSeparator, out.trim().split("\n"));
         } catch (IOException e) {
@@ -162,9 +187,22 @@ public class CommonUtils {
         }
     }
 
-    private String execute(String[] commands) throws IOException {
+    private String execute(String[] commands, String[] pythonPaths) throws IOException {
         ProcessBuilder pb = new ProcessBuilder(commands);
         pb.redirectErrorStream(true);
+
+        // Set PYTHONPATH environment variable if pythonPaths is provided
+        if (pythonPaths != null && pythonPaths.length > 0) {
+            String pythonPath = String.join(File.pathSeparator, pythonPaths);
+            Map<String, String> env = pb.environment();
+            // Prepend to existing PYTHONPATH if it exists
+            String existingPythonPath = env.get("PYTHONPATH");
+            if (existingPythonPath != null && !existingPythonPath.isEmpty()) {
+                pythonPath = pythonPath + File.pathSeparator + existingPythonPath;
+            }
+            env.put("PYTHONPATH", pythonPath);
+        }
+
         Process p = pb.start();
         InputStream in = new BufferedInputStream(p.getInputStream());
         StringBuilder out = new StringBuilder();
