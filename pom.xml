@@ -190,6 +190,15 @@
     </build>
     <profiles>
         <profile>
+            <id>jdk21</id>
+            <activation>
+                <jdk>[21,)</jdk>
+            </activation>
+            <properties>
+                <spotless.skip>true</spotless.skip>
+            </properties>
+        </profile>
+        <profile>
             <id>release</id>
             <activation>
                 <property>
