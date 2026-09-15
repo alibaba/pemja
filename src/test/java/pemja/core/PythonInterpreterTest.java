@@ -833,6 +833,7 @@ public class PythonInterpreterTest {
         public String testInt(T arg) {
             return "testInt_T";
         }
+
         /* -------------------------------------------------------------------------------------- */
 
         /* ----------------------------------- test Number -------------------------------------- */
@@ -958,6 +959,7 @@ public class PythonInterpreterTest {
             interpreter.exec("a = 'testJavaCallPython'");
             return interpreter.get("a", String.class);
         }
+
         /* -------------------------------------------------------------------------------------- */
 
         /* ----------------------------------- test return custom object ----------------------- */
