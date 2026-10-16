@@ -25,6 +25,7 @@ import pemja.core.object.PyObject;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.file.Files;
@@ -244,6 +245,35 @@ public class PythonInterpreterTest {
             }
         } catch (Exception e) {
             throw new RuntimeException("Failed to invoke test_call.py", e);
+        }
+    }
+
+    @Test
+    public void testInvokeMethodWithPrimitiveArrays() {
+        PythonInterpreterConfig config =
+                PythonInterpreterConfig.newBuilder().addPythonPaths(testDir).build();
+        try (PythonInterpreter interpreter = new PythonInterpreter(config)) {
+            interpreter.exec("import test_call");
+            Object[][] cases = {
+                {new boolean[] {true, false}, new Object[] {true, false}},
+                {new short[] {1, 2}, new Object[] {1L, 2L}},
+                {new int[] {1, 2}, new Object[] {1L, 2L}},
+                {new long[] {1, 2}, new Object[] {1L, 2L}},
+                {new float[] {1.5f, 2.5f}, new Object[] {1.5d, 2.5d}},
+                {new double[] {1.5, 2.5}, new Object[] {1.5d, 2.5d}}
+            };
+            for (Object[] testCase : cases) {
+                Object array = testCase[0];
+                assertArrayEquals(
+                        (Object[]) testCase[1],
+                        (Object[])
+                                interpreter.invokeMethod("test_call", "test_call_one_arg", array));
+                Object empty = Array.newInstance(array.getClass().getComponentType(), 0);
+                assertArrayEquals(
+                        new Object[0],
+                        (Object[])
+                                interpreter.invokeMethod("test_call", "test_call_one_arg", empty));
+            }
         }
     }
 
