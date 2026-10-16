@@ -209,6 +209,12 @@ public class PythonInterpreterTest {
             a1[1] = new int[] {3, 4};
             interpreter.set("a1", a1);
             assertArrayEquals(a1, interpreter.get("a1", int[][].class));
+
+            Object[] b1 = new Object[] {Short.MIN_VALUE, Short.MAX_VALUE};
+            interpreter.set("b1", b1);
+            assertArrayEquals(
+                    new Object[] {(long) Short.MIN_VALUE, (long) Short.MAX_VALUE},
+                    interpreter.get("b1", Object[].class));
         }
     }
 
@@ -339,6 +345,11 @@ public class PythonInterpreterTest {
             arg11.put(1L, "pemja");
             arg11.put("pemja", 2L);
             assertEquals(arg11, interpreter.invoke("test_call.test_call_one_arg", arg11));
+
+            assertEquals(
+                    (long) Short.MAX_VALUE,
+                    interpreter.invoke(
+                            "test_call.test_call_variable_args", Short.MAX_VALUE, Short.MIN_VALUE));
 
             PyIterator iterators =
                     (PyIterator) interpreter.invoke("test_call.test_return_generator", 3);

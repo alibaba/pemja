@@ -335,7 +335,7 @@ JcpPyObject_FromJObject(JNIEnv* env, jobject value)
         } else if ((*env)->IsSameObject(env, clazz, JBYTE_OBJ_TYPE)) {
             result = JcpPyInt_FromJByte(env, value);
         } else if ((*env)->IsSameObject(env, clazz, JSHORT_OBJ_TYPE)) {
-            result = JcpPyInt_FromJShort(env, clazz);
+            result = JcpPyInt_FromJShort(env, value);
         } else if ((*env)->IsSameObject(env, clazz, JBIGDECIMAL_TYPE)) {
             result = JcpPyDecimal_FromJBigDecimal(env, value);
         } else if ((*env)->IsSameObject(env, clazz, JBIGINTEGER_TYPE)) {
