@@ -710,6 +710,7 @@ JcpAPI_FUNC(PyObject*) JcpPyTuple_FromJBooleanArray(JNIEnv* env, jbooleanArray v
         PyTuple_SetItem(result, i, JcpPyBool_FromLong(booleans[i]));
     }
 
+    (*env)->ReleaseBooleanArrayElements(env, value, booleans, JNI_ABORT);
     return result;
 }
 
@@ -733,6 +734,7 @@ JcpAPI_FUNC(PyObject*) JcpPyTuple_FromJShortArray(JNIEnv* env, jshortArray value
         PyTuple_SetItem(result, i, JcpPyInt_FromInt(shorts[i]));
     }
 
+    (*env)->ReleaseShortArrayElements(env, value, shorts, JNI_ABORT);
     return result;
 }
 
@@ -756,6 +758,7 @@ JcpAPI_FUNC(PyObject*) JcpPyTuple_FromJIntArray(JNIEnv* env, jintArray value)
         PyTuple_SetItem(result, i, JcpPyInt_FromInt(ints[i]));
     }
 
+    (*env)->ReleaseIntArrayElements(env, value, ints, JNI_ABORT);
     return result;
 }
 
@@ -779,6 +782,7 @@ JcpAPI_FUNC(PyObject*) JcpPyTuple_FromJLongArray(JNIEnv* env, jlongArray value)
         PyTuple_SetItem(result, i, JcpPyInt_FromLong(longs[i]));
     }
 
+    (*env)->ReleaseLongArrayElements(env, value, longs, JNI_ABORT);
     return result;
 }
 
@@ -802,6 +806,7 @@ JcpAPI_FUNC(PyObject*) JcpPyTuple_FromJFloatArray(JNIEnv* env, jfloatArray value
         PyTuple_SetItem(result, i, JcpPyFloat_FromDouble(floats[i]));
     }
 
+    (*env)->ReleaseFloatArrayElements(env, value, floats, JNI_ABORT);
     return result;
 }
 
@@ -825,6 +830,7 @@ JcpAPI_FUNC(PyObject*) JcpPyTuple_FromJDoubleArray(JNIEnv* env, jdoubleArray val
         PyTuple_SetItem(result, i, JcpPyFloat_FromDouble(doubles[i]));
     }
 
+    (*env)->ReleaseDoubleArrayElements(env, value, doubles, JNI_ABORT);
     return result;
 }
 
