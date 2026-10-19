@@ -32,6 +32,13 @@ def test_callback_java_basic():
     return sb.toString()
 
 
+def test_callback_java_custom_object():
+    from pemja import findClass
+
+    TestObject = findClass("pemja.core.PythonInterpreterTest$TestObject")
+    return TestObject().returnSelf().returnString()
+
+
 def test_callback_with_all_types(self):
     # bool
     assert_equals(self.testBoolean(True), "testBoolean_boolean")
