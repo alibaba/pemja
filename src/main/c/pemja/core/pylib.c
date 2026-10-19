@@ -89,8 +89,9 @@ static PyObject *pemja_find_class(PyObject *self, PyObject *args) {
     return NULL;
   }
 
-  // get JNIEnv*
-  env = jcp_thread->env;
+  // The interpreter may be invoked sequentially by different Java threads.
+  // JNIEnv must belong to the thread making this call.
+  env = JcpThreadEnv_Get();
 
   // convert python class name to java class name. e.g. java.lang.Object ->
   // java/lang/Object
