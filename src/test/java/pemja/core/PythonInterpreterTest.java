@@ -39,6 +39,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.Assert.assertArrayEquals;
@@ -796,6 +799,38 @@ public class PythonInterpreterTest {
         if (exceptionReference.get() != null) {
             throw new RuntimeException(
                     "Error occurs in Python Interpreter threads", exceptionReference.get());
+        }
+    }
+
+    @Test
+    public void testCallbackJavaAfterThreadHandoff() throws Exception {
+        PythonInterpreterConfig config =
+                PythonInterpreterConfig.newBuilder().addPythonPaths(testDir).build();
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        try (PythonInterpreter interpreter = new PythonInterpreter(config)) {
+            interpreter.exec("import test_callback_java");
+            for (int i = 0; i < 3; i++) {
+                assertEquals(
+                        "pemjajavapython7fffffff--Pemja-is-cool",
+                        interpreter.invoke("test_callback_java.test_callback_java_basic"));
+                executor.submit(
+                                () -> {
+                                    assertEquals(
+                                            "pemjajavapython7fffffff--Pemja-is-cool",
+                                            interpreter.invoke(
+                                                    "test_callback_java.test_callback_java_basic"));
+                                    assertEquals(
+                                            "hello from java",
+                                            interpreter.invoke(
+                                                    "test_callback_java.test_callback_java_custom_object"));
+                                })
+                        .get(30, TimeUnit.SECONDS);
+                assertEquals(
+                        "hello from java",
+                        interpreter.invoke("test_callback_java.test_callback_java_custom_object"));
+            }
+        } finally {
+            executor.shutdownNow();
         }
     }
 
