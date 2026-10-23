@@ -77,23 +77,23 @@ String result = interpreter.invoke("str_upper.upper", "abcd");
 /*
 // invoke.py
 class A:
-       def __init__(self):
-           self._a = 0
+    def __init__(self):
+        self._a = 0
    
-       def get_value(self):
-           return self._a
+    def get_value(self):
+        return self._a
    
-       def add(self, n):
-           self._a += n
+    def add(self, n):
+        self._a += n
    
-       def add_all(self, *args):
-           for item in args:
-               self._a += item
-               return self._a
+    def add_all(self, *args):
+        for item in args:
+            self._a += item
+        return self._a
    
-       def minus(self, n):
-           self._a -= n
-           return self._a
+    def minus(self, n):
+        self._a -= n
+        return self._a
 */
 
 interpreter.exec("import invoke");
